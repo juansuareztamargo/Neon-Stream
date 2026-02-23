@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Stream: Typing Hacker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --bg-color: #0a0a0c;
+            --cyan: #00FFFF;
+            --pink: #FF00FF;
+            --lime: #39FF14;
+            --yellow: #FFFF00;
+            --red: #FF003C;
+            --panel-bg: rgba(10, 10, 12, 0.85);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* --- Canvases --- */
+        #gameCanvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1; /* Fondo principal (Matrix Rain) */
+        }
+
+        #textCanvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 15; /* Por encima de la UI/Teclado, por debajo de los menús (20) */
+            pointer-events: none;
+        }
+
+        /* --- UI Layers --- */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none; /* Let clicks pass to canvas if needed */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* --- HUD --- */
+        #hud {
+            display: none;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            text-shadow: 0 0 5px var(--cyan);
+            font-size: 1.5rem;
+        }
+
+        .hud-stat { display: flex; flex-direction: column; }
+        .hud-label { font-size: 0.8rem; color: #888; text-transform: uppercase; }
+        
+        #health-bar-container {
+            width: 200px;
+            height: 10px;
+            background: #222;
+            border: 1px solid var(--cyan);
+            margin-top: 5px;
+            box-shadow: 0 0 5px var(--cyan);
+        }
+        #health-bar {
+            width: 100%;
+            height: 100%;
+            background: var(--lime);
+            box-shadow: 0 0 10px var(--lime);
+            transition: width 0.2s, background-color 0.2s;
+        }
+
+        /* --- Progress Bar --- */
+        #progress-bar-container {
+            width: 200px;
+            height: 10px;
+            background: #222;
+            border: 1px solid var(--pink);
+            margin-top: 5px;
+            box-shadow: 0 0 5px var(--pink);
+        }
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--pink);
+            box-shadow: 0 0 10px var(--pink);
+            transition: width 0.3s;
+        }
+
+        /* --- Screens --- */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(10, 10, 12, 0.9);
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 2px solid var(--pink);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px var(--pink), inset 0 0 20px rgba(255, 0, 255, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--cyan);
+            text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        h2 { color: var(--yellow); margin-bottom: 20px; text-shadow: 0 0 5px var(--yellow); }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label { display: block; margin-bottom: 5px; color: #aaa; }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--cyan);
+            color: var(--lime);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            box-shadow: 0 0 15px var(--cyan);
+            border-color: var(--cyan);
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            color: var(--lime);
+            background: rgba(0,0,0,0.5);
+            padding: 5px;
+            border: 1px solid var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* --- Button Component System --- */
+        button {
+            background: transparent;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            padding: 15px 30px;
+            margin-top: 10px;
+            outline: none;
+        }
+
+        .btn-lime { border: 2px solid var(--lime); color: var(--lime); box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
+        .btn-lime:hover, .btn-lime:focus { background: var(--lime); color: var(--bg-color); box-shadow: 0 0 20px var(--lime); }
+
+        .btn-cyan { border: 2px solid var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(0, 255, 255, 0.3); }
+        .btn-cyan:hover, .btn-cyan:focus { background: var(--cyan); color: var(--bg-color); box-shadow: 0 0 20px var(--cyan); }
+
+        .btn-pink { border: 2px solid var(--pink); color: var(--pink); box-shadow: 0 0 10px rgba(255, 0, 255, 0.3); }
+        .btn-pink:hover, .btn-pink:focus { background: var(--pink); color: var(--bg-color); box-shadow: 0 0 20px var(--pink); }
+
+        .btn-red { border: 2px solid var(--red); color: var(--red); box-shadow: 0 0 10px rgba(255, 0, 60, 0.3); }
+        .btn-red:hover, .btn-red:focus { background: var(--red); color: var(--bg-color); box-shadow: 0 0 20px var(--red); }
+
+        .btn-yellow { border: 2px solid var(--yellow); color: var(--yellow); box-shadow: 0 0 10px rgba(255, 255, 0, 0.3); }
+        .btn-yellow:hover, .btn-yellow:focus { background: var(--yellow); color: var(--bg-color); box-shadow: 0 0 20px var(--yellow); }
+
+        .btn-gray { border: 2px solid #888; color: #888; box-shadow: 0 0 10px rgba(136, 136, 136, 0.3); }
+        .btn-gray:hover, .btn-gray:focus { background: #888; color: var(--bg-color); box-shadow: 0 0 20px #888; }
+
+        .btn-ai { border: 2px solid #B026FF; color: #B026FF; box-shadow: 0 0 10px rgba(176, 38, 255, 0.3); text-shadow: 0 0 5px #B026FF; }
+        .btn-ai:hover, .btn-ai:focus { background: #B026FF; color: var(--bg-color); box-shadow: 0 0 20px #B026FF; text-shadow: none; }
+
+        .hidden { display: none !important; }
+
+        /* --- Glitch Effect --- */
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-5px, 5px) }
+            40% { transform: translate(-5px, -5px) }
+            60% { transform: translate(5px, 5px) }
+            80% { transform: translate(5px, -5px) }
+            100% { transform: translate(0) }
+        }
+        .glitch-active { animation: glitch 0.2s ease-in-out; }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
+        ::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--lime); }
+
+        /* --- Virtual Keyboard Overlay --- */
+        #keyboard-container {
+            display: none; /* Flex when active */
+            flex-direction: column;
+            gap: 6px;
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.6;
+            z-index: 5;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .key-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .key {
+            width: 45px;
+            height: 45px;
+            border: 1px solid var(--key-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.4rem;
+            color: var(--key-color);
+            background: rgba(10, 10, 12, 0.7);
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+            text-transform: uppercase;
+            transition: all 0.05s ease-out;
+        }
+
+        .key.spacebar { width: 300px; }
+
+        /* Finger Color Mapping */
+        .finger-0 { --key-color: #ff0055; }
+        .finger-1 { --key-color: #ffaa00; }
+        .finger-2 { --key-color: #ffff00; }
+        .finger-3 { --key-color: #00ffaa; }
+        .finger-4 { --key-color: #ffffff; }
+        .finger-5 { --key-color: #00ffff; }
+        .finger-6 { --key-color: #0088ff; }
+        .finger-7 { --key-color: #8800ff; }
+        .finger-8 { --key-color: #ff00ff; }
+
+        /* Inactive Keys (Not used in current level) */
+        .finger-inactive { --key-color: #444; }
+        .key.finger-inactive {
+            color: #555;
+            background: rgba(10, 10, 12, 0.4);
+            box-shadow: none;
+            border-color: #333;
+        }
+
+        .key.active {
+            background-color: var(--key-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--key-color), inset 0 0 10px #fff;
+            transform: scale(1.15);
+            z-index: 10;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Main Canvas for Matrix Rain Background (Z-index 1) -->
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- Text Canvas for sharp, overlaying target words (Z-index 15) -->
+    <canvas id="textCanvas"></canvas>
+
+    <!-- UI Overlay (Z-index 10) -->
+    <div id="ui-layer">
+        
+        <!-- Heads Up Display -->
+        <div id="hud">
+            <div class="hud-stat">
+                <span class="hud-label" id="lbl-hud-alias">Alias</span>
+                <span id="hud-alias">HACKER</span>
+            </div>
+            <div class="hud-stat">
+                <span class="hud-label" id="lbl-hud-score">Score</span>
+                <span id="hud-score">0</span>
+            </div>
+            <div class="hud-stat">
+                <span class="hud-label" id="lbl-hud-level">Level</span>
+                <span id="hud-level">1</span>
+            </div>
+            <div class="hud-stat">
+                <span class="hud-label" id="lbl-hud-integrity">Integrity</span>
+                <div id="health-bar-container">
+                    <div id="health-bar"></div>
+                </div>
+            </div>
+            <div class="hud-stat">
+                <span class="hud-label" id="lbl-hud-progress">Hack Progress</span>
+                <div id="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Virtual Keyboard Overlay -->
+        <div id="keyboard-container"></div>
+        
+    </div>
+
+    <!-- Menus and Overlays (Z-index 20) -->
+    <!-- Profiles Screen -->
+    <div id="screen-profiles" class="screen">
+        <div class="panel">
+            <h1>NEON STREAM</h1>
+            <h2>Select Profile</h2>
+            <div id="profile-list" class="form-group" style="max-height: 250px; overflow-y: auto; margin-bottom: 20px;"></div>
+            <div id="new-profile-form" class="form-group" style="border-top: 1px solid var(--pink); padding-top: 20px;">
+                <label>Create New Hacker Alias (Max 3):</label>
+                <input type="text" id="input-new-alias" placeholder="ZeroCool_99" maxlength="15">
+                <button id="btn-create-profile" class="btn-cyan" style="width: 100%; margin-top: 10px; font-size: 1.2rem;">Initialize</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Menu Screen -->
+    <div id="screen-main-menu" class="screen hidden">
+        <div class="panel">
+            <h1>NEON STREAM</h1>
+            <h2 id="welcome-alias">Welcome GUEST</h2>
+            <button id="btn-to-levels" class="btn-lime" style="display: block; width: 100%; margin-bottom: 15px;">Access Nodes (Play)</button>
+            <button id="btn-to-ai-node" class="btn-ai" style="display: block; width: 100%; margin-bottom: 15px; font-size: 1.2rem;">✨ Generate AI Node</button>
+            <button id="btn-to-settings" class="btn-cyan" style="display: block; width: 100%; margin-bottom: 15px; font-size: 1.2rem;">Settings</button>
+            <button id="btn-switch-profile" class="btn-gray" style="display: block; width: 100%; font-size: 1rem;">Switch Alias</button>
+        </div>
+    </div>
+
+    <!-- AI Node Screen -->
+    <div id="screen-ai-node" class="screen hidden">
+        <div class="panel">
+            <h2 id="title-ai-node" style="color: #B026FF;">✨ Construct AI Node</h2>
+            <p id="desc-ai-node" style="color: #aaa; margin-bottom: 15px;">Input a topic. The AI Overseer will generate a custom data stream.</p>
+            <div class="form-group">
+                <input type="text" id="input-ai-topic" placeholder="e.g. Space Exploration, Greek Mythology..." maxlength="30">
+            </div>
+            <button id="btn-generate-ai" class="btn-ai" style="width: 100%; margin-bottom: 15px;">Synthesize Stream</button>
+            <button id="btn-ai-back" class="btn-pink" style="width: 100%; font-size: 1rem;">Back to Main Menu</button>
+            <p id="ai-loading-text" style="color: var(--cyan); margin-top: 15px; display: none; font-style: italic;">Connecting to Neural Net... ✨</p>
+        </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="screen-settings" class="screen hidden">
+        <div class="panel">
+            <h2 id="settings-header" style="color: var(--cyan);">Settings / Configuración</h2>
+            <div class="form-group">
+                <label id="lbl-settings-lang">System Language:</label>
+                <select id="select-lang">
+                    <option value="en">English (EN)</option>
+                    <option value="es">Español (ES)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label id="lbl-settings-layout">Keyboard Layout:</label>
+                <select id="select-layout">
+                    <option value="ansi-us">ANSI (US QWERTY)</option>
+                    <option value="iso-es">ISO (ES QWERTY + Ñ)</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-top: 30px; border-top: 1px solid var(--pink); padding-top: 20px;">
+                <label id="lbl-settings-bg" style="color: var(--pink);">Topología Matrix 3D (Opcional):</label>
+                <p id="desc-settings-bg" style="font-size: 0.8rem; margin-bottom: 10px; color: #888;">Carga una imagen. ¡La lluvia Matrix colisionará físicamente con sus contornos para revelarla!</p>
+                <input type="file" id="input-bg-image" accept="image/*" style="font-size: 0.9rem;">
+                <button id="btn-clear-bg" class="btn-gray" style="font-size: 1rem; width: 100%; padding: 10px; margin-top: 10px;">Clear Image / Quitar Imagen</button>
+            </div>
+            <button id="btn-save-settings" class="btn-cyan" style="width: 100%; margin-top: 20px;">Save & Return</button>
+        </div>
+    </div>
+
+    <!-- Level Select Screen -->
+    <div id="screen-levels" class="screen hidden">
+        <div class="panel" style="max-width: 900px; width: 95%;">
+            <h2 id="title-levels" style="color: var(--lime);">Select Access Node</h2>
+            <div id="level-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px;"></div>
+            <button id="btn-levels-back" class="btn-pink" style="width: 100%;">Back to Main Menu</button>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="screen-gameover" class="screen hidden">
+        <div class="panel" style="border-color: var(--red); box-shadow: 0 0 20px var(--red);">
+            <h1 id="title-fail" style="color: var(--red); text-shadow: 0 0 10px var(--red);">SYSTEM FAILURE</h1>
+            <h2 id="final-score">Final Score: 0</h2>
+            <p id="desc-fail" style="margin-bottom: 10px; color: #aaa;">Data streams breached the firewall.</p>
+            <p id="ai-feedback-loss" style="color: #B026FF; font-style: italic; margin-bottom: 20px; min-height: 48px; font-size: 1.1rem;"></p>
+            <button id="btn-restart" class="btn-red">Reboot System</button>
+            <button id="btn-exit-fail" class="btn-gray" style="margin-left: 10px;">Exit</button>
+        </div>
+    </div>
+
+    <!-- Level Up Screen -->
+    <div id="screen-levelup" class="screen hidden" style="background: rgba(10, 10, 12, 0.6);">
+        <div class="panel" style="border-color: var(--lime); box-shadow: 0 0 20px var(--lime);">
+            <h1 id="title-success" style="color: var(--lime); text-shadow: 0 0 10px var(--lime);">ACCESS GRANTED</h1>
+            <h2 id="next-level-name">Level 2</h2>
+            <p id="ai-feedback-win" style="color: #B026FF; font-style: italic; margin-bottom: 20px; min-height: 48px; font-size: 1.1rem;"></p>
+            <button id="btn-continue" class="btn-lime">Continue</button>
+            <button id="btn-exit-win" class="btn-gray" style="margin-left: 10px;">Exit</button>
+        </div>
+    </div>
+
+    <!-- Pause Screen -->
+    <div id="screen-pause" class="screen hidden" style="background: rgba(10, 10, 12, 0.8);">
+        <div class="panel" style="border-color: var(--cyan); box-shadow: 0 0 20px var(--cyan);">
+            <h1 id="title-pause" style="color: var(--cyan); text-shadow: 0 0 10px var(--cyan);">SYSTEM PAUSED</h1>
+            <button id="btn-resume" class="btn-cyan" style="display: block; width: 100%; margin-bottom: 15px;">Continue Hack</button>
+            <button id="btn-exit-matrix" class="btn-red" style="display: block; width: 100%;">Exit Matrix</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // SYSTEM: AUDIO MANAGER (Web Audio API)
+        // ==========================================
+        class AudioManager {
+            constructor() {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioContext();
+                this.enabled = true; 
+            }
+
+            resume() {
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playTone(freq, type = 'sine', duration = 0.1, vol = 0.1, delay = 0) {
+                if (!this.enabled || this.ctx.state === 'suspended') return;
+                try {
+                    const startTime = this.ctx.currentTime + delay;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    gain.gain.setValueAtTime(vol, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                } catch (e) { /* Fallback silence */ }
+            }
+            
+            hover() { this.playTone(800, 'sine', 0.05, 0.03); }
+            click() { this.playTone(300, 'square', 0.1, 0.05); }
+            type() { this.playTone(600, 'triangle', 0.03, 0.02); }
+            typeComplete() { this.playTone(1200, 'sine', 0.1, 0.05); }
+            error() { this.playTone(100, 'sawtooth', 0.2, 0.1); }
+            
+            dataBurst(isOnFire) {
+                const vol = isOnFire ? 0.04 : 0.02;
+                this.playTone(800, 'square', 0.05, vol, 0);
+                this.playTone(1200, 'sine', 0.05, vol, 0.04);
+                if (isOnFire) {
+                    this.playTone(1600, 'triangle', 0.1, vol, 0.08); 
+                }
+            }
+        }
+
+        // ==========================================
+        // DATA SCHEMAS
+        // ==========================================
+        const UIText = {
+            en: {
+                hudAlias: "Alias",
+                hudScore: "Score",
+                hudLevel: "Level",
+                hudIntegrity: "Integrity",
+                hudProgress: "Hack Progress",
+                menuWelcome: "Welcome",
+                btnPlay: "Access Nodes (Play)",
+                btnAINode: "✨ Generate AI Node",
+                btnSettings: "Settings",
+                btnSwitchAlias: "Switch Alias",
+                titleAINode: "✨ Construct AI Node",
+                descAINode: "Input a topic. The AI Overseer will generate a custom data stream.",
+                placeholderAINode: "e.g. Space Exploration, Greek Mythology...",
+                btnGenerateAI: "Synthesize Stream",
+                btnBackMenu: "Back to Main Menu",
+                loadingAI: "Connecting to Neural Net... ✨",
+                titleSettings: "Settings",
+                lblLanguage: "System Language:",
+                lblLayout: "Keyboard Layout:",
+                lblSettingsBg: "Matrix Image Reveal (Optional):",
+                descSettingsBg: "Upload an image. As you progress, the matrix rain will colide and reveal its 3D topology!",
+                btnClearBg: "Clear Image",
+                btnSaveSettings: "Save & Return",
+                titleLevels: "Select Access Node",
+                titleFailure: "SYSTEM FAILURE",
+                descFailure: "Data streams breached the firewall.",
+                btnReboot: "Reboot System",
+                btnExit: "Exit Matrix",
+                titleSuccess: "ACCESS GRANTED",
+                btnContinue: "Continue",
+                titlePause: "SYSTEM PAUSED",
+                btnResume: "Continue Hack",
+                spacebar: "SPACE"
+            },
+            es: {
+                hudAlias: "Alias",
+                hudScore: "Puntuación",
+                hudLevel: "Nivel",
+                hudIntegrity: "Integridad",
+                hudProgress: "Progreso del Hackeo",
+                menuWelcome: "Bienvenido",
+                btnPlay: "Nodos de Acceso (Jugar)",
+                btnAINode: "✨ Generar Nodo IA",
+                btnSettings: "Configuración",
+                btnSwitchAlias: "Cambiar Alias",
+                titleAINode: "✨ Construir Nodo IA",
+                descAINode: "Introduce un tema. El Supervisor IA generará un flujo de datos.",
+                placeholderAINode: "ej. Exploración Espacial, Mitología...",
+                btnGenerateAI: "Sintetizar Flujo",
+                btnBackMenu: "Volver al Menú principal",
+                loadingAI: "Conectando a la Red Neuronal... ✨",
+                titleSettings: "Configuración",
+                lblLanguage: "Idioma del Sistema:",
+                lblLayout: "Distribución del Teclado:",
+                lblSettingsBg: "Topología Matrix 3D (Opcional):",
+                descSettingsBg: "Carga una imagen. ¡La lluvia Matrix colisionará físicamente con sus contornos para revelarla!",
+                btnClearBg: "Quitar Imagen",
+                btnSaveSettings: "Guardar y Volver",
+                titleLevels: "Seleccionar Nodo de Acceso",
+                titleFailure: "FALLO DEL SISTEMA",
+                descFailure: "Los datos han roto el cortafuegos.",
+                btnReboot: "Reiniciar Sistema",
+                btnExit: "Salir de Matrix",
+                titleSuccess: "ACCESO CONCEDIDO",
+                btnContinue: "Continuar",
+                titlePause: "SISTEMA PAUSADO",
+                btnResume: "Continuar Hackeo",
+                spacebar: "ESPACIO"
+            }
+        };
+
+        const KeyboardLayouts = {
+            'ansi-us': [
+                [{c:'1', f:0}, {c:'2', f:1}, {c:'3', f:2}, {c:'4', f:3}, {c:'5', f:3}, {c:'6', f:5}, {c:'7', f:5}, {c:'8', f:6}, {c:'9', f:7}, {c:'0', f:8}],
+                [{c:'q', f:0}, {c:'w', f:1}, {c:'e', f:2}, {c:'r', f:3}, {c:'t', f:3}, {c:'y', f:5}, {c:'u', f:5}, {c:'i', f:6}, {c:'o', f:7}, {c:'p', f:8}],
+                [{c:'a', f:0}, {c:'s', f:1}, {c:'d', f:2}, {c:'f', f:3}, {c:'g', f:3}, {c:'h', f:5}, {c:'j', f:5}, {c:'k', f:6}, {c:'l', f:7}, {c:';', f:8}],
+                [{c:'z', f:0}, {c:'x', f:1}, {c:'c', f:2}, {c:'v', f:3}, {c:'b', f:3}, {c:'n', f:5}, {c:'m', f:5}, {c:',', f:6}, {c:'.', f:7}, {c:'/', f:8}],
+                [{c:' ', f:4, isSpace: true}]
+            ],
+            'iso-es': [
+                [{c:'1', f:0}, {c:'2', f:1}, {c:'3', f:2}, {c:'4', f:3}, {c:'5', f:3}, {c:'6', f:5}, {c:'7', f:5}, {c:'8', f:6}, {c:'9', f:7}, {c:'0', f:8}],
+                [{c:'q', f:0}, {c:'w', f:1}, {c:'e', f:2}, {c:'r', f:3}, {c:'t', f:3}, {c:'y', f:5}, {c:'u', f:5}, {c:'i', f:6}, {c:'o', f:7}, {c:'p', f:8}],
+                [{c:'a', f:0}, {c:'s', f:1}, {c:'d', f:2}, {c:'f', f:3}, {c:'g', f:3}, {c:'h', f:5}, {c:'j', f:5}, {c:'k', f:6}, {c:'l', f:7}, {c:'ñ', f:8}],
+                [{c:'z', f:0}, {c:'x', f:1}, {c:'c', f:2}, {c:'v', f:3}, {c:'b', f:3}, {c:'n', f:5}, {c:'m', f:5}, {c:',', f:6}, {c:'.', f:7}, {c:'-', f:8}],
+                [{c:' ', f:4, isSpace: true}]
+            ]
+        };
+
+        const Dictionaries = {
+            en: {
+                level_1:  { id: "lvl_1",  name: "Home Core", type: "characters", pool: ["f", "j"], targetScore: 500, fallSpeed: 0.5, spawnRate: 2000 },
+                level_2:  { id: "lvl_2",  name: "Home Extend", type: "characters", pool: ["d", "k", "f", "j"], targetScore: 1000, fallSpeed: 0.6, spawnRate: 1800 },
+                level_3:  { id: "lvl_3",  name: "Home Full", type: "characters", pool: ["s", "l", "a", ";", "d", "k"], targetScore: 750, fallSpeed: 0.7, spawnRate: 1600 },
+                level_4:  { id: "lvl_4",  name: "Top Core", type: "characters", pool: ["e", "i", "r", "u", "f", "j", "d", "k"], targetScore: 1000, fallSpeed: 0.8, spawnRate: 1500 },
+                level_5:  { id: "lvl_5",  name: "Bottom Core", type: "characters", pool: ["c", "m", "v", "n", "s", "l", "e", "i"], targetScore: 1250, fallSpeed: 0.9, spawnRate: 1400 },
+                level_6:  { id: "lvl_6",  name: "Syntax I: Micro", type: "words", pool: ["it", "is", "to", "do", "if", "or"], targetScore: 1500, fallSpeed: 0.7, spawnRate: 2000 },
+                level_7:  { id: "lvl_7",  name: "Syntax II: Min", type: "words", pool: ["the", "bug", "net", "ram", "log", "run"], targetScore: 1750, fallSpeed: 0.75, spawnRate: 2200 },
+                level_8:  { id: "lvl_8",  name: "Syntax III: Core", type: "words", pool: ["code", "hack", "data", "byte", "file", "node"], targetScore: 2000, fallSpeed: 0.80, spawnRate: 2100 },
+                level_9:  { id: "lvl_9",  name: "Syntax IV: Macro", type: "words", pool: ["virus", "logic", "macro", "pixel", "cache"], targetScore: 2250, fallSpeed: 0.85, spawnRate: 2000 },
+                level_10: { id: "lvl_10", name: "Syntax V: Network", type: "words", pool: ["hacker", "server", "python", "crypto", "system"], targetScore: 2500, fallSpeed: 0.90, spawnRate: 1900 },
+                level_11: { id: "lvl_11", name: "Jargon", type: "words", pool: ["network", "boolean", "firewall", "malware", "terminal"], targetScore: 2750, fallSpeed: 0.95, spawnRate: 1800 },
+                level_12: { id: "lvl_12", name: "Numerics", type: "characters", pool: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], targetScore: 3000, fallSpeed: 1.0, spawnRate: 1700 },
+                level_13: { id: "lvl_13", name: "Alphanumeric", type: "words", pool: ["net1", "bug2", "hack99", "sys32", "web3", "p2p"], targetScore: 3250, fallSpeed: 1.05, spawnRate: 1600 },
+                level_14: { id: "lvl_14", name: "Cyberpunk", type: "words", pool: ["matrix", "cyberspace", "mainframe", "overclock"], targetScore: 3500, fallSpeed: 1.10, spawnRate: 1500 },
+                level_15: { id: "lvl_15", name: "Hardcore", type: "words", pool: ["cryptography", "algorithm", "motherboard", "bandwidth"], targetScore: 4000, fallSpeed: 1.15, spawnRate: 1400 },
+                level_16: { id: "lvl_16", name: "Code Snippets", type: "words", pool: ["function", "return", "const", "await", "import"], targetScore: 4500, fallSpeed: 1.20, spawnRate: 1300 },
+                level_17: { id: "lvl_17", name: "System Overload I", type: "words", pool: ["vulnerability", "authentication", "infrastructure"], targetScore: 5000, fallSpeed: 1.25, spawnRate: 1200 },
+                level_18: { id: "lvl_18", name: "System Overload II", type: "words", pool: ["encapsulation", "asynchronous", "polymorphism"], targetScore: 5500, fallSpeed: 1.30, spawnRate: 1100 },
+                level_19: { id: "lvl_19", name: "God Mode", type: "words", pool: ["telemetry", "subroutine", "quantum", "cybernetics"], targetScore: 6000, fallSpeed: 1.40, spawnRate: 1000 },
+                level_20: { id: "lvl_20", name: "The Singularity", type: "words", pool: ["singularity", "transcendence", "omnipresence"], targetScore: 7500, fallSpeed: 1.50, spawnRate: 900 }
+            },
+            es: {
+                level_1:  { id: "lvl_1",  name: "Centro Principal", type: "characters", pool: ["f", "j"], targetScore: 500, fallSpeed: 0.5, spawnRate: 2000 },
+                level_2:  { id: "lvl_2",  name: "Centro Extendido", type: "characters", pool: ["d", "k", "f", "j"], targetScore: 1000, fallSpeed: 0.6, spawnRate: 1800 },
+                level_3:  { id: "lvl_3",  name: "Fila Central", type: "characters", pool: ["s", "l", "a", "ñ", "d", "k"], targetScore: 750, fallSpeed: 0.7, spawnRate: 1600 },
+                level_4:  { id: "lvl_4",  name: "Arriba Principal", type: "characters", pool: ["e", "i", "r", "u", "f", "j", "d", "k"], targetScore: 1000, fallSpeed: 0.8, spawnRate: 1500 },
+                level_5:  { id: "lvl_5",  name: "Abajo Principal", type: "characters", pool: ["c", "m", "v", "n", "s", "l", "e", "i"], targetScore: 1250, fallSpeed: 0.9, spawnRate: 1400 },
+                level_6:  { id: "lvl_6",  name: "Sintaxis I: Micro", type: "words", pool: ["en", "el", "un", "su", "si", "ya"], targetScore: 1500, fallSpeed: 0.7, spawnRate: 2000 },
+                level_7:  { id: "lvl_7",  name: "Sintaxis II: Min", type: "words", pool: ["red", "bit", "web", "api", "log", "ram"], targetScore: 1750, fallSpeed: 0.75, spawnRate: 2200 },
+                level_8:  { id: "lvl_8",  name: "Sintaxis III: Base", type: "words", pool: ["dato", "chip", "byte", "hack", "nube"], targetScore: 2000, fallSpeed: 0.80, spawnRate: 2100 },
+                level_9:  { id: "lvl_9",  name: "Sintaxis IV: Macro", type: "words", pool: ["virus", "clave", "pixel", "bucle", "robot"], targetScore: 2250, fallSpeed: 0.85, spawnRate: 2000 },
+                level_10: { id: "lvl_10", name: "Sintaxis V: Redes", type: "words", pool: ["hacker", "enlace", "fuente", "servidor", "sistema"], targetScore: 2500, fallSpeed: 0.90, spawnRate: 1900 },
+                level_11: { id: "lvl_11", name: "Jerga Tech", type: "words", pool: ["cortafuegos", "terminal", "programa", "interfaz"], targetScore: 2750, fallSpeed: 0.95, spawnRate: 1800 },
+                level_12: { id: "lvl_12", name: "Numéricos", type: "characters", pool: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], targetScore: 3000, fallSpeed: 1.0, spawnRate: 1700 },
+                level_13: { id: "lvl_13", name: "Acentos", type: "words", pool: ["código", "ratón", "conexión", "módem", "píxel"], targetScore: 3250, fallSpeed: 1.05, spawnRate: 1600 },
+                level_14: { id: "lvl_14", name: "Cyberpunk", type: "words", pool: ["matriz", "ciberespacio", "terminal", "sintético"], targetScore: 3500, fallSpeed: 1.10, spawnRate: 1500 },
+                level_15: { id: "lvl_15", name: "Núcleo Duro", type: "words", pool: ["criptografía", "algoritmo", "procesador", "encriptado"], targetScore: 4000, fallSpeed: 1.15, spawnRate: 1400 },
+                level_16: { id: "lvl_16", name: "Código", type: "words", pool: ["funcion", "retornar", "variable", "constante", "importar"], targetScore: 4500, fallSpeed: 1.20, spawnRate: 1300 },
+                level_17: { id: "lvl_17", name: "Sobrecarga I", type: "words", pool: ["vulnerabilidad", "autenticación", "infraestructura"], targetScore: 5000, fallSpeed: 1.25, spawnRate: 1200 },
+                level_18: { id: "lvl_18", name: "Sobrecarga II", type: "words", pool: ["encapsulación", "asíncrono", "polimorfismo"], targetScore: 5500, fallSpeed: 1.30, spawnRate: 1100 },
+                level_19: { id: "lvl_19", name: "Modo Dios", type: "words", pool: ["telemetría", "subrutina", "cuántico", "cibernética"], targetScore: 6000, fallSpeed: 1.40, spawnRate: 1000 },
+                level_20: { id: "lvl_20", name: "La Singularidad", type: "words", pool: ["singularidad", "trascendencia", "omnipresencia"], targetScore: 7500, fallSpeed: 1.50, spawnRate: 900 }
+            }
+        };
+
+        const NeonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFFF00'];
+
+        // ==========================================
+        // SYSTEM: GEMINI API SERVICE ✨
+        // ==========================================
+        class GeminiService {
+            constructor() {
+                this.apiKey = ""; // Provided by execution environment
+                this.baseUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+            }
+
+            async fetchWithRetry(payload, retries = 5) {
+                const delays = [1000, 2000, 4000, 8000, 16000];
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return await response.json();
+                    } catch (error) {
+                        if (i === retries - 1) throw error;
+                        await new Promise(res => setTimeout(res, delays[i]));
+                    }
+                }
+            }
+
+            async generateWordPool(topic, language) {
+                const langStr = language === 'es' ? 'Spanish' : 'English';
+                const payload = {
+                    contents: [{ parts: [{ text: `Generate exactly 15 unique words related to the topic: "${topic}". The words must be single words without spaces, suitable for a typing game.` }] }],
+                    systemInstruction: { parts: [{ text: `You are an assistant for a typing game. Generate words exclusively in the language: ${langStr}. Ensure they are grammatically correct and appropriate.` }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "OBJECT",
+                            properties: {
+                                words: { type: "ARRAY", items: { type: "STRING" } }
+                            }
+                        }
+                    }
+                };
+                try {
+                    const result = await this.fetchWithRetry(payload);
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    return JSON.parse(text).words;
+                } catch (e) {
+                    console.error("Gemini Generation Error:", e);
+                    return ["system", "error", "fallback", "node", "breached"];
+                }
+            }
+
+            async generateFeedback(isWin, score, combo, language) {
+                const langStr = language === 'es' ? 'Spanish' : 'English';
+                const prompt = `The hacker ${isWin ? 'successfully breached the system' : 'was blocked by the firewall'}. Score: ${score}. Max Flawless Combo: ${combo}. Give a 1 to 2 sentence evaluation.`;
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: `You are an edgy, cyberpunk AI System Overseer. Provide immersive, hacker-themed feedback in ${langStr}. Be slightly condescending if they failed, and begrudgingly impressed if they succeeded with a high combo. Do not use quotes.` }] }
+                };
+                
+                try {
+                    const result = await this.fetchWithRetry(payload);
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || (isWin ? "System breached. Impressive." : "Connection terminated. Weak.");
+                } catch (e) {
+                    return isWin ? "System breached." : "Connection terminated.";
+                }
+            }
+        }
+
+        // ==========================================
+        // SYSTEM: USER MANAGER (localStorage)
+        // ==========================================
+        class UserManager {
+            constructor() {
+                this.profiles = this.loadProfiles();
+                
+                try {
+                    this.activeAlias = localStorage.getItem('neonStreamLastAlias') || null;
+                } catch (e) {
+                    this.activeAlias = null;
+                }
+                
+                if (this.activeAlias && !this.profiles[this.activeAlias]) {
+                    this.activeAlias = null;
+                }
+            }
+
+            loadProfiles() {
+                try {
+                    const stored = localStorage.getItem('neonStreamProfiles');
+                    return stored ? JSON.parse(stored) : {};
+                } catch (e) {
+                    return {};
+                }
+            }
+
+            saveProfiles() {
+                try {
+                    localStorage.setItem('neonStreamProfiles', JSON.stringify(this.profiles));
+                    if (this.activeAlias) {
+                        localStorage.setItem('neonStreamLastAlias', this.activeAlias);
+                    }
+                    return true;
+                } catch (e) {
+                    return false; 
+                }
+            }
+
+            createProfile(alias) {
+                if (!alias || this.profiles[alias]) return false;
+                if (Object.keys(this.profiles).length >= 3) {
+                    alert("Maximum of 3 perfiles alcanzado. Por favor borra uno primero.");
+                    return false;
+                }
+                const isSpanish = navigator.language.toLowerCase().startsWith('es');
+                
+                this.profiles[alias] = {
+                    preferences: { 
+                        language: isSpanish ? "es" : "en", 
+                        layout: isSpanish ? "iso-es" : "ansi-us",
+                        bgImage: null 
+                    },
+                    progress: { highestLevelUnlocked: 1, highScores: {} }
+                };
+                this.activeAlias = alias;
+                this.saveProfiles();
+                return true;
+            }
+
+            deleteProfile(alias) {
+                if (this.profiles[alias]) {
+                    delete this.profiles[alias];
+                    if (this.activeAlias === alias) {
+                        this.activeAlias = null;
+                        try { localStorage.removeItem('neonStreamLastAlias'); } catch(e){}
+                    }
+                    this.saveProfiles();
+                }
+            }
+
+            selectProfile(alias) {
+                if (this.profiles[alias]) {
+                    this.activeAlias = alias;
+                    this.saveProfiles();
+                }
+            }
+
+            get profile() {
+                return this.activeAlias ? this.profiles[this.activeAlias] : null;
+            }
+
+            updateSettings(lang, layout) {
+                if (!this.profile) return;
+                this.profile.preferences.language = lang;
+                this.profile.preferences.layout = layout;
+                this.saveProfiles();
+            }
+
+            updateBgImage(base64Data) {
+                if (!this.profile) return;
+                const oldBg = this.profile.preferences.bgImage;
+                this.profile.preferences.bgImage = base64Data;
+                const saved = this.saveProfiles();
+                if (!saved && base64Data !== null) {
+                    alert("Error: La imagen es demasiado pesada para la memoria de tu perfil. Por favor, sube una imagen más sencilla.");
+                    this.profile.preferences.bgImage = oldBg;
+                }
+            }
+
+            unlockLevel(levelNum) {
+                if (this.profile && levelNum > this.profile.progress.highestLevelUnlocked) {
+                    this.profile.progress.highestLevelUnlocked = levelNum;
+                    this.saveProfiles();
+                }
+            }
+        }
+
+        // ==========================================
+        // ENGINE: RENDERER (Canvas & Particles)
+        // ==========================================
+        class Renderer {
+            constructor(gameCanvasId, textCanvasId) {
+                // Fondo: Lluvia Matrix y Topología
+                this.canvas = document.getElementById(gameCanvasId);
+                this.ctx = this.canvas.getContext('2d');
+                
+                // Frente: Textos/Palabras objetivo limpios, sin estela, máxima legibilidad
+                this.textCanvas = document.getElementById(textCanvasId);
+                this.textCtx = this.textCanvas.getContext('2d');
+                
+                // Procesamiento de Imagen 3D
+                this.offscreenCanvas = document.createElement('canvas');
+                this.offscreenCtx = this.offscreenCanvas.getContext('2d', { willReadFrequently: true });
+                this.bgImageObj = null;
+                this.currentBgBase64 = null;
+                
+                this.gridSize = 16;
+                this.gridCols = 0;
+                this.gridRows = 0;
+                this.imageGrid = [];
+
+                this.particles = [];
+                this.bgDrops = [];
+                this.activeHighlights = {};
+                this.systemGlow = { alpha: 0, color: '#00FFFF' }; 
+                
+                this.initBackgroundDrops();
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            getRandomMatrixChar() {
+                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*<>[]{}アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワ";
+                return chars[Math.floor(Math.random() * chars.length)];
+            }
+
+            setBgImage(base64) {
+                if (!base64) {
+                    this.bgImageObj = null;
+                    this.imageGrid = [];
+                    this.currentBgBase64 = null;
+                    return;
+                }
+                
+                if (this.currentBgBase64 === base64 && this.imageGrid.length > 0) return; 
+                
+                this.currentBgBase64 = base64;
+                const img = new Image();
+                img.onload = () => {
+                    this.bgImageObj = img;
+                    this.cacheAndCalculateTopography();
+                };
+                img.src = base64;
+            }
+
+            cacheAndCalculateTopography() {
+                if (!this.bgImageObj) return;
+                
+                this.offscreenCanvas.width = this.canvas.width;
+                this.offscreenCanvas.height = this.canvas.height;
+                
+                const imgAspect = this.bgImageObj.width / this.bgImageObj.height;
+                const canvasAspect = this.canvas.width / this.canvas.height;
+                
+                let baseW = this.canvas.width;
+                let baseH = this.canvas.height;
+                let drawW, drawH;
+
+                if (imgAspect > canvasAspect) {
+                    drawH = baseH;
+                    drawW = drawH * imgAspect;
+                } else {
+                    drawW = baseW;
+                    drawH = drawW / imgAspect;
+                }
+
+                // Reducir la imagen a la mitad (50%)
+                drawW *= 0.5;
+                drawH *= 0.5;
+
+                // Centrar la imagen escalada en el canvas
+                let offsetX = (this.canvas.width - drawW) / 2;
+                let offsetY = (this.canvas.height - drawH) / 2;
+
+                this.offscreenCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.offscreenCtx.drawImage(this.bgImageObj, offsetX, offsetY, drawW, drawH);
+                
+                const imageData = this.offscreenCtx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+                const data = imageData.data;
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+
+                this.gridCols = Math.floor(w / this.gridSize);
+                this.gridRows = Math.floor(h / this.gridSize);
+                this.imageGrid = new Array(this.gridCols).fill(null).map(() => new Array(this.gridRows).fill(null));
+
+                for (let c = 0; c < this.gridCols; c++) {
+                    for (let r = 0; r < this.gridRows; r++) {
+                        const px = c * this.gridSize;
+                        const py = r * this.gridSize;
+                        
+                        const idx = (py * w + px) * 4;
+                        if (idx >= 0 && idx < data.length - (w * 4 * 2)) {
+                            const imgR = data[idx];
+                            const imgG = data[idx+1];
+                            const imgB = data[idx+2];
+                            
+                            const luma = 0.299*imgR + 0.587*imgG + 0.114*imgB;
+                            
+                            const idxR = (py * w + Math.min(px + 2, w - 1)) * 4;
+                            const idxD = (Math.min(py + 2, h - 1) * w + px) * 4;
+                            const lumaR = 0.299*data[idxR] + 0.587*data[idxR+1] + 0.114*data[idxR+2];
+                            const lumaD = 0.299*data[idxD] + 0.587*data[idxD+1] + 0.114*data[idxD+2];
+                            
+                            const edgeMagnitude = Math.abs(luma - lumaR) + Math.abs(luma - lumaD);
+                            
+                            const darkness = 255 - luma;
+                            const edgeScore = edgeMagnitude * (darkness / 255) * 1.5 + (edgeMagnitude * 0.5);
+                            
+                            // MEJORA: Umbral más bajo para asegurar que se capturen más detalles de la imagen
+                            if (edgeScore > 8 || luma > 10) {
+                                this.imageGrid[c][r] = {
+                                    x: px, y: py,
+                                    edge: edgeScore,
+                                    luma: luma, 
+                                    wake: 0, 
+                                    char: this.getRandomMatrixChar()
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+
+            initBackgroundDrops() {
+                const numDrops = 300; 
+                for(let i = 0; i < numDrops; i++) {
+                    const isFast = Math.random() < 0.012; 
+                    let dropSpeed = 0;
+                    if (isFast) {
+                        dropSpeed = Math.random() * 4.25 + 1.25; 
+                    } else {
+                        dropSpeed = (Math.random() * 0.8 + 0.2) * 0.8;
+                    }
+
+                    this.bgDrops.push({
+                        x: Math.random() * window.innerWidth,
+                        y: Math.random() * window.innerHeight,
+                        z: Math.random() * 0.65 + 0.05, 
+                        speed: dropSpeed,
+                        isFast: isFast,
+                        char: this.getRandomMatrixChar()
+                    });
+                }
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.textCanvas.width = window.innerWidth;
+                this.textCanvas.height = window.innerHeight;
+                if (this.bgImageObj) {
+                    this.cacheAndCalculateTopography();
+                }
+            }
+
+            highlightChar(char) {
+                this.activeHighlights[char.toLowerCase()] = 1.0;
+            }
+
+            triggerSystemGlow(accuracy) {
+                let glowColor = '#39FF14'; // Perfect
+                if (accuracy < 1.0 && accuracy >= 0.5) glowColor = '#FFFF00'; // Okay
+                else if (accuracy < 0.5) glowColor = '#FF003C'; // Poor
+                this.systemGlow = { alpha: 0.8, color: glowColor }; 
+            }
+
+            triggerErrorGlow() {
+                this.systemGlow = { alpha: 0.8, color: '#FF003C' };
+            }
+
+            clearFrame(timestamp = 0) {
+                // 1. Borrado SÚPER sutil en el fondo Matrix para lograr esa estela exagerada
+                this.ctx.fillStyle = 'rgba(10, 10, 12, 0.02)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // 2. Borrado TOTAL e INMEDIATO en el lienzo frontal de Texto (Cero estela para las palabras jugables)
+                this.textCtx.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
+
+                // NIEBLA PROCEDURAL (Como nube muy suave y letárgica, apenas perceptible)
+                const t = timestamp * 0.00004; 
+                const cx1 = this.canvas.width / 2 + Math.sin(t) * (this.canvas.width * 0.3);
+                const cy1 = this.canvas.height / 2 + Math.cos(t * 0.7) * (this.canvas.height * 0.3);
+                const cx2 = this.canvas.width / 2 + Math.sin(t * 1.2 + Math.PI) * (this.canvas.width * 0.3);
+                const cy2 = this.canvas.height / 2 + Math.cos(t * 0.9 + Math.PI) * (this.canvas.height * 0.3);
+
+                // El radio ahora es enorme (1.5x ancho pantalla) para que no se note el borde circular
+                const grad1 = this.ctx.createRadialGradient(cx1, cy1, 0, cx1, cy1, this.canvas.width * 1.5);
+                grad1.addColorStop(0, 'rgba(0, 255, 255, 0.003)'); 
+                grad1.addColorStop(1, 'transparent');
+                this.ctx.fillStyle = grad1;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                const grad2 = this.ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, this.canvas.width * 1.5);
+                grad2.addColorStop(0, 'rgba(0, 255, 100, 0.002)'); 
+                grad2.addColorStop(1, 'transparent');
+                this.ctx.fillStyle = grad2;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                if (this.systemGlow.alpha > 0) {
+                    this.systemGlow.alpha -= 0.025;
+                    if (this.systemGlow.alpha < 0) this.systemGlow.alpha = 0;
+                }
+            }
+
+            updateAndDrawBackground(progress = 0) {
+                for (let key in this.activeHighlights) {
+                    this.activeHighlights[key] -= 0.05;
+                    if (this.activeHighlights[key] <= 0) delete this.activeHighlights[key];
+                }
+
+                const hasTopology = this.imageGrid && this.imageGrid.length > 0;
+
+                // ACTUALIZACIÓN DE GOTAS DE LLUVIA
+                for (let drop of this.bgDrops) {
+                    drop.y += drop.speed * drop.z;
+                    
+                    if (drop.y > this.canvas.height) {
+                        drop.y = -20;
+                        drop.x = Math.random() * this.canvas.width;
+                    }
+                    if (Math.random() < 0.05) drop.char = this.getRandomMatrixChar();
+
+                    if (hasTopology) {
+                        const c = Math.floor(drop.x / this.gridSize);
+                        const r = Math.floor(drop.y / this.gridSize);
+                        
+                        if (c >= 0 && c < this.gridCols && r >= 0 && r < this.gridRows) {
+                            const cell = this.imageGrid[c][r];
+                            if (cell) {
+                                cell.wake = Math.max(cell.wake, drop.z * 1.5);
+                                
+                                if (progress > 0 && cell.edge > 12 && Math.random() < progress * 0.8) {
+                                    
+                                    drop.y -= drop.speed * drop.z * (Math.random() * 2.5 + 1.0); 
+                                    drop.x += (Math.random() - 0.5) * this.gridSize * 1.5;
+                                    
+                                    // Chispas ralentizadas para acentuar físicas
+                                    if (Math.random() < 0.25) {
+                                        this.particles.push({
+                                            type: 'pixel', 
+                                            x: drop.x, y: drop.y, w: 2, h: 2,
+                                            // Saltan con menos velocidad
+                                            vx: (Math.random()-0.5)*1.5, vy: -(Math.random()*1.0 + 0.2),
+                                            // Viven más tiempo
+                                            life: 1.0, decay: 0.01, 
+                                            color: '#39FF14' 
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    } 
+                    
+                    let dropCharLower = drop.char.toLowerCase();
+                    if (this.systemGlow.alpha > 0) {
+                        this.ctx.fillStyle = this.systemGlow.color;
+                        this.ctx.globalAlpha = Math.min(1, (drop.z * 0.4) + this.systemGlow.alpha);
+                        this.ctx.shadowBlur = 15 * this.systemGlow.alpha;
+                        this.ctx.shadowColor = this.systemGlow.color;
+                    } else if (this.activeHighlights[dropCharLower]) {
+                        const intensity = this.activeHighlights[dropCharLower];
+                        this.ctx.fillStyle = `rgba(0, 255, 255, ${intensity})`;
+                        this.ctx.shadowBlur = 10 * intensity;
+                        this.ctx.shadowColor = '#00FFFF';
+                    } else if (drop.isFast) {
+                        this.ctx.fillStyle = `rgba(255, 255, 255, ${drop.z + 0.2})`;
+                        this.ctx.shadowBlur = 8;
+                        this.ctx.shadowColor = '#39FF14'; 
+                    } else {
+                        this.ctx.fillStyle = `rgba(0, 255, 0, ${drop.z * 0.6})`; 
+                        this.ctx.shadowBlur = 0;
+                    }
+
+                    const size = Math.max(10, Math.floor(28 * drop.z));
+                    this.ctx.font = `${size}px 'Share Tech Mono'`;
+                    this.ctx.fillText(drop.char, drop.x, drop.y);
+                    this.ctx.globalAlpha = 1.0; 
+                    this.ctx.shadowBlur = 0; 
+                }
+
+                // DIBUJADO DE LA IMAGEN DE FONDO
+                if (hasTopology) {
+                    this.ctx.font = `${this.gridSize}px 'Share Tech Mono'`;
+                    this.ctx.textAlign = "left";
+                    this.ctx.textBaseline = "top";
+                    
+                    for (let c = 0; c < this.gridCols; c++) {
+                        for (let r = 0; r < this.gridRows; r++) {
+                            const cell = this.imageGrid[c][r];
+                            if (cell) {
+                                let staticBaseVis = 0;
+                                if (progress > 0) {
+                                    const edgeWeight = Math.min(1.0, cell.edge / 40);
+                                    const fillWeight = cell.luma / 255;
+                                    
+                                    // Aumentamos muchísimo el revelado final exponencial de la luminosidad
+                                    // Cuando el progreso se acerca a 1.0, la imagen se hace nítida e inconfundible.
+                                    const revealPower = Math.pow(progress, 1.5);
+                                    staticBaseVis = (progress * edgeWeight * 0.6) + (revealPower * fillWeight * 1.5); 
+                                }
+                                
+                                const activeIllumination = Math.min(1.0, Math.max(cell.wake, staticBaseVis));
+                                
+                                if (activeIllumination > 0.005) {
+                                    // Genera el volumen a través del tono Verde
+                                    let baseG = Math.floor(10 + (cell.luma / 255) * 245); 
+                                    let baseR = 0;
+                                    let baseB = 0;
+                                    
+                                    if (cell.wake > 0.7) {
+                                        baseR = 150;
+                                        baseB = 150;
+                                        baseG = 255;
+                                    }
+
+                                    if (this.systemGlow.alpha > 0 && Math.random() > 0.5) {
+                                        this.ctx.fillStyle = this.systemGlow.color;
+                                    } else {
+                                        this.ctx.fillStyle = `rgba(${baseR}, ${baseG}, ${baseB}, ${activeIllumination})`;
+                                    }
+
+                                    if (Math.random() < 0.01) cell.char = this.getRandomMatrixChar();
+                                    
+                                    this.ctx.fillText(cell.char, cell.x, cell.y);
+                                }
+                                
+                                cell.wake -= 0.005;
+                                if(cell.wake < 0) cell.wake = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
+            drawStream(stream) {
+                // Dibujamos las palabras EN EL TEXT CANVAS. 
+                // Sin estela, más grande, en negrita y SIEMPRE por encima de todo.
+                const ctx = this.textCtx;
+                
+                ctx.font = "bold 38px 'Share Tech Mono'";
+                const x = stream.x;
+                const y = stream.y;
+
+                // Contorno negro sólido detrás de cada letra para hacerlas ultra-legibles 
+                // incluso contra fondos verdes muy saturados.
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = '#000000';
+                ctx.lineJoin = 'round';
+                ctx.strokeText(stream.text, x, y);
+
+                // Glow reducido (al 50%)
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = stream.color;
+
+                if (stream.typedLength > 0) {
+                    const typedStr = stream.text.substring(0, stream.typedLength);
+                    const remainingStr = stream.text.substring(stream.typedLength);
+                    
+                    ctx.fillStyle = '#ffffff'; 
+                    ctx.fillText(typedStr, x, y);
+                    
+                    const offset = ctx.measureText(typedStr).width;
+                    ctx.fillStyle = stream.color;
+                    ctx.fillText(remainingStr, x + offset, y);
+                } else {
+                    ctx.fillStyle = stream.color;
+                    ctx.fillText(stream.text, x, y);
+                }
+
+                ctx.shadowBlur = 0;
+            }
+
+            createDataBurst(x, y, color, isOnFire) {
+                // Las explosiones se quedan en el lienzo principal (ctx) 
+                // para que dejen estela junto a la lluvia Matrix
+                const numWaves = isOnFire ? 3 : 1;
+                for (let i = 0; i < numWaves; i++) {
+                    this.particles.push({
+                        type: 'shockwave',
+                        x: x, y: y,
+                        radius: 5,
+                        maxRadius: isOnFire ? 37 + (i * 15) : 17, 
+                        expansionSpeed: isOnFire ? 3.75 - (i * 0.25) : 2,
+                        life: 1.0,
+                        decay: isOnFire ? 0.025 : 0.05,
+                        color: isOnFire && i % 2 === 1 ? '#FFFFFF' : color, 
+                        lineWidth: isOnFire ? 3 : 2
+                    });
+                }
+
+                const numPixels = isOnFire ? 40 : 20; 
+                for (let i = 0; i < numPixels; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = (Math.random() * 4 + 1); 
+                    const size = (Math.random() * 2.5 + 1); 
+                    this.particles.push({
+                        type: 'pixel', 
+                        x: x, y: y, w: size, h: size,
+                        vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+                        life: 1.0, decay: Math.random() * 0.06 + 0.03, 
+                        color: Math.random() > 0.15 ? color : '#FFFFFF'
+                    });
+                }
+
+                if (isOnFire) {
+                    this.systemGlow = { alpha: 0.35, color: color };
+                    this.createGlitchEffect(x, y - 20, color, "FLAWLESS");
+                }
+            }
+
+            createGlitchEffect(x, y, color, text) {
+                for (let i = 0; i < 10; i++) {
+                    this.particles.push({
+                        type: 'block',
+                        x: x + (Math.random() - 0.5) * 50,
+                        y: y - 15 + (Math.random() * 30),
+                        w: Math.random() * 40 + 10,
+                        h: Math.random() * 5 + 1,
+                        vx: (Math.random() - 0.5) * 2, 
+                        life: 1.0,
+                        decay: Math.random() * 0.1 + 0.05,
+                        color: Math.random() > 0.5 ? color : '#ffffff'
+                    });
+                }
+                for (let i = 0; i < 3; i++) {
+                    this.particles.push({
+                        type: 'text',
+                        char: text[Math.floor(Math.random() * text.length)] || "0",
+                        x: x + (Math.random() - 0.5) * 30,
+                        y: y + (Math.random() - 0.5) * 30,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4,
+                        life: 1.0,
+                        decay: 0.08,
+                        color: color
+                    });
+                }
+            }
+
+            updateAndDrawParticles() {
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    let p = this.particles[i];
+                    
+                    // GRAVEDAD: Ahora caen más suave, acentuando que es un fluido
+                    if (p.type === 'pixel') {
+                        p.vy += 0.04; // Fuerza de gravedad tirando hacia abajo muy poco a poco
+                    }
+
+                    if (p.vx) p.x += p.vx;
+                    if (p.vy) p.y += p.vy;
+                    p.life -= p.decay;
+
+                    if (p.life <= 0) {
+                        this.particles.splice(i, 1);
+                    } else {
+                        this.ctx.globalAlpha = p.life;
+                        this.ctx.fillStyle = p.color;
+                        this.ctx.shadowBlur = p.type === 'pixel' ? 5 : 10; 
+                        this.ctx.shadowColor = p.color;
+                        
+                        if (p.type === 'shockwave') {
+                            this.ctx.beginPath();
+                            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                            this.ctx.strokeStyle = p.color;
+                            this.ctx.lineWidth = p.lineWidth;
+                            this.ctx.stroke();
+                            p.radius += p.expansionSpeed;
+                        } else if (p.type === 'block') {
+                            let drawX = p.x + (Math.random() > 0.8 ? (Math.random() - 0.5) * 10 : 0);
+                            this.ctx.fillRect(drawX, p.y, p.w, p.h);
+                        } else if (p.type === 'text') {
+                            this.ctx.font = "24px 'Share Tech Mono'"; 
+                            this.ctx.fillText(p.char, p.x, p.y);
+                        } else if (p.type === 'pixel') {
+                            this.ctx.fillRect(p.x, p.y, p.w, p.h);
+                        }
+                        
+                        this.ctx.globalAlpha = 1.0;
+                        this.ctx.shadowBlur = 0;
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // ENGINE: SPAWNER (Managing Data Streams)
+        // ==========================================
+        class Spawner {
+            constructor(game, canvasWidth) {
+                this.game = game;
+                this.streams = [];
+                this.canvasWidth = canvasWidth;
+                this.lastSpawnTime = 0;
+                this.currentLevelData = null;
+            }
+
+            setLevel(levelData) {
+                this.currentLevelData = levelData;
+                this.streams = []; 
+            }
+
+            update(time, canvasHeight, onMiss) {
+                if (!this.currentLevelData) return;
+
+                const effectiveSpeed = Math.max(0.1, this.game.speedMultiplier);
+                const spacingMultiplier = this.currentLevelData.type === 'characters' ? 1.0 : 1.75;
+                const dynamicSpawnRate = (this.currentLevelData.spawnRate / effectiveSpeed) * spacingMultiplier;
+
+                if (time - this.lastSpawnTime > dynamicSpawnRate) {
+                    this.spawnStream();
+                    this.lastSpawnTime = time;
+                }
+
+                for (let i = this.streams.length - 1; i >= 0; i--) {
+                    let s = this.streams[i];
+                    s.y += s.baseSpeed * this.game.speedMultiplier;
+
+                    if (s.y > canvasHeight + 30) {
+                        onMiss(s);
+                        this.streams.splice(i, 1);
+                    }
+                }
+            }
+
+            spawnStream() {
+                const pool = this.currentLevelData.pool;
+                const text = pool[Math.floor(Math.random() * pool.length)];
+                if (!text) return; 
+
+                const color = NeonColors[Math.floor(Math.random() * NeonColors.length)];
+                
+                const currentCanvasWidth = this.game.renderer.textCanvas.width;
+                
+                // Calculado con la nueva tipografía más grande
+                this.game.renderer.textCtx.font = "bold 38px 'Share Tech Mono'";
+                const textWidth = this.game.renderer.textCtx.measureText(text).width;
+                
+                // Margen ampliado para garantizar que nada se salga por los bordes (incluso letras sueltas)
+                const padding = 50; 
+                const minX = padding;
+                let maxX = currentCanvasWidth - textWidth - padding;
+                
+                if (maxX < minX) maxX = minX;
+                
+                const x = minX + Math.random() * (maxX - minX);
+                
+                this.streams.push({
+                    text: text,
+                    x: x,
+                    y: -30,
+                    baseSpeed: this.currentLevelData.fallSpeed * (1 + (Math.random() * 0.2)),
+                    color: color,
+                    typedLength: 0,
+                    misses: 0
+                });
+            }
+        }
+
+        // ==========================================
+        // ENGINE: VIRTUAL KEYBOARD OVERLAY
+        // ==========================================
+        class VirtualKeyboard {
+            constructor() {
+                this.container = document.getElementById('keyboard-container');
+                this.keyElements = {}; 
+            }
+
+            build(layoutId, lang = 'en', pool = []) {
+                this.container.innerHTML = '';
+                this.keyElements = {};
+                const layout = KeyboardLayouts[layoutId] || KeyboardLayouts['ansi-us'];
+                const spaceText = UIText[lang].spacebar;
+
+                const activeChars = new Set();
+                pool.forEach(item => {
+                    for (let char of item) {
+                        activeChars.add(char.toLowerCase());
+                    }
+                });
+
+                layout.forEach((row, rowIndex) => {
+                    const rowEl = document.createElement('div');
+                    rowEl.className = 'key-row';
+                    
+                    if (rowIndex === 1) rowEl.style.paddingLeft = '22px';
+                    if (rowIndex === 2) rowEl.style.paddingLeft = '33px';
+                    if (rowIndex === 3) rowEl.style.paddingLeft = '56px';
+
+                    row.forEach(keyData => {
+                        const keyEl = document.createElement('div');
+                        const lowerChar = keyData.c.toLowerCase();
+                        
+                        const isKeyActive = activeChars.has(lowerChar);
+                        const fingerClass = isKeyActive ? `finger-${keyData.f}` : 'finger-inactive';
+                        
+                        keyEl.className = `key ${fingerClass}`;
+                        if (keyData.isSpace) keyEl.classList.add('spacebar');
+                        keyEl.innerText = keyData.isSpace ? spaceText : keyData.c;
+                        
+                        this.keyElements[lowerChar] = keyEl;
+                        rowEl.appendChild(keyEl);
+                    });
+                    this.container.appendChild(rowEl);
+                });
+            }
+
+            press(char) {
+                const lowerChar = char.toLowerCase();
+                if (this.keyElements[lowerChar]) {
+                    this.keyElements[lowerChar].classList.add('active');
+                }
+            }
+
+            release(char) {
+                const lowerChar = char.toLowerCase();
+                if (this.keyElements[lowerChar]) {
+                    this.keyElements[lowerChar].classList.remove('active');
+                }
+            }
+
+            show() { this.container.style.display = 'flex'; }
+            hide() { this.container.style.display = 'none'; }
+        }
+
+        // ==========================================
+        // ENGINE: INPUT HANDLER
+        // ==========================================
+        class InputHandler {
+            constructor(game) {
+                this.game = game;
+                this.activeStreamIndex = -1; 
+                
+                window.addEventListener('keydown', (e) => this.handleKey(e));
+                window.addEventListener('keyup', (e) => this.handleKeyUp(e));
+            }
+
+            handleKey(e) {
+                if (this.game.audio) this.game.audio.resume();
+
+                if (e.key === 'Escape') {
+                    if (this.game.state === 'PLAYING') {
+                        this.game.pauseGame();
+                    } else if (this.game.state === 'PAUSED') {
+                        this.game.resumeGame();
+                    }
+                    return;
+                }
+
+                if (this.game.state !== 'PLAYING') return;
+                
+                if (e.ctrlKey || e.altKey || e.metaKey) return;
+                
+                const key = e.key.toLowerCase();
+                
+                if (key.length === 1) {
+                    this.game.renderer.highlightChar(key);
+                    this.game.virtualKeyboard.press(key);
+                }
+
+                if (this.activeStreamIndex !== -1 && this.game.spawner.streams[this.activeStreamIndex]) {
+                    let stream = this.game.spawner.streams[this.activeStreamIndex];
+                    
+                    if (!stream.text || stream.typedLength >= stream.text.length) {
+                        this.activeStreamIndex = -1;
+                        return;
+                    }
+                    
+                    let expectedChar = stream.text[stream.typedLength].toLowerCase();
+                    
+                    if (key === expectedChar) {
+                        stream.typedLength++;
+                        this.game.increaseSpeed(); 
+                        this.game.addScore(10);
+                        this.game.audio.type();
+                        
+                        if (stream.typedLength === stream.text.length) {
+                            let isFlawless = stream.misses === 0;
+                            if (isFlawless) this.game.combo++;
+                            else this.game.combo = 0;
+                            
+                            let isOnFire = this.game.combo >= 5;
+                            let accuracy = stream.text.length / (stream.text.length + stream.misses);
+                            
+                            this.game.renderer.triggerSystemGlow(accuracy);
+
+                            this.game.audio.dataBurst(isOnFire);
+                            this.game.renderer.createDataBurst(stream.x + (this.game.renderer.textCtx.measureText(stream.text).width/2), stream.y, stream.color, isOnFire);
+                            
+                            this.game.addScore(stream.text.length * 20);
+                            this.game.spawner.streams.splice(this.activeStreamIndex, 1);
+                            this.activeStreamIndex = -1; 
+                        }
+                    } else if (key.length === 1) { 
+                        stream.misses++;
+                        this.game.combo = 0; 
+                        this.game.decreaseSpeed(); 
+                        this.game.renderer.triggerErrorGlow(); 
+                        this.game.triggerGlitch();
+                        this.game.audio.error();
+                    }
+                    return;
+                }
+
+                let targetIndex = -1;
+                let lowestY = -100;
+
+                for (let i = 0; i < this.game.spawner.streams.length; i++) {
+                    let s = this.game.spawner.streams[i];
+                    if (s.text && s.text.length > 0 && s.text[0].toLowerCase() === key && s.typedLength === 0) {
+                        if (s.y > lowestY) {
+                            lowestY = s.y;
+                            targetIndex = i;
+                        }
+                    }
+                }
+
+                if (targetIndex !== -1) {
+                    this.activeStreamIndex = targetIndex;
+                    let stream = this.game.spawner.streams[targetIndex];
+                    stream.typedLength = 1;
+                    this.game.increaseSpeed();
+                    this.game.addScore(10);
+                    this.game.audio.type();
+                    
+                    if (stream.typedLength === stream.text.length) {
+                        this.game.combo++;
+                        let isOnFire = this.game.combo >= 5;
+                        let accuracy = 1.0; 
+                        this.game.renderer.triggerSystemGlow(accuracy);
+
+                        this.game.audio.dataBurst(isOnFire);
+                        this.game.renderer.createDataBurst(stream.x, stream.y, stream.color, isOnFire);
+                        
+                        this.game.addScore(20);
+                        this.game.spawner.streams.splice(targetIndex, 1);
+                        this.activeStreamIndex = -1;
+                    }
+                } else if (key.length === 1) {
+                    this.game.combo = 0; 
+                    this.game.decreaseSpeed(); 
+                    this.game.renderer.triggerErrorGlow(); 
+                    this.game.triggerGlitch();
+                    this.game.audio.error();
+                }
+            }
+
+            handleKeyUp(e) {
+                if (this.game.state !== 'PLAYING') return;
+                const key = e.key.toLowerCase();
+                if (key.length === 1) {
+                    this.game.virtualKeyboard.release(key);
+                }
+            }
+        }
+
+        // ==========================================
+        // ENGINE: MAIN GAME LOOP
+        // ==========================================
+        class Game {
+            constructor() {
+                this.audio = new AudioManager();
+                this.userManager = new UserManager();
+                // Ahora indicamos al renderer ambos IDs de canvas
+                this.renderer = new Renderer('gameCanvas', 'textCanvas');
+                this.virtualKeyboard = new VirtualKeyboard();
+                this.gemini = new GeminiService();
+                this.spawner = new Spawner(this, this.renderer.textCanvas.width);
+                this.inputHandler = new InputHandler(this);
+                
+                this.state = 'MENU'; 
+                this.levelNum = 1;
+                this.customLevelData = null; 
+                this.score = 0;
+                this.health = 100;
+                this.maxHealth = 100;
+                this.speedMultiplier = 1.0; 
+                this.combo = 0; 
+                
+                this.initUI();
+                
+                if (this.userManager.activeAlias) {
+                    this.showMainMenu();
+                } else {
+                    this.showScreen('profiles');
+                    this.renderProfilesList();
+                }
+
+                requestAnimationFrame((t) => this.loop(t));
+            }
+
+            bindAudioToButtons(container) {
+                const buttons = container.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    if (!btn.dataset.audioBound) {
+                        btn.addEventListener('mouseenter', () => this.audio.hover());
+                        btn.addEventListener('click', () => this.audio.click());
+                        btn.dataset.audioBound = 'true';
+                    }
+                });
+            }
+
+            renderProfilesList() {
+                const list = document.getElementById('profile-list');
+                const formGroup = document.getElementById('new-profile-form');
+                list.innerHTML = '';
+                
+                const aliases = Object.keys(this.userManager.profiles);
+                
+                if (aliases.length >= 3) {
+                    formGroup.style.display = 'none';
+                } else {
+                    formGroup.style.display = 'block';
+                }
+
+                if (aliases.length === 0) {
+                    list.innerHTML = '<p style="color: #666; font-style: italic;">No active profiles detected.</p>';
+                    return;
+                }
+
+                for (const alias of aliases) {
+                    const rowContainer = document.createElement('div');
+                    rowContainer.style.display = 'flex';
+                    rowContainer.style.gap = '10px';
+                    rowContainer.style.marginBottom = '10px';
+
+                    const delBtn = document.createElement('button');
+                    delBtn.innerHTML = '🗑️';
+                    delBtn.className = 'btn-red';
+                    delBtn.style.padding = '10px 15px';
+                    delBtn.style.margin = '0';
+                    delBtn.style.flex = '0 0 auto';
+                    delBtn.addEventListener('click', () => {
+                        if (confirm(`Are you sure you want to delete profile '${alias}'? All progress will be lost.`)) {
+                            this.userManager.deleteProfile(alias);
+                            this.renderProfilesList();
+                        }
+                    });
+
+                    const loadBtn = document.createElement('button');
+                    loadBtn.innerText = `Load: ${alias}`;
+                    loadBtn.className = 'btn-cyan';
+                    loadBtn.style.width = '100%';
+                    loadBtn.style.margin = '0';
+                    loadBtn.style.flex = '1 1 auto';
+                    
+                    loadBtn.addEventListener('click', () => {
+                        this.userManager.selectProfile(alias);
+                        this.showMainMenu();
+                    });
+
+                    rowContainer.appendChild(delBtn);
+                    rowContainer.appendChild(loadBtn);
+                    list.appendChild(rowContainer);
+                }
+                
+                this.bindAudioToButtons(list);
+            }
+
+            updateUILanguage() {
+                const lang = this.userManager.profile?.preferences?.language || 'en';
+                const t = UIText[lang];
+
+                document.getElementById('lbl-hud-alias').innerText = t.hudAlias;
+                document.getElementById('lbl-hud-score').innerText = t.hudScore;
+                document.getElementById('lbl-hud-level').innerText = t.hudLevel;
+                document.getElementById('lbl-hud-integrity').innerText = t.hudIntegrity;
+                document.getElementById('lbl-hud-progress').innerText = t.hudProgress;
+
+                if (this.userManager.activeAlias) {
+                    document.getElementById('welcome-alias').innerText = `${t.menuWelcome} ${this.userManager.activeAlias}`;
+                } else {
+                    document.getElementById('welcome-alias').innerText = `${t.menuWelcome} GUEST`;
+                }
+                
+                document.getElementById('btn-to-levels').innerText = t.btnPlay;
+                document.getElementById('btn-to-ai-node').innerText = t.btnAINode;
+                document.getElementById('btn-to-settings').innerText = t.btnSettings;
+                document.getElementById('btn-switch-profile').innerText = t.btnSwitchAlias;
+
+                document.getElementById('title-ai-node').innerText = t.titleAINode;
+                document.getElementById('desc-ai-node').innerText = t.descAINode;
+                document.getElementById('input-ai-topic').placeholder = t.placeholderAINode;
+                document.getElementById('btn-generate-ai').innerText = t.btnGenerateAI;
+                document.getElementById('btn-ai-back').innerText = t.btnBackMenu;
+                document.getElementById('ai-loading-text').innerText = t.loadingAI;
+
+                document.getElementById('settings-header').innerText = t.titleSettings;
+                document.getElementById('lbl-settings-lang').innerText = t.lblLanguage;
+                document.getElementById('lbl-settings-layout').innerText = t.lblLayout;
+                document.getElementById('btn-save-settings').innerText = t.btnSaveSettings;
+                
+                document.getElementById('lbl-settings-bg').innerText = t.lblSettingsBg;
+                document.getElementById('desc-settings-bg').innerText = t.descSettingsBg;
+                document.getElementById('btn-clear-bg').innerText = t.btnClearBg;
+
+                document.getElementById('title-levels').innerText = t.titleLevels;
+                document.getElementById('btn-levels-back').innerText = t.btnBackMenu;
+
+                document.getElementById('title-fail').innerText = t.titleFailure;
+                document.getElementById('desc-fail').innerText = t.descFailure;
+                document.getElementById('btn-restart').innerText = t.btnReboot;
+                document.getElementById('btn-exit-fail').innerText = t.btnExit;
+
+                document.getElementById('title-success').innerText = t.titleSuccess;
+                document.getElementById('btn-continue').innerText = t.btnContinue;
+                document.getElementById('btn-exit-win').innerText = t.btnExit;
+
+                document.getElementById('title-pause').innerText = t.titlePause;
+                document.getElementById('btn-resume').innerText = t.btnResume;
+                document.getElementById('btn-exit-matrix').innerText = t.btnExit;
+            }
+
+            showMainMenu() {
+                this.updateUILanguage();
+                this.showScreen('main-menu');
+            }
+
+            initUI() {
+                document.body.addEventListener('click', () => this.audio.resume());
+                document.body.addEventListener('keydown', () => this.audio.resume());
+
+                this.bindAudioToButtons(document.body);
+
+                window.addEventListener('keydown', (e) => {
+                    if (this.state === 'PLAYING') return;
+
+                    if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === 'g') {
+                        const levelsScreen = document.getElementById('screen-levels');
+                        if (!levelsScreen.classList.contains('hidden')) {
+                            this.userManager.unlockLevel(20); 
+                            this.populateLevelSelect(); 
+                            e.preventDefault();
+                            return;
+                        }
+                    }
+
+                    // Permitir todos los cursores direccionales
+                    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                        const activeScreen = document.querySelector('.screen:not(.hidden)');
+                        if (!activeScreen) return;
+                        
+                        const navigables = Array.from(activeScreen.querySelectorAll('input, select, button'));
+                        if (navigables.length === 0) return;
+
+                        let currentIndex = navigables.indexOf(document.activeElement);
+                        
+                        // Navegación espacial 2D específica para la cuadrícula de niveles
+                        const grid = document.getElementById('level-grid');
+                        if (grid && grid.contains(document.activeElement) && activeScreen.id === 'screen-levels') {
+                            const items = Array.from(grid.querySelectorAll('button'));
+                            let cols = 1;
+                            
+                            // Calcular automáticamente cuántas columnas tiene la cuadrícula
+                            for (let i = 1; i < items.length; i++) {
+                                if (items[i].offsetTop > items[0].offsetTop) {
+                                    cols = i;
+                                    break;
+                                }
+                            }
+                            
+                            let itemIndex = items.indexOf(document.activeElement);
+                            if (e.key === 'ArrowRight') itemIndex = Math.min(itemIndex + 1, items.length - 1);
+                            else if (e.key === 'ArrowLeft') itemIndex = Math.max(itemIndex - 1, 0);
+                            else if (e.key === 'ArrowDown') itemIndex = Math.min(itemIndex + cols, items.length - 1);
+                            else if (e.key === 'ArrowUp') itemIndex = Math.max(itemIndex - cols, 0);
+                            
+                            items[itemIndex].focus();
+                            this.audio.hover();
+                            e.preventDefault();
+                            return;
+                        }
+
+                        // Navegación estándar de listas/menús con cualquier cursor
+                        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                            currentIndex = (currentIndex + 1) % navigables.length;
+                        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                            currentIndex = (currentIndex - 1 + navigables.length) % navigables.length;
+                        }
+                        
+                        navigables[currentIndex].focus();
+                        this.audio.hover(); 
+                        e.preventDefault();
+                    } else if (e.key === 'Enter') {
+                        const activeElement = document.activeElement;
+                        if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT')) {
+                            const activeScreen = document.querySelector('.screen:not(.hidden)');
+                            if (activeScreen) {
+                                const btn = activeScreen.querySelector('button.btn-cyan') || activeScreen.querySelector('button');
+                                if (btn) btn.click();
+                            }
+                        }
+                    }
+                });
+
+                document.getElementById('btn-create-profile').addEventListener('click', () => {
+                    const aliasInput = document.getElementById('input-new-alias');
+                    const alias = aliasInput.value.trim();
+                    if (alias.length > 0) {
+                        if (this.userManager.createProfile(alias)) {
+                            aliasInput.value = '';
+                            this.showMainMenu();
+                        } else {
+                            if(Object.keys(this.userManager.profiles).length < 3) {
+                                alert("Alias already exists or is invalid.");
+                            }
+                        }
+                    }
+                });
+
+                document.getElementById('btn-to-levels').addEventListener('click', () => {
+                    this.populateLevelSelect();
+                    this.showScreen('levels');
+                });
+
+                document.getElementById('btn-to-ai-node').addEventListener('click', () => {
+                    this.showScreen('ai-node');
+                });
+
+                document.getElementById('btn-generate-ai').addEventListener('click', async () => {
+                    const topicInput = document.getElementById('input-ai-topic');
+                    const topic = topicInput.value.trim();
+                    if (!topic) return;
+
+                    const btn = document.getElementById('btn-generate-ai');
+                    const loadingText = document.getElementById('ai-loading-text');
+                    
+                    btn.disabled = true;
+                    btn.style.opacity = 0.5;
+                    loadingText.style.display = 'block';
+
+                    const lang = this.userManager.profile.preferences.language;
+                    const wordPool = await this.gemini.generateWordPool(topic, lang);
+
+                    btn.disabled = false;
+                    btn.style.opacity = 1;
+                    loadingText.style.display = 'none';
+                    topicInput.value = '';
+
+                    const maxLevel = this.userManager.profile.progress.highestLevelUnlocked || 1;
+                    const baseLevelSpeed = Dictionaries[lang][`level_${Math.min(maxLevel, 20)}`].fallSpeed;
+
+                    this.customLevelData = {
+                        id: "lvl_ai",
+                        name: `AI Node: ${topic.toUpperCase()}`,
+                        type: "words",
+                        pool: wordPool,
+                        targetScore: 4000, 
+                        fallSpeed: baseLevelSpeed,
+                        spawnRate: 1500
+                    };
+
+                    this.startGame('AI');
+                });
+
+                document.getElementById('btn-ai-back').addEventListener('click', () => {
+                    this.showMainMenu();
+                });
+
+                document.getElementById('btn-to-settings').addEventListener('click', () => {
+                    const prefs = this.userManager.profile.preferences;
+                    document.getElementById('select-lang').value = prefs.language;
+                    document.getElementById('select-layout').value = prefs.layout;
+                    this.showScreen('settings');
+                });
+
+                document.getElementById('btn-switch-profile').addEventListener('click', () => {
+                    this.userManager.activeAlias = null; 
+                    this.renderProfilesList();
+                    this.showScreen('profiles');
+                });
+
+                document.getElementById('input-bg-image').addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const MAX_SIZE = 600;
+                            let w = img.width;
+                            let h = img.height;
+                            if (w > MAX_SIZE || h > MAX_SIZE) {
+                                const ratio = Math.min(MAX_SIZE/w, MAX_SIZE/h);
+                                w *= ratio;
+                                h *= ratio;
+                            }
+                            const tmpCanvas = document.createElement('canvas');
+                            tmpCanvas.width = w;
+                            tmpCanvas.height = h;
+                            const tmpCtx = tmpCanvas.getContext('2d');
+                            tmpCtx.drawImage(img, 0, 0, w, h);
+                            
+                            const base64 = tmpCanvas.toDataURL('image/jpeg', 0.6);
+                            this.userManager.updateBgImage(base64);
+                            this.renderer.setBgImage(base64); 
+                            alert("¡Imagen cargada correctamente en tu perfil!");
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                document.getElementById('btn-clear-bg').addEventListener('click', () => {
+                    this.userManager.updateBgImage(null);
+                    this.renderer.setBgImage(null);
+                    document.getElementById('input-bg-image').value = '';
+                });
+
+                document.getElementById('btn-save-settings').addEventListener('click', () => {
+                    const lang = document.getElementById('select-lang').value;
+                    const layout = document.getElementById('select-layout').value;
+                    this.userManager.updateSettings(lang, layout);
+                    this.updateUILanguage(); 
+                    this.showMainMenu();
+                });
+
+                document.getElementById('btn-levels-back').addEventListener('click', () => {
+                    this.showMainMenu();
+                });
+
+                document.getElementById('btn-restart').addEventListener('click', () => {
+                    this.startGame(this.levelNum); 
+                });
+
+                document.getElementById('btn-exit-fail').addEventListener('click', () => {
+                    this.showMainMenu();
+                });
+
+                document.getElementById('btn-continue').addEventListener('click', () => {
+                    if (this.levelNum === 'AI') {
+                        this.showMainMenu();
+                    } else {
+                        this.showScreen('levels'); 
+                        this.populateLevelSelect();
+                    }
+                });
+                
+                document.getElementById('btn-exit-win').addEventListener('click', () => {
+                    this.showMainMenu();
+                });
+
+                document.getElementById('btn-resume').addEventListener('click', () => {
+                    this.resumeGame();
+                });
+
+                document.getElementById('btn-exit-matrix').addEventListener('click', () => {
+                    this.populateLevelSelect();
+                    this.showScreen('levels');
+                    this.state = 'MENU';
+                });
+            }
+
+            populateLevelSelect() {
+                const grid = document.getElementById('level-grid');
+                grid.innerHTML = '';
+                const lang = this.userManager.profile.preferences.language;
+                const maxLevel = this.userManager.profile.progress.highestLevelUnlocked || 1;
+                
+                for (let i = 1; i <= 20; i++) {
+                    const levelData = Dictionaries[lang][`level_${i}`];
+                    if (!levelData) continue;
+
+                    const btn = document.createElement('button');
+                    btn.title = levelData.name;
+                    btn.style.margin = '0';
+                    btn.style.width = '100%';
+                    btn.style.minHeight = '80px';
+                    btn.style.padding = '10px 5px';
+                    btn.style.display = 'flex';
+                    btn.style.flexDirection = 'column';
+                    btn.style.justifyContent = 'center';
+                    btn.style.alignItems = 'center';
+                    
+                    if (i <= maxLevel) {
+                        btn.className = 'btn-cyan';
+                        btn.innerHTML = `
+                            <span style="font-size: 1.5rem; font-weight: bold;">${i}</span>
+                            <span style="font-size: 0.8rem; margin-top: 5px; color: #fff; text-shadow: none;">${levelData.name}</span>
+                        `;
+                        btn.addEventListener('click', () => {
+                            this.startGame(i);
+                        });
+                    } else {
+                        btn.className = '';
+                        btn.style.border = '2px solid #333';
+                        btn.style.color = '#555';
+                        btn.style.cursor = 'not-allowed';
+                        btn.style.boxShadow = 'none';
+                        btn.innerHTML = `
+                            <span style="font-size: 1.2rem;">🔒 ${i}</span>
+                            <span style="font-size: 0.75rem; margin-top: 5px; opacity: 0.5;">${levelData.name}</span>
+                        `;
+                    }
+                    grid.appendChild(btn);
+                }
+                this.bindAudioToButtons(grid);
+            }
+
+            startGame(levelNumber) {
+                this.levelNum = levelNumber;
+                this.score = 0;
+                this.health = this.maxHealth;
+                this.speedMultiplier = 1.0; 
+                this.combo = 0; 
+                this.inputHandler.activeStreamIndex = -1;
+
+                const lang = this.userManager.profile.preferences.language;
+                const layout = this.userManager.profile.preferences.layout;
+                
+                this.renderer.setBgImage(this.userManager.profile.preferences.bgImage || null);
+                
+                let levelData;
+                if (levelNumber === 'AI') {
+                    levelData = this.customLevelData;
+                } else {
+                    const levelKey = `level_${this.levelNum}`;
+                    levelData = Dictionaries[lang][levelKey];
+                }
+
+                if (!levelData) {
+                    alert("YOU BEAT THE GAME. HACKER SUPREME.");
+                    this.showScreen('menu');
+                    return;
+                }
+
+                this.spawner.setLevel(levelData);
+                
+                this.virtualKeyboard.build(layout, lang, levelData.pool); 
+                
+                document.getElementById('hud-alias').innerText = this.userManager.activeAlias || "GUEST";
+                document.getElementById('hud-level').innerText = levelData.name;
+                
+                this.updateUILanguage(); 
+                this.updateScore();
+                this.updateHealth();
+
+                this.showScreen('playing');
+                this.state = 'PLAYING';
+            }
+
+            showScreen(screen) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+                document.getElementById('hud').style.display = 'none';
+                this.virtualKeyboard.hide();
+
+                const target = document.getElementById(`screen-${screen}`);
+                if (target) target.classList.remove('hidden');
+                
+                if (screen === 'playing') {
+                    document.getElementById('hud').style.display = 'flex';
+                    this.virtualKeyboard.show();
+                }
+
+                setTimeout(() => {
+                    const activeScreen = document.querySelector('.screen:not(.hidden)');
+                    if (activeScreen) {
+                        const firstNavigable = activeScreen.querySelector('input, select, button');
+                        if (firstNavigable) firstNavigable.focus();
+                    }
+                }, 10);
+            }
+
+            pauseGame() {
+                this.state = 'PAUSED';
+                this.showScreen('pause');
+            }
+
+            resumeGame() {
+                this.state = 'PLAYING';
+                this.showScreen('playing');
+            }
+
+            increaseSpeed() {
+                this.speedMultiplier = Math.min(2.5, this.speedMultiplier + 0.02);
+            }
+
+            decreaseSpeed() {
+                this.speedMultiplier = Math.max(0.5, this.speedMultiplier * 0.5);
+            }
+
+            addScore(pts) {
+                this.score += pts;
+                this.updateScore();
+
+                let targetScore;
+                if (this.levelNum === 'AI') {
+                    targetScore = this.customLevelData.targetScore;
+                } else {
+                    const lang = this.userManager.profile.preferences.language;
+                    targetScore = Dictionaries[lang][`level_${this.levelNum}`].targetScore;
+                }
+                
+                if (this.score >= targetScore && this.state === 'PLAYING') {
+                    this.levelComplete();
+                }
+            }
+
+            updateScore() {
+                document.getElementById('hud-score').innerText = this.score;
+
+                if (this.state === 'PLAYING') {
+                    let targetScore;
+                    if (this.levelNum === 'AI') {
+                        targetScore = this.customLevelData.targetScore;
+                    } else {
+                        const lang = this.userManager.profile.preferences.language;
+                        targetScore = Dictionaries[lang][`level_${this.levelNum}`].targetScore;
+                    }
+                    const progressPercent = Math.min(100, (this.score / targetScore) * 100);
+                    document.getElementById('progress-bar').style.width = progressPercent + '%';
+                }
+            }
+
+            updateHealth() {
+                const percentage = Math.max(0, (this.health / this.maxHealth) * 100);
+                const bar = document.getElementById('health-bar');
+                bar.style.width = percentage + '%';
+                
+                if (percentage > 50) bar.style.backgroundColor = 'var(--lime)';
+                else if (percentage > 25) bar.style.backgroundColor = 'var(--yellow)';
+                else bar.style.backgroundColor = 'var(--red)';
+            }
+
+            handleMiss(stream) {
+                if (this.inputHandler.activeStreamIndex !== -1 && this.spawner.streams[this.inputHandler.activeStreamIndex] === stream) {
+                    this.inputHandler.activeStreamIndex = -1;
+                }
+
+                this.health -= 15;
+                this.combo = 0; 
+                this.decreaseSpeed(); 
+                this.renderer.triggerErrorGlow(); 
+                this.updateHealth();
+                this.triggerGlitch();
+                this.audio.error();
+
+                if (this.health <= 0 && this.state === 'PLAYING') {
+                    this.gameOver();
+                }
+            }
+
+            triggerGlitch() {
+                const body = document.body;
+                body.classList.remove('glitch-active');
+                void body.offsetWidth; 
+                body.classList.add('glitch-active');
+            }
+
+            async levelComplete() {
+                if (this.levelNum !== 'AI') {
+                    this.userManager.unlockLevel(this.levelNum + 1);
+                }
+                
+                this.state = 'LEVELUP';
+                const nextLevelName = this.levelNum === 'AI' ? "Custom Node Cleared" : (Dictionaries[this.userManager.profile.preferences.language][`level_${this.levelNum + 1}`]?.name || "END OF SYSTEM");
+                document.getElementById('next-level-name').innerText = `Next: ${nextLevelName}`;
+                
+                const feedbackEl = document.getElementById('ai-feedback-win');
+                feedbackEl.innerText = "Analyzing system logs... ✨";
+                this.showScreen('levelup');
+
+                const feedback = await this.gemini.generateFeedback(true, this.score, this.combo, this.userManager.profile.preferences.language);
+                feedbackEl.innerText = `"${feedback}"`;
+            }
+
+            async gameOver() {
+                this.state = 'GAMEOVER';
+                document.getElementById('final-score').innerText = `Final Score: ${this.score}`;
+                
+                const feedbackEl = document.getElementById('ai-feedback-loss');
+                feedbackEl.innerText = "Intercepting Overseer transmission... ✨";
+                this.showScreen('gameover');
+
+                const feedback = await this.gemini.generateFeedback(false, this.score, this.combo, this.userManager.profile.preferences.language);
+                feedbackEl.innerText = `"${feedback}"`;
+            }
+
+            loop(timestamp) {
+                let progress = 0;
+                if (this.state === 'PLAYING') {
+                    let targetScore;
+                    if (this.levelNum === 'AI') {
+                        targetScore = this.customLevelData.targetScore;
+                    } else {
+                        const lang = this.userManager.profile.preferences.language;
+                        targetScore = Dictionaries[lang][`level_${this.levelNum}`].targetScore;
+                    }
+                    progress = Math.min(1.0, this.score / targetScore);
+                }
+
+                this.renderer.clearFrame(timestamp);
+                this.renderer.updateAndDrawBackground(progress);
+                this.renderer.updateAndDrawParticles();
+
+                if (this.state === 'PLAYING') {
+                    this.spawner.update(timestamp, this.renderer.canvas.height, (s) => this.handleMiss(s));
+                    
+                    for (let s of this.spawner.streams) {
+                        this.renderer.drawStream(s);
+                    }
+                }
+
+                requestAnimationFrame((t) => this.loop(t));
+            }
+        }
+
+        window.onload = () => {
+            const app = new Game();
+        };
+
+    </script>
+</body>
+</html>
