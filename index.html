@@ -237,41 +237,50 @@
         #keyboard-container {
             display: none; /* Flex when active */
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             position: absolute;
-            bottom: 40px;
+            bottom: 4px;
             left: 50%;
             transform: translateX(-50%);
-            opacity: 0.6;
+            opacity: 0.8;
             z-index: 5;
             pointer-events: none;
-            transition: opacity 0.3s;
+            transition: opacity 0.55s ease;
+            will-change: opacity;
+        }
+
+        #keyboard-container.reveal-fading {
+            opacity: 0;
         }
 
         .key-row {
             display: flex;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
         }
 
         .key {
-            width: 45px;
-            height: 45px;
+            width: 34px;
+            height: 34px;
             border: 1px solid var(--key-color);
-            border-radius: 6px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 1.4rem;
+            font-size: 0.8rem;
             color: var(--key-color);
-            background: rgba(10, 10, 12, 0.7);
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.8);
+            background: rgba(10, 10, 12, 0.66);
+            box-shadow: inset 0 0 6px rgba(0,0,0,0.8);
             text-transform: uppercase;
             transition: all 0.05s ease-out;
         }
 
-        .key.spacebar { width: 300px; }
+        .key.wide-2 { width: 73px; }
+        .key.wide-3 { width: 112px; }
+        .key.wide-4 { width: 151px; }
+        .key.wide-6 { width: 229px; }
+        .key.spacebar { width: 229px; }
 
         /* Finger Color Mapping */
         .finger-0 { --key-color: #ff0055; }
@@ -296,9 +305,117 @@
         .key.active {
             background-color: var(--key-color);
             color: var(--bg-color);
-            box-shadow: 0 0 20px var(--key-color), inset 0 0 10px #fff;
-            transform: scale(1.15);
+            box-shadow: 0 0 14px var(--key-color), inset 0 0 8px #fff;
+            transform: scale(1.08);
             z-index: 10;
+        }
+
+        .finger-guide-layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        .finger-guide-dot {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            background: rgba(10, 10, 12, 0.65);
+            box-shadow: 0 0 10px currentColor;
+            transform: translate(-50%, -50%);
+            animation: fingerPulse 1s ease-in-out infinite;
+            transition: left 0.35s ease, top 0.35s ease;
+        }
+
+        .finger-guide-dot.finger-0 { color: #ff0055; }
+        .finger-guide-dot.finger-1 { color: #ffaa00; }
+        .finger-guide-dot.finger-2 { color: #ffff00; }
+        .finger-guide-dot.finger-3 { color: #00ffaa; }
+        .finger-guide-dot.finger-4 { color: #ffffff; }
+        .finger-guide-dot.finger-5 { color: #00ffff; }
+        .finger-guide-dot.finger-6 { color: #0088ff; }
+        .finger-guide-dot.finger-7 { color: #8800ff; }
+        .finger-guide-dot.finger-8 { color: #ff00ff; }
+
+        #level-select-panel {
+            width: min(97vw, 1160px);
+            max-height: 92vh;
+            padding: clamp(10px, 2vh, 24px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        #level-select-panel h2 {
+            margin-bottom: clamp(8px, 1.8vh, 20px);
+        }
+
+          #level-grid {
+              display: grid;
+              grid-template-columns: repeat(5, minmax(0, 1fr));
+              gap: 12px;
+              width: 100%;
+              flex: 1 1 auto;
+              min-height: 0;
+              margin-bottom: 0;
+              align-content: start;
+          }
+
+            #reveal-skip-hint {
+                position: absolute;
+                left: 50%;
+                bottom: 14px;
+                transform: translateX(-50%);
+                z-index: 16;
+                pointer-events: none;
+                font-size: clamp(0.9rem, 1.8vw, 1.15rem);
+                letter-spacing: 1px;
+                color: #ffb347;
+                text-shadow: 0 0 8px rgba(255, 140, 0, 0.9), 0 0 16px rgba(255, 185, 60, 0.55);
+                opacity: 0;
+                transition: opacity 0.25s ease;
+                animation: revealHintPulse 1.1s ease-in-out infinite;
+            }
+
+            #fps-counter {
+                position: absolute;
+                right: 12px;
+                bottom: 10px;
+                z-index: 16;
+                pointer-events: none;
+                font-size: 0.84rem;
+                color: #7cf8ff;
+                padding: 4px 8px;
+                border: 1px solid rgba(0, 255, 255, 0.45);
+                border-radius: 4px;
+                background: rgba(0, 10, 14, 0.55);
+                text-shadow: 0 0 8px rgba(0, 255, 255, 0.75);
+                box-shadow: 0 0 8px rgba(0, 255, 255, 0.28) inset;
+                opacity: 0;
+                transition: opacity 0.18s ease;
+            }
+
+            #fps-counter.visible {
+                opacity: 1;
+            }
+
+
+          #reveal-skip-hint.visible {
+              opacity: 1;
+          }
+
+          @keyframes revealHintPulse {
+              0%, 100% { transform: translateX(-50%) scale(1); }
+              50% { transform: translateX(-50%) scale(1.04); }
+          }
+
+
+        @keyframes fingerPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.75; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
         }
 
     </style>
@@ -342,10 +459,14 @@
             </div>
         </div>
 
-        <!-- Virtual Keyboard Overlay -->
-        <div id="keyboard-container"></div>
-        
-    </div>
+          <!-- Virtual Keyboard Overlay -->
+            <div id="keyboard-container"></div>
+            <div id="reveal-skip-hint" class="hidden"></div>
+            <div id="fps-counter" class="hidden">FPS: --</div>
+            
+        </div>
+
+
 
     <!-- Menus and Overlays (Z-index 20) -->
     <!-- Profiles Screen -->
@@ -406,24 +527,34 @@
                     <option value="iso-es">ISO (ES QWERTY + Ñ)</option>
                 </select>
             </div>
-            <div class="form-group" style="margin-top: 30px; border-top: 1px solid var(--pink); padding-top: 20px;">
-                <label id="lbl-settings-bg" style="color: var(--pink);">Topología Matrix 3D (Opcional):</label>
-                <p id="desc-settings-bg" style="font-size: 0.8rem; margin-bottom: 10px; color: #888;">Carga una imagen. ¡La lluvia Matrix colisionará físicamente con sus contornos para revelarla!</p>
-                <input type="file" id="input-bg-image" accept="image/*" style="font-size: 0.9rem;">
-                <button id="btn-clear-bg" class="btn-gray" style="font-size: 1rem; width: 100%; padding: 10px; margin-top: 10px;">Clear Image / Quitar Imagen</button>
-            </div>
+              <div class="form-group" style="margin-top: 30px; border-top: 1px solid var(--pink); padding-top: 20px;">
+                  <label id="lbl-settings-bg" style="color: var(--pink);">Topología Matrix 3D (Opcional):</label>
+                  <p id="desc-settings-bg" style="font-size: 0.8rem; margin-bottom: 10px; color: #888;">Carga una imagen. ¡La lluvia Matrix colisionará físicamente con sus contornos para revelarla!</p>
+                  <input type="file" id="input-bg-image" accept="image/*" style="font-size: 0.9rem;">
+                    <div style="margin-top: 12px;">
+                        <label id="lbl-settings-bg-aggr" for="input-bg-aggr">Background Removal Aggressiveness:</label>
+                        <input type="range" id="input-bg-aggr" min="0" max="100" step="1" value="50" style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #8aa0a8; margin-top: 3px; letter-spacing: 0.3px;">
+                            <span id="txt-bg-aggr-soft">Soft</span>
+                            <span id="txt-bg-aggr-medium">Medium</span>
+                            <span id="txt-bg-aggr-strong">Strong</span>
+                        </div>
+                        <p id="desc-settings-bg-aggr" style="font-size: 0.78rem; color: #888; margin-top: 4px;"><span id="txt-bg-aggr-prefix">Current level:</span> <span id="val-bg-aggr">50</span>%</p>
+                    </div>
+                  <button id="btn-clear-bg" class="btn-gray" style="font-size: 1rem; width: 100%; padding: 10px; margin-top: 10px;">Clear Image / Quitar Imagen</button>
+              </div>
             <button id="btn-save-settings" class="btn-cyan" style="width: 100%; margin-top: 20px;">Save & Return</button>
         </div>
     </div>
 
     <!-- Level Select Screen -->
-    <div id="screen-levels" class="screen hidden">
-        <div class="panel" style="max-width: 900px; width: 95%;">
-            <h2 id="title-levels" style="color: var(--lime);">Select Access Node</h2>
-            <div id="level-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px;"></div>
-            <button id="btn-levels-back" class="btn-pink" style="width: 100%;">Back to Main Menu</button>
+        <div id="screen-levels" class="screen hidden">
+            <div id="level-select-panel" class="panel">
+                <h2 id="title-levels" style="color: var(--lime);">Select Access Node</h2>
+                <div id="level-grid"></div>
+                <button id="btn-levels-back" class="btn-pink" style="width: 100%; margin-top: 14px;">Back to Main Menu</button>
+            </div>
         </div>
-    </div>
 
     <!-- Game Over Screen -->
     <div id="screen-gameover" class="screen hidden">
@@ -432,8 +563,8 @@
             <h2 id="final-score">Final Score: 0</h2>
             <p id="desc-fail" style="margin-bottom: 10px; color: #aaa;">Data streams breached the firewall.</p>
             <p id="ai-feedback-loss" style="color: #B026FF; font-style: italic; margin-bottom: 20px; min-height: 48px; font-size: 1.1rem;"></p>
-            <button id="btn-restart" class="btn-red">Reboot System</button>
-            <button id="btn-exit-fail" class="btn-gray" style="margin-left: 10px;">Exit</button>
+              <button id="btn-restart" class="btn-cyan">Reboot System</button>
+              <button id="btn-exit-fail" class="btn-red" style="margin-left: 10px;">Exit</button>
         </div>
     </div>
 
@@ -443,8 +574,8 @@
             <h1 id="title-success" style="color: var(--lime); text-shadow: 0 0 10px var(--lime);">ACCESS GRANTED</h1>
             <h2 id="next-level-name">Level 2</h2>
             <p id="ai-feedback-win" style="color: #B026FF; font-style: italic; margin-bottom: 20px; min-height: 48px; font-size: 1.1rem;"></p>
-            <button id="btn-continue" class="btn-lime">Continue</button>
-            <button id="btn-exit-win" class="btn-gray" style="margin-left: 10px;">Exit</button>
+              <button id="btn-continue" class="btn-lime">Continue</button>
+              <button id="btn-exit-win" class="btn-red" style="margin-left: 10px;">Exit</button>
         </div>
     </div>
 
@@ -531,10 +662,15 @@
                 titleSettings: "Settings",
                 lblLanguage: "System Language:",
                 lblLayout: "Keyboard Layout:",
-                lblSettingsBg: "Matrix Image Reveal (Optional):",
-                descSettingsBg: "Upload an image. As you progress, the matrix rain will colide and reveal its 3D topology!",
-                btnClearBg: "Clear Image",
-                btnSaveSettings: "Save & Return",
+                  lblSettingsBg: "Matrix Image Reveal (Optional):",
+                  descSettingsBg: "Upload an image. As you progress, the matrix rain will colide and reveal its 3D topology!",
+                    lblSettingsBgAgg: "Background Removal Aggressiveness:",
+                    descSettingsBgAgg: "Current level:",
+                    bgAggSoft: "Soft",
+                    bgAggMedium: "Medium",
+                    bgAggStrong: "Strong",
+                    btnClearBg: "Clear Image",
+                  btnSaveSettings: "Save & Return",
                 titleLevels: "Select Access Node",
                 titleFailure: "SYSTEM FAILURE",
                 descFailure: "Data streams breached the firewall.",
@@ -543,8 +679,11 @@
                 titleSuccess: "ACCESS GRANTED",
                 btnContinue: "Continue",
                 titlePause: "SYSTEM PAUSED",
-                btnResume: "Continue Hack",
-                spacebar: "SPACE"
+                  btnResume: "Continue Hack",
+                revealSkipHint: "Press any key",
+                    revealContinueHint: "Press any key",
+                    spacebar: "SPACE"
+
             },
             es: {
                 hudAlias: "Alias",
@@ -566,88 +705,119 @@
                 titleSettings: "Configuración",
                 lblLanguage: "Idioma del Sistema:",
                 lblLayout: "Distribución del Teclado:",
-                lblSettingsBg: "Topología Matrix 3D (Opcional):",
-                descSettingsBg: "Carga una imagen. ¡La lluvia Matrix colisionará físicamente con sus contornos para revelarla!",
-                btnClearBg: "Quitar Imagen",
-                btnSaveSettings: "Guardar y Volver",
+                  lblSettingsBg: "Topología Matrix 3D (Opcional):",
+                  descSettingsBg: "Carga una imagen. ¡La lluvia Matrix colisionará físicamente con sus contornos para revelarla!",
+                    lblSettingsBgAgg: "Agresividad al eliminar fondo:",
+                    descSettingsBgAgg: "Nivel actual:",
+                    bgAggSoft: "Suave",
+                    bgAggMedium: "Medio",
+                    bgAggStrong: "Fuerte",
+                    btnClearBg: "Quitar Imagen",
+                  btnSaveSettings: "Guardar y Volver",
                 titleLevels: "Seleccionar Nodo de Acceso",
                 titleFailure: "FALLO DEL SISTEMA",
                 descFailure: "Los datos han roto el cortafuegos.",
                 btnReboot: "Reiniciar Sistema",
-                btnExit: "Salir de Matrix",
-                titleSuccess: "ACCESO CONCEDIDO",
-                btnContinue: "Continuar",
-                titlePause: "SISTEMA PAUSADO",
-                btnResume: "Continuar Hackeo",
-                spacebar: "ESPACIO"
+                  btnExit: "Salir de Matrix",
+                  titleSuccess: "ACCESO CONCEDIDO",
+                  btnContinue: "Continuar",
+                  titlePause: "SISTEMA PAUSADO",
+                    btnResume: "Continuar Hackeo",
+                    revealSkipHint: "Pulsa cualquier tecla",
+                    revealContinueHint: "Pulsa cualquier tecla",
+                    spacebar: "ESPACIO"
+
             }
         };
 
         const KeyboardLayouts = {
             'ansi-us': [
-                [{c:'1', f:0}, {c:'2', f:1}, {c:'3', f:2}, {c:'4', f:3}, {c:'5', f:3}, {c:'6', f:5}, {c:'7', f:5}, {c:'8', f:6}, {c:'9', f:7}, {c:'0', f:8}],
-                [{c:'q', f:0}, {c:'w', f:1}, {c:'e', f:2}, {c:'r', f:3}, {c:'t', f:3}, {c:'y', f:5}, {c:'u', f:5}, {c:'i', f:6}, {c:'o', f:7}, {c:'p', f:8}],
-                [{c:'a', f:0}, {c:'s', f:1}, {c:'d', f:2}, {c:'f', f:3}, {c:'g', f:3}, {c:'h', f:5}, {c:'j', f:5}, {c:'k', f:6}, {c:'l', f:7}, {c:';', f:8}],
-                [{c:'z', f:0}, {c:'x', f:1}, {c:'c', f:2}, {c:'v', f:3}, {c:'b', f:3}, {c:'n', f:5}, {c:'m', f:5}, {c:',', f:6}, {c:'.', f:7}, {c:'/', f:8}],
-                [{c:' ', f:4, isSpace: true}]
+                [{c:'`', f:0}, {c:'1', f:0}, {c:'2', f:1}, {c:'3', f:2}, {c:'4', f:3}, {c:'5', f:3}, {c:'6', f:5}, {c:'7', f:5}, {c:'8', f:6}, {c:'9', f:7}, {c:'0', f:8}, {c:'-', f:8}, {c:'=', f:8}, {c:'⌫', l:'BKSP', f:8, w:3}],
+                [{c:'↹', l:'TAB', f:0, w:2}, {c:'q', f:0}, {c:'w', f:1}, {c:'e', f:2}, {c:'r', f:3}, {c:'t', f:3}, {c:'y', f:5}, {c:'u', f:5}, {c:'i', f:6}, {c:'o', f:7}, {c:'p', f:8}, {c:'[', f:8}, {c:']', f:8}, {c:'\\', f:8, w:2}],
+                [{c:'´', f:0}, {c:'a', f:0}, {c:'s', f:1}, {c:'d', f:2}, {c:'f', f:3}, {c:'g', f:3}, {c:'h', f:5}, {c:'j', f:5}, {c:'k', f:6}, {c:'l', f:7}, {c:';', f:8}, {c:"'", f:8}, {c:'↵', l:'ENTER', f:8, w:3}],
+                [{c:'⇧', l:'SHIFT', f:0, w:2}, {c:'z', f:0}, {c:'x', f:1}, {c:'c', f:2}, {c:'v', f:3}, {c:'b', f:3}, {c:'n', f:5}, {c:'m', f:5}, {c:',', f:6}, {c:'.', f:7}, {c:'/', f:8}, {c:'?', f:8}],
+                [{c:'@', f:0}, {c:'#', f:1}, {c:'$', f:2}, {c:'%', f:3}, {c:' ', f:4, isSpace: true}, {c:'!', f:6}, {c:'&', f:7}, {c:'*', f:8}]
             ],
             'iso-es': [
-                [{c:'1', f:0}, {c:'2', f:1}, {c:'3', f:2}, {c:'4', f:3}, {c:'5', f:3}, {c:'6', f:5}, {c:'7', f:5}, {c:'8', f:6}, {c:'9', f:7}, {c:'0', f:8}],
-                [{c:'q', f:0}, {c:'w', f:1}, {c:'e', f:2}, {c:'r', f:3}, {c:'t', f:3}, {c:'y', f:5}, {c:'u', f:5}, {c:'i', f:6}, {c:'o', f:7}, {c:'p', f:8}],
-                [{c:'a', f:0}, {c:'s', f:1}, {c:'d', f:2}, {c:'f', f:3}, {c:'g', f:3}, {c:'h', f:5}, {c:'j', f:5}, {c:'k', f:6}, {c:'l', f:7}, {c:'ñ', f:8}],
-                [{c:'z', f:0}, {c:'x', f:1}, {c:'c', f:2}, {c:'v', f:3}, {c:'b', f:3}, {c:'n', f:5}, {c:'m', f:5}, {c:',', f:6}, {c:'.', f:7}, {c:'-', f:8}],
-                [{c:' ', f:4, isSpace: true}]
+                [{c:'º', f:0}, {c:'1', f:0}, {c:'2', f:1}, {c:'3', f:2}, {c:'4', f:3}, {c:'5', f:3}, {c:'6', f:5}, {c:'7', f:5}, {c:'8', f:6}, {c:'9', f:7}, {c:'0', f:8}, {c:"'", f:8}, {c:'¡', f:8}, {c:'⌫', l:'BKSP', f:8, w:3}],
+                [{c:'↹', l:'TAB', f:0, w:2}, {c:'q', f:0}, {c:'w', f:1}, {c:'e', f:2}, {c:'r', f:3}, {c:'t', f:3}, {c:'y', f:5}, {c:'u', f:5}, {c:'i', f:6}, {c:'o', f:7}, {c:'p', f:8}, {c:'`', f:8}, {c:'+', f:8}, {c:'ç', f:8}],
+                [{c:'´', f:0}, {c:'a', f:0}, {c:'s', f:1}, {c:'d', f:2}, {c:'f', f:3}, {c:'g', f:3}, {c:'h', f:5}, {c:'j', f:5}, {c:'k', f:6}, {c:'l', f:7}, {c:'ñ', f:8}, {c:'¨', f:8}, {c:'↵', l:'ENTER', f:8, w:3}],
+                [{c:'⇧', l:'SHIFT', f:0, w:2}, {c:'<', f:0}, {c:'z', f:1}, {c:'x', f:2}, {c:'c', f:3}, {c:'v', f:3}, {c:'b', f:5}, {c:'n', f:5}, {c:'m', f:6}, {c:',', f:7}, {c:'.', f:8}, {c:'-', f:8}],
+                [{c:'@', f:0}, {c:'¿', f:1}, {c:'€', f:2}, {c:'(', f:3}, {c:' ', f:4, isSpace: true}, {c:')', f:6}, {c:'!', f:7}, {c:'?', f:8}]
             ]
         };
 
+        const TOTAL_LEVELS = 30;
+
         const Dictionaries = {
             en: {
-                level_1:  { id: "lvl_1",  name: "Home Core", type: "characters", pool: ["f", "j"], targetScore: 500, fallSpeed: 0.5, spawnRate: 2000 },
-                level_2:  { id: "lvl_2",  name: "Home Extend", type: "characters", pool: ["d", "k", "f", "j"], targetScore: 1000, fallSpeed: 0.6, spawnRate: 1800 },
-                level_3:  { id: "lvl_3",  name: "Home Full", type: "characters", pool: ["s", "l", "a", ";", "d", "k"], targetScore: 750, fallSpeed: 0.7, spawnRate: 1600 },
-                level_4:  { id: "lvl_4",  name: "Top Core", type: "characters", pool: ["e", "i", "r", "u", "f", "j", "d", "k"], targetScore: 1000, fallSpeed: 0.8, spawnRate: 1500 },
-                level_5:  { id: "lvl_5",  name: "Bottom Core", type: "characters", pool: ["c", "m", "v", "n", "s", "l", "e", "i"], targetScore: 1250, fallSpeed: 0.9, spawnRate: 1400 },
-                level_6:  { id: "lvl_6",  name: "Syntax I: Micro", type: "words", pool: ["it", "is", "to", "do", "if", "or"], targetScore: 1500, fallSpeed: 0.7, spawnRate: 2000 },
-                level_7:  { id: "lvl_7",  name: "Syntax II: Min", type: "words", pool: ["the", "bug", "net", "ram", "log", "run"], targetScore: 1750, fallSpeed: 0.75, spawnRate: 2200 },
-                level_8:  { id: "lvl_8",  name: "Syntax III: Core", type: "words", pool: ["code", "hack", "data", "byte", "file", "node"], targetScore: 2000, fallSpeed: 0.80, spawnRate: 2100 },
-                level_9:  { id: "lvl_9",  name: "Syntax IV: Macro", type: "words", pool: ["virus", "logic", "macro", "pixel", "cache"], targetScore: 2250, fallSpeed: 0.85, spawnRate: 2000 },
-                level_10: { id: "lvl_10", name: "Syntax V: Network", type: "words", pool: ["hacker", "server", "python", "crypto", "system"], targetScore: 2500, fallSpeed: 0.90, spawnRate: 1900 },
-                level_11: { id: "lvl_11", name: "Jargon", type: "words", pool: ["network", "boolean", "firewall", "malware", "terminal"], targetScore: 2750, fallSpeed: 0.95, spawnRate: 1800 },
-                level_12: { id: "lvl_12", name: "Numerics", type: "characters", pool: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], targetScore: 3000, fallSpeed: 1.0, spawnRate: 1700 },
-                level_13: { id: "lvl_13", name: "Alphanumeric", type: "words", pool: ["net1", "bug2", "hack99", "sys32", "web3", "p2p"], targetScore: 3250, fallSpeed: 1.05, spawnRate: 1600 },
-                level_14: { id: "lvl_14", name: "Cyberpunk", type: "words", pool: ["matrix", "cyberspace", "mainframe", "overclock"], targetScore: 3500, fallSpeed: 1.10, spawnRate: 1500 },
-                level_15: { id: "lvl_15", name: "Hardcore", type: "words", pool: ["cryptography", "algorithm", "motherboard", "bandwidth"], targetScore: 4000, fallSpeed: 1.15, spawnRate: 1400 },
-                level_16: { id: "lvl_16", name: "Code Snippets", type: "words", pool: ["function", "return", "const", "await", "import"], targetScore: 4500, fallSpeed: 1.20, spawnRate: 1300 },
-                level_17: { id: "lvl_17", name: "System Overload I", type: "words", pool: ["vulnerability", "authentication", "infrastructure"], targetScore: 5000, fallSpeed: 1.25, spawnRate: 1200 },
-                level_18: { id: "lvl_18", name: "System Overload II", type: "words", pool: ["encapsulation", "asynchronous", "polymorphism"], targetScore: 5500, fallSpeed: 1.30, spawnRate: 1100 },
-                level_19: { id: "lvl_19", name: "God Mode", type: "words", pool: ["telemetry", "subroutine", "quantum", "cybernetics"], targetScore: 6000, fallSpeed: 1.40, spawnRate: 1000 },
-                level_20: { id: "lvl_20", name: "The Singularity", type: "words", pool: ["singularity", "transcendence", "omnipresence"], targetScore: 7500, fallSpeed: 1.50, spawnRate: 900 }
+                level_1:  { id: "lvl_1",  name: "Home Core", type: "characters", pool: ["f", "j"], targetScore: 450, fallSpeed: 0.50, spawnRate: 2100 },
+                level_2:  { id: "lvl_2",  name: "Home Reach", type: "characters", pool: ["d", "k", "f", "j"], targetScore: 700, fallSpeed: 0.55, spawnRate: 2000 },
+                level_3:  { id: "lvl_3",  name: "Home Flow", type: "characters", pool: ["s", "l", "a", ";", "d", "k", "f", "j"], targetScore: 900, fallSpeed: 0.60, spawnRate: 1900 },
+                level_4:  { id: "lvl_4",  name: "Top Bridge", type: "characters", pool: ["e", "i", "r", "u", "d", "k", "f", "j"], targetScore: 1100, fallSpeed: 0.65, spawnRate: 1800 },
+                level_5:  { id: "lvl_5",  name: "Top Ring", type: "characters", pool: ["w", "o", "q", "p", "e", "i", "r", "u"], targetScore: 1300, fallSpeed: 0.70, spawnRate: 1700 },
+                level_6:  { id: "lvl_6",  name: "Bottom Bridge", type: "characters", pool: ["c", "m", "v", "n", "x", ",", ".", "z"], targetScore: 1500, fallSpeed: 0.75, spawnRate: 1650 },
+                level_7:  { id: "lvl_7",  name: "Bottom Precision", type: "characters", pool: ["b", "n", "m", ",", ".", "/", "v", "c"], targetScore: 1700, fallSpeed: 0.80, spawnRate: 1600 },
+                level_8:  { id: "lvl_8",  name: "Number Intro", type: "characters", pool: ["4", "5", "6", "7", "f", "j", "d", "k"], targetScore: 1900, fallSpeed: 0.85, spawnRate: 1550 },
+                level_9:  { id: "lvl_9",  name: "Number Spread", type: "characters", pool: ["1", "2", "3", "8", "9", "0", "q", "p"], targetScore: 2100, fallSpeed: 0.90, spawnRate: 1500 },
+                level_10: { id: "lvl_10", name: "Common Symbols", type: "characters", pool: ["-", "=", "[", "]", "'", "?", ",", "."], targetScore: 2300, fallSpeed: 0.95, spawnRate: 1450 },
+                level_11: { id: "lvl_11", name: "Accent & Syntax", type: "characters", pool: ["`", "´", ";", "'", "/", "\\", "[", "]"], targetScore: 2500, fallSpeed: 1.00, spawnRate: 1400 },
+                level_12: { id: "lvl_12", name: "Micro Words", type: "words", pool: ["if", "for", "var", "log", "run", "map"], targetScore: 2750, fallSpeed: 0.95, spawnRate: 1850 },
+                level_13: { id: "lvl_13", name: "Words + Comma", type: "words", pool: ["code,run", "data,node", "log,file", "fast,loop", "safe,mode"], targetScore: 3000, fallSpeed: 1.00, spawnRate: 1800 },
+                level_14: { id: "lvl_14", name: "Spacebar Drill", type: "words", pool: ["go now", "run test", "fast code", "open node", "data flow"], targetScore: 3250, fallSpeed: 1.05, spawnRate: 1750 },
+                level_15: { id: "lvl_15", name: "Mixed Rhythm", type: "words", pool: ["build, run", "scan node", "hack, patch", "open file", "code mode"], targetScore: 3600, fallSpeed: 1.10, spawnRate: 1680 },
+                level_16: { id: "lvl_16", name: "Network Terms", type: "words", pool: ["packet", "router", "server", "switch", "socket"], targetScore: 3950, fallSpeed: 1.15, spawnRate: 1600 },
+                level_17: { id: "lvl_17", name: "Syntax Pressure", type: "words", pool: ["array.push", "const key", "while(true)", "node.js", "cache-hit"], targetScore: 4300, fallSpeed: 1.20, spawnRate: 1520 },
+                level_18: { id: "lvl_18", name: "Accent Mix", type: "words", pool: ["cafe`,run", "resume?", "naive code", "role-play", "touch\u00e9"], targetScore: 4700, fallSpeed: 1.25, spawnRate: 1450 },
+                level_19: { id: "lvl_19", name: "Long Burst I", type: "words", pool: ["firewall", "terminal", "protocol", "boolean", "compile"], targetScore: 5100, fallSpeed: 1.30, spawnRate: 1380 },
+                level_20: { id: "lvl_20", name: "Long Burst II", type: "words", pool: ["encryption", "bandwidth", "framework", "debugging", "streamline"], targetScore: 5600, fallSpeed: 1.35, spawnRate: 1300 },
+                level_21: { id: "lvl_21", name: "Space + Symbols", type: "words", pool: ["alert, now", "patch now", "trace, run", "link, map", "deep scan"], targetScore: 6100, fallSpeed: 1.40, spawnRate: 1220 },
+                level_22: { id: "lvl_22", name: "Rapid Context", type: "words", pool: ["quantum-node", "auth token", "core, stream", "system check", "signal/path"], targetScore: 6700, fallSpeed: 1.45, spawnRate: 1150 },
+                level_23: { id: "lvl_23", name: "Overclock", type: "words", pool: ["transmission", "subroutine", "hyperthread", "datasphere", "multicast"], targetScore: 7300, fallSpeed: 1.50, spawnRate: 1080 },
+                level_24: { id: "lvl_24", name: "Critical Matrix", type: "words", pool: ["cyber, matrix", "access granted", "deep protocol", "neural switch", "host override"], targetScore: 7900, fallSpeed: 1.55, spawnRate: 1010 },
+                level_25: { id: "lvl_25", name: "Sector-5 Sentinel", type: "words", pool: ["sector lock", "matrix pivot", "override, now", "kernel bridge", "neon sentinel"], targetScore: 8600, fallSpeed: 1.60, spawnRate: 940 },
+                level_26: { id: "lvl_26", name: "Thread Weave", type: "words", pool: ["thread sync", "buffer merge", "token, stream", "hash route", "cache pulse"], targetScore: 9300, fallSpeed: 1.66, spawnRate: 900 },
+                level_27: { id: "lvl_27", name: "Cipher Drift", type: "words", pool: ["cipher mode", "key,frame", "signal trace", "vector/path", "delta cache"], targetScore: 10050, fallSpeed: 1.72, spawnRate: 860 },
+                level_28: { id: "lvl_28", name: "Neural Surge", type: "words", pool: ["neural core", "quantum,link", "matrix pulse", "runtime gate", "binary storm"], targetScore: 10850, fallSpeed: 1.78, spawnRate: 820 },
+                level_29: { id: "lvl_29", name: "Prime Firewall", type: "words", pool: ["firewall++", "auth,override", "deep packet", "stream breaker", "signal breach"], targetScore: 11700, fallSpeed: 1.84, spawnRate: 780 },
+                level_30: { id: "lvl_30", name: "Final Boss: Root Core", type: "words", pool: ["root access", "system,owned", "final override", "neon apocalypse", "omega protocol"], targetScore: 12600, fallSpeed: 1.92, spawnRate: 740 }
             },
             es: {
-                level_1:  { id: "lvl_1",  name: "Centro Principal", type: "characters", pool: ["f", "j"], targetScore: 500, fallSpeed: 0.5, spawnRate: 2000 },
-                level_2:  { id: "lvl_2",  name: "Centro Extendido", type: "characters", pool: ["d", "k", "f", "j"], targetScore: 1000, fallSpeed: 0.6, spawnRate: 1800 },
-                level_3:  { id: "lvl_3",  name: "Fila Central", type: "characters", pool: ["s", "l", "a", "ñ", "d", "k"], targetScore: 750, fallSpeed: 0.7, spawnRate: 1600 },
-                level_4:  { id: "lvl_4",  name: "Arriba Principal", type: "characters", pool: ["e", "i", "r", "u", "f", "j", "d", "k"], targetScore: 1000, fallSpeed: 0.8, spawnRate: 1500 },
-                level_5:  { id: "lvl_5",  name: "Abajo Principal", type: "characters", pool: ["c", "m", "v", "n", "s", "l", "e", "i"], targetScore: 1250, fallSpeed: 0.9, spawnRate: 1400 },
-                level_6:  { id: "lvl_6",  name: "Sintaxis I: Micro", type: "words", pool: ["en", "el", "un", "su", "si", "ya"], targetScore: 1500, fallSpeed: 0.7, spawnRate: 2000 },
-                level_7:  { id: "lvl_7",  name: "Sintaxis II: Min", type: "words", pool: ["red", "bit", "web", "api", "log", "ram"], targetScore: 1750, fallSpeed: 0.75, spawnRate: 2200 },
-                level_8:  { id: "lvl_8",  name: "Sintaxis III: Base", type: "words", pool: ["dato", "chip", "byte", "hack", "nube"], targetScore: 2000, fallSpeed: 0.80, spawnRate: 2100 },
-                level_9:  { id: "lvl_9",  name: "Sintaxis IV: Macro", type: "words", pool: ["virus", "clave", "pixel", "bucle", "robot"], targetScore: 2250, fallSpeed: 0.85, spawnRate: 2000 },
-                level_10: { id: "lvl_10", name: "Sintaxis V: Redes", type: "words", pool: ["hacker", "enlace", "fuente", "servidor", "sistema"], targetScore: 2500, fallSpeed: 0.90, spawnRate: 1900 },
-                level_11: { id: "lvl_11", name: "Jerga Tech", type: "words", pool: ["cortafuegos", "terminal", "programa", "interfaz"], targetScore: 2750, fallSpeed: 0.95, spawnRate: 1800 },
-                level_12: { id: "lvl_12", name: "Numéricos", type: "characters", pool: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"], targetScore: 3000, fallSpeed: 1.0, spawnRate: 1700 },
-                level_13: { id: "lvl_13", name: "Acentos", type: "words", pool: ["código", "ratón", "conexión", "módem", "píxel"], targetScore: 3250, fallSpeed: 1.05, spawnRate: 1600 },
-                level_14: { id: "lvl_14", name: "Cyberpunk", type: "words", pool: ["matriz", "ciberespacio", "terminal", "sintético"], targetScore: 3500, fallSpeed: 1.10, spawnRate: 1500 },
-                level_15: { id: "lvl_15", name: "Núcleo Duro", type: "words", pool: ["criptografía", "algoritmo", "procesador", "encriptado"], targetScore: 4000, fallSpeed: 1.15, spawnRate: 1400 },
-                level_16: { id: "lvl_16", name: "Código", type: "words", pool: ["funcion", "retornar", "variable", "constante", "importar"], targetScore: 4500, fallSpeed: 1.20, spawnRate: 1300 },
-                level_17: { id: "lvl_17", name: "Sobrecarga I", type: "words", pool: ["vulnerabilidad", "autenticación", "infraestructura"], targetScore: 5000, fallSpeed: 1.25, spawnRate: 1200 },
-                level_18: { id: "lvl_18", name: "Sobrecarga II", type: "words", pool: ["encapsulación", "asíncrono", "polimorfismo"], targetScore: 5500, fallSpeed: 1.30, spawnRate: 1100 },
-                level_19: { id: "lvl_19", name: "Modo Dios", type: "words", pool: ["telemetría", "subrutina", "cuántico", "cibernética"], targetScore: 6000, fallSpeed: 1.40, spawnRate: 1000 },
-                level_20: { id: "lvl_20", name: "La Singularidad", type: "words", pool: ["singularidad", "trascendencia", "omnipresencia"], targetScore: 7500, fallSpeed: 1.50, spawnRate: 900 }
+                level_1:  { id: "lvl_1",  name: "Centro Núcleo", type: "characters", pool: ["f", "j"], targetScore: 450, fallSpeed: 0.50, spawnRate: 2100 },
+                level_2:  { id: "lvl_2",  name: "Centro Extendido", type: "characters", pool: ["d", "k", "f", "j"], targetScore: 700, fallSpeed: 0.55, spawnRate: 2000 },
+                level_3:  { id: "lvl_3",  name: "Fila Base", type: "characters", pool: ["s", "l", "a", "ñ", "d", "k", "f", "j"], targetScore: 900, fallSpeed: 0.60, spawnRate: 1900 },
+                level_4:  { id: "lvl_4",  name: "Puente Superior", type: "characters", pool: ["e", "i", "r", "u", "d", "k", "f", "j"], targetScore: 1100, fallSpeed: 0.65, spawnRate: 1800 },
+                level_5:  { id: "lvl_5",  name: "Anillo Superior", type: "characters", pool: ["w", "o", "q", "p", "e", "i", "r", "u"], targetScore: 1300, fallSpeed: 0.70, spawnRate: 1700 },
+                level_6:  { id: "lvl_6",  name: "Puente Inferior", type: "characters", pool: ["c", "m", "v", "n", "x", ",", ".", "z"], targetScore: 1500, fallSpeed: 0.75, spawnRate: 1650 },
+                level_7:  { id: "lvl_7",  name: "Precisión Inferior", type: "characters", pool: ["b", "n", "m", ",", ".", "-", "v", "c"], targetScore: 1700, fallSpeed: 0.80, spawnRate: 1600 },
+                level_8:  { id: "lvl_8",  name: "Números Inicio", type: "characters", pool: ["4", "5", "6", "7", "f", "j", "d", "k"], targetScore: 1900, fallSpeed: 0.85, spawnRate: 1550 },
+                level_9:  { id: "lvl_9",  name: "Números Ampliados", type: "characters", pool: ["1", "2", "3", "8", "9", "0", "q", "p"], targetScore: 2100, fallSpeed: 0.90, spawnRate: 1500 },
+                level_10: { id: "lvl_10", name: "Símbolos Frecuentes", type: "characters", pool: ["'", "¡", "¿", "?", ",", ".", "-", "+"], targetScore: 2300, fallSpeed: 0.95, spawnRate: 1450 },
+                level_11: { id: "lvl_11", name: "Acentos y Ñ", type: "characters", pool: ["´", "¨", "ñ", "ç", "`", "+", "<", "-"], targetScore: 2500, fallSpeed: 1.00, spawnRate: 1400 },
+                level_12: { id: "lvl_12", name: "Palabras Cortas", type: "words", pool: ["red", "nodo", "dato", "hack", "clave", "byte"], targetScore: 2750, fallSpeed: 0.95, spawnRate: 1850 },
+                level_13: { id: "lvl_13", name: "Comas en Flujo", type: "words", pool: ["código,ya", "dato,nodo", "red,segura", "clave,api", "traza,log"], targetScore: 3000, fallSpeed: 1.00, spawnRate: 1800 },
+                level_14: { id: "lvl_14", name: "Espacio Guiado", type: "words", pool: ["de red", "en nodo", "tu clave", "dato base", "modo pro"], targetScore: 3250, fallSpeed: 1.05, spawnRate: 1750 },
+                level_15: { id: "lvl_15", name: "Ritmo Mixto", type: "words", pool: ["clave, red", "nodo seguro", "api, dato", "modo debug", "código base"], targetScore: 3600, fallSpeed: 1.10, spawnRate: 1680 },
+                level_16: { id: "lvl_16", name: "Terminos Red", type: "words", pool: ["servidor", "paquete", "enlace", "router", "terminal"], targetScore: 3950, fallSpeed: 1.15, spawnRate: 1600 },
+                level_17: { id: "lvl_17", name: "Sintaxis Viva", type: "words", pool: ["const dato", "while(true)", "nodo.js", "clave-api", "array.push"], targetScore: 4300, fallSpeed: 1.20, spawnRate: 1520 },
+                level_18: { id: "lvl_18", name: "Acentos Activos", type: "words", pool: ["señal", "acción", "código útil", "rápido, sí", "visión"], targetScore: 4700, fallSpeed: 1.25, spawnRate: 1450 },
+                level_19: { id: "lvl_19", name: "Ráfaga Larga I", type: "words", pool: ["cortafuegos", "protocolo", "seguridad", "conexión", "infraestructura"], targetScore: 5100, fallSpeed: 1.30, spawnRate: 1380 },
+                level_20: { id: "lvl_20", name: "Ráfaga Larga II", type: "words", pool: ["autenticación", "encriptación", "distribución", "persistencia", "sincronización"], targetScore: 5600, fallSpeed: 1.35, spawnRate: 1300 },
+                level_21: { id: "lvl_21", name: "Espacio + Signos", type: "words", pool: ["alerta, ya", "traza hoy", "clave, red", "nodo, base", "modo rápido"], targetScore: 6100, fallSpeed: 1.40, spawnRate: 1220 },
+                level_22: { id: "lvl_22", name: "Contexto Rápido", type: "words", pool: ["token seguro", "sistema, core", "canal/rápido", "flujo total", "capa lógica"], targetScore: 6700, fallSpeed: 1.45, spawnRate: 1150 },
+                level_23: { id: "lvl_23", name: "Overclock", type: "words", pool: ["telemetría", "subrutina", "ciberespacio", "hipervínculo", "multinúcleo"], targetScore: 7300, fallSpeed: 1.50, spawnRate: 1080 },
+                level_24: { id: "lvl_24", name: "Matrix Crítico", type: "words", pool: ["acceso total", "matriz, viva", "protocolo final", "nodo maestro", "control global"], targetScore: 7900, fallSpeed: 1.55, spawnRate: 1010 },
+                level_25: { id: "lvl_25", name: "Centinela Sector-5", type: "words", pool: ["sector blindado", "giro matrix", "override, ya", "puente kernel", "centinela neón"], targetScore: 8600, fallSpeed: 1.60, spawnRate: 940 },
+                level_26: { id: "lvl_26", name: "Tejido de Hilos", type: "words", pool: ["hilo síncrono", "buffer mixto", "token, flujo", "ruta hash", "pulso caché"], targetScore: 9300, fallSpeed: 1.66, spawnRate: 900 },
+                level_27: { id: "lvl_27", name: "Deriva Cifrada", type: "words", pool: ["modo cifrado", "clave,frame", "traza señal", "vector/ruta", "delta caché"], targetScore: 10050, fallSpeed: 1.72, spawnRate: 860 },
+                level_28: { id: "lvl_28", name: "Pulso Neural", type: "words", pool: ["núcleo neural", "quantum,link", "pulso matrix", "puerta runtime", "tormenta binaria"], targetScore: 10850, fallSpeed: 1.78, spawnRate: 820 },
+                level_29: { id: "lvl_29", name: "Firewall Prime", type: "words", pool: ["firewall++", "auth,override", "paquete profundo", "rompe flujo", "brecha señal"], targetScore: 11700, fallSpeed: 1.84, spawnRate: 780 },
+                level_30: { id: "lvl_30", name: "Boss Final: Núcleo Root", type: "words", pool: ["acceso root", "sistema, tomado", "override final", "apocalipsis neón", "protocolo omega"], targetScore: 12600, fallSpeed: 1.92, spawnRate: 740 }
             }
         };
 
         const NeonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFFF00'];
+        const MATRIX_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*<>[]{}アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワ";
 
         // ==========================================
         // SYSTEM: GEMINI API SERVICE ✨
@@ -691,14 +861,14 @@
                         }
                     }
                 };
-                try {
-                    const result = await this.fetchWithRetry(payload);
-                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    return JSON.parse(text).words;
-                } catch (e) {
-                    console.error("Gemini Generation Error:", e);
-                    return ["system", "error", "fallback", "node", "breached"];
-                }
+                  try {
+                      const result = await this.fetchWithRetry(payload);
+                      const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                      return JSON.parse(text).words;
+                  } catch (e) {
+                      return ["system", "error", "fallback", "node", "breached"];
+                  }
+
             }
 
             async generateFeedback(isWin, score, combo, language) {
@@ -736,16 +906,71 @@
                 }
             }
 
-            loadProfiles() {
-                try {
-                    const stored = localStorage.getItem('neonStreamProfiles');
-                    return stored ? JSON.parse(stored) : {};
-                } catch (e) {
-                    return {};
-                }
-            }
+              normalizeAlias(alias) {
+                  return alias
+                      .trim()
+                      .toLowerCase()
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/\s+/g, ' ');
+              }
 
-            saveProfiles() {
+              loadProfiles() {
+                  try {
+                      const stored = localStorage.getItem('neonStreamProfiles');
+                      const parsed = stored ? JSON.parse(stored) : {};
+                      const dedupedProfiles = {};
+                      const seenNormalizedAliases = new Set();
+
+                        for (const [rawAlias, profileData] of Object.entries(parsed)) {
+                            if (typeof rawAlias !== 'string') continue;
+                            const cleanAlias = rawAlias.trim();
+                            if (!cleanAlias) continue;
+
+                            const normalizedAlias = this.normalizeAlias(cleanAlias);
+                            if (seenNormalizedAliases.has(normalizedAlias)) continue;
+
+                            const safeProfile = profileData && typeof profileData === 'object' ? profileData : {};
+                                if (!safeProfile.preferences || typeof safeProfile.preferences !== 'object') {
+                                    safeProfile.preferences = { language: 'es', layout: 'iso-es', bgImage: null, bgImageOriginal: null, bgRemovalAggression: 50 };
+                                }
+                                if (typeof safeProfile.preferences.bgImageOriginal === 'undefined') {
+                                    safeProfile.preferences.bgImageOriginal = safeProfile.preferences.bgImage || null;
+                                }
+                                if (typeof safeProfile.preferences.bgRemovalAggression !== 'number' || Number.isNaN(safeProfile.preferences.bgRemovalAggression)) {
+                                    safeProfile.preferences.bgRemovalAggression = 50;
+                                }
+                                safeProfile.preferences.bgRemovalAggression = Math.max(0, Math.min(100, Math.round(safeProfile.preferences.bgRemovalAggression)));
+
+                            if (!safeProfile.progress || typeof safeProfile.progress !== 'object') {
+                                safeProfile.progress = { highestLevelUnlocked: 1, highScores: {} };
+                            }
+
+                            if (typeof safeProfile.progress.highestLevelUnlocked !== 'number' || Number.isNaN(safeProfile.progress.highestLevelUnlocked)) {
+                                safeProfile.progress.highestLevelUnlocked = 1;
+                            }
+                            safeProfile.progress.highestLevelUnlocked = Math.max(1, Math.min(TOTAL_LEVELS, Math.floor(safeProfile.progress.highestLevelUnlocked)));
+
+                            // Recovery for legacy persistent God Mode unlocks:
+                            // if all levels appear unlocked but no score history exists, restore normal progression.
+                            const hasAnyHighScore = safeProfile.progress.highScores && Object.keys(safeProfile.progress.highScores).length > 0;
+                            if (safeProfile.progress.highestLevelUnlocked === TOTAL_LEVELS && !hasAnyHighScore && !safeProfile.progress.levelProgressVerified) {
+                                safeProfile.progress.highestLevelUnlocked = 1;
+                            }
+                            safeProfile.progress.levelProgressVerified = true;
+
+                            seenNormalizedAliases.add(normalizedAlias);
+                            dedupedProfiles[cleanAlias] = safeProfile;
+                        }
+
+
+                      return dedupedProfiles;
+                  } catch (e) {
+                      return {};
+                  }
+              }
+
+              saveProfiles() {
                 try {
                     localStorage.setItem('neonStreamProfiles', JSON.stringify(this.profiles));
                     if (this.activeAlias) {
@@ -757,26 +982,37 @@
                 }
             }
 
-            createProfile(alias) {
-                if (!alias || this.profiles[alias]) return false;
-                if (Object.keys(this.profiles).length >= 3) {
-                    alert("Maximum of 3 perfiles alcanzado. Por favor borra uno primero.");
-                    return false;
-                }
-                const isSpanish = navigator.language.toLowerCase().startsWith('es');
-                
-                this.profiles[alias] = {
-                    preferences: { 
-                        language: isSpanish ? "es" : "en", 
-                        layout: isSpanish ? "iso-es" : "ansi-us",
-                        bgImage: null 
-                    },
-                    progress: { highestLevelUnlocked: 1, highScores: {} }
-                };
-                this.activeAlias = alias;
-                this.saveProfiles();
-                return true;
-            }
+              createProfile(alias) {
+                  const cleanAlias = (alias || '').trim();
+                  if (!cleanAlias) return false;
+
+                  const normalizedAlias = this.normalizeAlias(cleanAlias);
+                  const duplicateAlias = Object.keys(this.profiles).some(existingAlias => {
+                      return this.normalizeAlias(existingAlias) === normalizedAlias;
+                  });
+                  if (duplicateAlias) return false;
+
+                  if (Object.keys(this.profiles).length >= 3) {
+                      alert("Maximum of 3 perfiles alcanzado. Por favor borra uno primero.");
+                      return false;
+                  }
+                  const isSpanish = navigator.language.toLowerCase().startsWith('es');
+                  
+                    this.profiles[cleanAlias] = {
+                        preferences: { 
+                            language: isSpanish ? "es" : "en", 
+                            layout: isSpanish ? "iso-es" : "ansi-us",
+                            bgImage: null,
+                            bgImageOriginal: null,
+                            bgRemovalAggression: 50
+                        },
+                        progress: { highestLevelUnlocked: 1, highScores: {} }
+                    };
+
+                  this.activeAlias = cleanAlias;
+                  this.saveProfiles();
+                  return true;
+              }
 
             deleteProfile(alias) {
                 if (this.profiles[alias]) {
@@ -800,30 +1036,40 @@
                 return this.activeAlias ? this.profiles[this.activeAlias] : null;
             }
 
-            updateSettings(lang, layout) {
+            updateSettings(lang, layout, bgRemovalAggression = null) {
                 if (!this.profile) return;
                 this.profile.preferences.language = lang;
                 this.profile.preferences.layout = layout;
+                if (typeof bgRemovalAggression === 'number' && !Number.isNaN(bgRemovalAggression)) {
+                    this.profile.preferences.bgRemovalAggression = Math.max(0, Math.min(100, Math.round(bgRemovalAggression)));
+                }
                 this.saveProfiles();
             }
 
-            updateBgImage(base64Data) {
-                if (!this.profile) return;
-                const oldBg = this.profile.preferences.bgImage;
-                this.profile.preferences.bgImage = base64Data;
-                const saved = this.saveProfiles();
-                if (!saved && base64Data !== null) {
-                    alert("Error: La imagen es demasiado pesada para la memoria de tu perfil. Por favor, sube una imagen más sencilla.");
-                    this.profile.preferences.bgImage = oldBg;
-                }
-            }
+              updateBgImage(base64Data, originalBase64 = null) {
+                  if (!this.profile) return;
+                  const oldBg = this.profile.preferences.bgImage;
+                  const oldBgOriginal = this.profile.preferences.bgImageOriginal || null;
+                  this.profile.preferences.bgImage = base64Data;
+                  this.profile.preferences.bgImageOriginal = originalBase64;
+                  const saved = this.saveProfiles();
+                  if (!saved && base64Data !== null) {
+                      alert("Error: La imagen es demasiado pesada para la memoria de tu perfil. Por favor, sube una imagen más sencilla.");
+                      this.profile.preferences.bgImage = oldBg;
+                      this.profile.preferences.bgImageOriginal = oldBgOriginal;
+                  }
+              }
 
-            unlockLevel(levelNum) {
-                if (this.profile && levelNum > this.profile.progress.highestLevelUnlocked) {
-                    this.profile.progress.highestLevelUnlocked = levelNum;
-                    this.saveProfiles();
-                }
-            }
+
+              unlockLevel(levelNum) {
+                  if (!this.profile) return;
+                  const clampedLevel = Math.max(1, Math.min(TOTAL_LEVELS, levelNum));
+                  if (clampedLevel > this.profile.progress.highestLevelUnlocked) {
+                      this.profile.progress.highestLevelUnlocked = clampedLevel;
+                      this.saveProfiles();
+                  }
+              }
+
         }
 
         // ==========================================
@@ -841,19 +1087,47 @@
                 
                 // Procesamiento de Imagen 3D
                 this.offscreenCanvas = document.createElement('canvas');
-                this.offscreenCtx = this.offscreenCanvas.getContext('2d', { willReadFrequently: true });
-                this.bgImageObj = null;
-                this.currentBgBase64 = null;
-                
-                this.gridSize = 16;
-                this.gridCols = 0;
-                this.gridRows = 0;
-                this.imageGrid = [];
+                  this.offscreenCtx = this.offscreenCanvas.getContext('2d', { willReadFrequently: true });
+                  this.bgImageObj = null;
+                  this.bgImageOriginalObj = null;
+                  this.currentBgBase64 = null;
 
-                this.particles = [];
-                this.bgDrops = [];
-                this.activeHighlights = {};
-                this.systemGlow = { alpha: 0, color: '#00FFFF' }; 
+                
+                    this.gridSize = 12;
+                    this.gridCols = 0;
+                    this.gridRows = 0;
+                    this.imageGrid = [];
+                    this.topologyCells = [];
+                    this.topologyFrameCounter = 0;
+
+                    this.particles = [];
+                    this.maxParticlesBase = 650;
+                    this.maxParticles = this.maxParticlesBase;
+                    this.bgDrops = [];
+                    this.baseDropCount = 0;
+                    this.activeHighlights = {};
+                    this.systemGlow = { alpha: 0, color: '#00FFFF' }; 
+                    this.hackReveal = 0;
+                    this.performance = {
+                        tier: 0,
+                        smoothedFrameMs: 16.7,
+                        lastTimestamp: 0,
+                        downFrames: 0,
+                        upFrames: 0
+                    };
+                    this.adaptiveParticleQuality = 1;
+
+                  this.hackRevealActive = false;
+                  this.hackRevealStartTime = 0;
+                    this.hackRevealDurationMs = 10000;
+                    this.hackRevealHoldDurationMs = 0;
+                    this.hackRevealHoldUntil = 0;
+                    this.hackRevealPhase = 'idle'; // idle | morph | hold
+                    this.bgDrawRect = null;
+                    this.topologyRenderAccumulator = 0;
+                    this.topologyCursor = 0;
+                    this.renderFrameCount = 0;
+
                 
                 this.initBackgroundDrops();
                 this.resize();
@@ -861,27 +1135,222 @@
             }
 
             getRandomMatrixChar() {
-                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*<>[]{}アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワ";
-                return chars[Math.floor(Math.random() * chars.length)];
+                return MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
             }
 
-            setBgImage(base64) {
-                if (!base64) {
-                    this.bgImageObj = null;
-                    this.imageGrid = [];
-                    this.currentBgBase64 = null;
+            updateAdaptivePerformance(timestamp) {
+                const perf = this.performance;
+                if (!perf.lastTimestamp) {
+                    perf.lastTimestamp = timestamp;
                     return;
                 }
-                
-                if (this.currentBgBase64 === base64 && this.imageGrid.length > 0) return; 
-                
-                this.currentBgBase64 = base64;
-                const img = new Image();
-                img.onload = () => {
-                    this.bgImageObj = img;
-                    this.cacheAndCalculateTopography();
-                };
-                img.src = base64;
+
+                const frameMs = Math.max(1, timestamp - perf.lastTimestamp);
+                perf.lastTimestamp = timestamp;
+                perf.smoothedFrameMs = perf.smoothedFrameMs * 0.92 + frameMs * 0.08;
+
+                const isSlow = perf.smoothedFrameMs > 24;
+                const isFast = perf.smoothedFrameMs < 18;
+
+                if (isSlow) {
+                    perf.downFrames += 1;
+                    perf.upFrames = 0;
+                } else if (isFast) {
+                    perf.upFrames += 1;
+                    perf.downFrames = 0;
+                } else {
+                    perf.downFrames = Math.max(0, perf.downFrames - 1);
+                    perf.upFrames = Math.max(0, perf.upFrames - 1);
+                }
+
+                if (perf.downFrames > 32) {
+                    perf.tier = Math.min(3, perf.tier + 1);
+                    perf.downFrames = 0;
+                    perf.upFrames = 0;
+                } else if (perf.upFrames > 96) {
+                    perf.tier = Math.max(0, perf.tier - 1);
+                    perf.downFrames = 0;
+                    perf.upFrames = 0;
+                }
+            }
+
+              getPerfSettings(isRevealActive) {
+                  if (isRevealActive) {
+                      return {
+                          activeDropCount: this.bgDrops.length,
+                          dropCharRefreshChance: 0.05,
+                          glowChance: 0.35,
+                          topologyStride: 1,
+                          topologyCharRefreshChance: 0.018,
+                          topologyCellBudget: Number.MAX_SAFE_INTEGER,
+                          fogSkipFrames: 0,
+                          allowRainTintSampling: true,
+                          particleQuality: 1
+                      };
+                  }
+
+                  const tier = this.performance.tier;
+                  if (tier === 0) {
+                      return {
+                          activeDropCount: Math.floor(this.bgDrops.length * 0.85),
+                          dropCharRefreshChance: 0.04,
+                          glowChance: 0.28,
+                          topologyStride: 2,
+                          topologyCharRefreshChance: 0.01,
+                          topologyCellBudget: 2400,
+                          fogSkipFrames: 1,
+                          allowRainTintSampling: false,
+                          particleQuality: 0.88
+                      };
+                  }
+                  if (tier === 1) {
+                      return {
+                          activeDropCount: Math.floor(this.bgDrops.length * 0.72),
+                          dropCharRefreshChance: 0.032,
+                          glowChance: 0.2,
+                          topologyStride: 3,
+                          topologyCharRefreshChance: 0.007,
+                          topologyCellBudget: 1700,
+                          fogSkipFrames: 2,
+                          allowRainTintSampling: false,
+                          particleQuality: 0.7
+                      };
+                  }
+                  if (tier === 2) {
+                      return {
+                          activeDropCount: Math.floor(this.bgDrops.length * 0.58),
+                          dropCharRefreshChance: 0.024,
+                          glowChance: 0.14,
+                          topologyStride: 4,
+                          topologyCharRefreshChance: 0.005,
+                          topologyCellBudget: 1100,
+                          fogSkipFrames: 3,
+                          allowRainTintSampling: false,
+                          particleQuality: 0.56
+                      };
+                  }
+                  return {
+                      activeDropCount: Math.floor(this.bgDrops.length * 0.46),
+                      dropCharRefreshChance: 0.018,
+                      glowChance: 0.1,
+                      topologyStride: 5,
+                      topologyCharRefreshChance: 0.0035,
+                      topologyCellBudget: 780,
+                      fogSkipFrames: 4,
+                      allowRainTintSampling: false,
+                      particleQuality: 0.45
+                  };
+              }
+
+              setBgImage(base64, originalBase64 = null) {
+                  if (!base64) {
+                      this.bgImageObj = null;
+                      this.bgImageOriginalObj = null;
+                      this.imageGrid = [];
+                      this.currentBgBase64 = null;
+                      this.bgDrawRect = null;
+                      this.resetHackReveal();
+                      return;
+                  }
+
+                  const effectiveOriginal = originalBase64 || base64;
+                  const cacheKey = `${base64}::${effectiveOriginal}`;
+                  if (this.currentBgBase64 === cacheKey && this.imageGrid.length > 0) return;
+
+                  this.currentBgBase64 = cacheKey;
+
+                  const processedImg = new Image();
+                  processedImg.onload = () => {
+                      this.bgImageObj = processedImg;
+                      this.cacheAndCalculateTopography();
+                  };
+                  processedImg.src = base64;
+
+                  const originalImg = new Image();
+                  originalImg.onload = () => {
+                      this.bgImageOriginalObj = originalImg;
+                  };
+                  originalImg.src = effectiveOriginal;
+              }
+
+
+            triggerHackReveal(enable) {
+                if (!enable) {
+                    this.resetHackReveal();
+                    return;
+                }
+                if (!this.bgImageObj) {
+                    this.resetHackReveal();
+                    return;
+                }
+                // Recompute draw rect using current HUD geometry right before reveal.
+                this.cacheAndCalculateTopography();
+                this.hackReveal = 0;
+                this.hackRevealPhase = 'morph';
+                this.hackRevealActive = true;
+                this.hackRevealStartTime = performance.now();
+                this.hackRevealHoldUntil = 0;
+            }
+
+            accelerateHackReveal() {
+                if (this.hackRevealPhase !== 'morph') return false;
+                this.hackReveal = 1;
+                this.hackRevealActive = false;
+                this.hackRevealPhase = 'hold';
+                this.hackRevealHoldUntil = performance.now() + this.hackRevealHoldDurationMs;
+                return true;
+            }
+
+            skipHackReveal() {
+                if (this.hackRevealPhase === 'idle') return false;
+                this.hackReveal = 1;
+                this.hackRevealActive = false;
+                this.hackRevealPhase = 'hold';
+                this.hackRevealHoldUntil = performance.now();
+                return true;
+            }
+
+            sampleCellAt(x, y) {
+                if (!this.imageGrid || this.imageGrid.length === 0) return null;
+                const c = Math.floor(x / this.gridSize);
+                const r = Math.floor(y / this.gridSize);
+                if (c < 0 || c >= this.gridCols || r < 0 || r >= this.gridRows) return null;
+                return this.imageGrid[c][r];
+            }
+
+            isHackRevealCompleted(now = performance.now()) {
+                if (!this.bgImageObj) return true;
+                if (this.hackRevealPhase === 'idle') return true;
+                if (this.hackRevealPhase === 'morph') return false;
+                return this.hackRevealHoldUntil > 0 && now >= this.hackRevealHoldUntil;
+            }
+
+            resetHackReveal() {
+                this.hackReveal = 0;
+                this.hackRevealActive = false;
+                this.hackRevealStartTime = 0;
+                this.hackRevealHoldUntil = 0;
+                this.hackRevealPhase = 'idle';
+            }
+
+            resetForNewLevel() {
+                this.resetHackReveal();
+                this.particles = [];
+                this.activeHighlights = {};
+                this.systemGlow = { alpha: 0, color: '#00FFFF' };
+                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+                this.ctx.globalAlpha = 1;
+                this.ctx.shadowBlur = 0;
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.ctx.fillStyle = '#0a0a0c';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                this.textCtx.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
+                for (let c = 0; c < this.gridCols; c++) {
+                    for (let r = 0; r < this.gridRows; r++) {
+                        const cell = this.imageGrid[c]?.[r];
+                        if (cell) cell.wake = 0;
+                    }
+                }
             }
 
             cacheAndCalculateTopography() {
@@ -905,13 +1374,23 @@
                     drawH = drawW / imgAspect;
                 }
 
-                // Reducir la imagen a la mitad (50%)
-                drawW *= 0.5;
-                drawH *= 0.5;
+                // Maximizar la imagen dentro del viewport útil (sin pisar el HUD superior)
+                const hud = document.getElementById('hud');
+                const hudHeight = hud ? hud.getBoundingClientRect().height : 0;
+                const topInset = Math.max(0, Math.ceil(hudHeight + 8));
+                const usableX = 0;
+                const usableY = topInset;
+                const usableW = this.canvas.width;
+                const usableH = Math.max(1, this.canvas.height - topInset);
 
-                // Centrar la imagen escalada en el canvas
-                let offsetX = (this.canvas.width - drawW) / 2;
-                let offsetY = (this.canvas.height - drawH) / 2;
+                const fitScale = Math.min(usableW / drawW, usableH / drawH);
+                drawW *= fitScale;
+                drawH *= fitScale;
+
+                // Centrar dentro del área útil (debajo del HUD)
+                const offsetX = usableX + (usableW - drawW) / 2;
+                const offsetY = usableY + (usableH - drawH) / 2;
+                this.bgDrawRect = { x: offsetX, y: offsetY, w: drawW, h: drawH, topInset };
 
                 this.offscreenCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 this.offscreenCtx.drawImage(this.bgImageObj, offsetX, offsetY, drawW, drawH);
@@ -924,6 +1403,7 @@
                 this.gridCols = Math.floor(w / this.gridSize);
                 this.gridRows = Math.floor(h / this.gridSize);
                 this.imageGrid = new Array(this.gridCols).fill(null).map(() => new Array(this.gridRows).fill(null));
+                this.topologyCells = [];
 
                 for (let c = 0; c < this.gridCols; c++) {
                     for (let r = 0; r < this.gridRows; r++) {
@@ -931,12 +1411,16 @@
                         const py = r * this.gridSize;
                         
                         const idx = (py * w + px) * 4;
-                        if (idx >= 0 && idx < data.length - (w * 4 * 2)) {
-                            const imgR = data[idx];
-                            const imgG = data[idx+1];
-                            const imgB = data[idx+2];
-                            
-                            const luma = 0.299*imgR + 0.587*imgG + 0.114*imgB;
+                          if (idx >= 0 && idx < data.length - (w * 4 * 2)) {
+                              const alpha = data[idx + 3];
+                              if (alpha < 18) continue;
+
+                              const imgR = data[idx];
+                              const imgG = data[idx+1];
+                              const imgB = data[idx+2];
+                              
+                              const luma = 0.299*imgR + 0.587*imgG + 0.114*imgB;
+
                             
                             const idxR = (py * w + Math.min(px + 2, w - 1)) * 4;
                             const idxD = (Math.min(py + 2, h - 1) * w + px) * 4;
@@ -948,48 +1432,62 @@
                             const darkness = 255 - luma;
                             const edgeScore = edgeMagnitude * (darkness / 255) * 1.5 + (edgeMagnitude * 0.5);
                             
-                            // MEJORA: Umbral más bajo para asegurar que se capturen más detalles de la imagen
-                            if (edgeScore > 8 || luma > 10) {
-                                this.imageGrid[c][r] = {
-                                    x: px, y: py,
-                                    edge: edgeScore,
-                                    luma: luma, 
-                                    wake: 0, 
-                                    char: this.getRandomMatrixChar()
-                                };
-                            }
+                              // Umbral bajo para capturar más detalle y formar imagen completa con caracteres
+                              if (edgeScore > 6 || luma > 8) {
+                                  const cell = {
+                                      x: px, y: py,
+                                      edge: edgeScore,
+                                      luma: luma,
+                                      r: imgR,
+                                      g: imgG,
+                                      b: imgB,
+                                      wake: 0,
+                                      char: this.getRandomMatrixChar(),
+                                      glyphScale: 0.72 + Math.random() * 0.64
+                                  };
+                                  this.imageGrid[c][r] = cell;
+                                  this.topologyCells.push(cell);
+                              }
+
+
                         }
                     }
                 }
             }
 
-            initBackgroundDrops() {
-                const numDrops = 300; 
-                for(let i = 0; i < numDrops; i++) {
-                    const isFast = Math.random() < 0.012; 
-                    let dropSpeed = 0;
-                    if (isFast) {
-                        dropSpeed = Math.random() * 4.25 + 1.25; 
-                    } else {
-                        dropSpeed = (Math.random() * 0.8 + 0.2) * 0.8;
-                    }
+              initBackgroundDrops() {
+                    const viewportDensity = Math.max(1, (window.innerWidth * window.innerHeight) / (1366 * 768));
+                    const numDrops = Math.floor(440 * Math.min(2.4, viewportDensity * 1.18));
+                    this.baseDropCount = numDrops;
+                  this.bgDrops = [];
+                  for (let i = 0; i < numDrops; i++) {
+                      const isFast = Math.random() < 0.018;
+                      let dropSpeed = 0;
+                      if (isFast) {
+                          dropSpeed = Math.random() * 4.1 + 1.35;
+                      } else {
+                          dropSpeed = (Math.random() * 0.85 + 0.18) * 0.86;
+                      }
 
-                    this.bgDrops.push({
-                        x: Math.random() * window.innerWidth,
-                        y: Math.random() * window.innerHeight,
-                        z: Math.random() * 0.65 + 0.05, 
-                        speed: dropSpeed,
-                        isFast: isFast,
-                        char: this.getRandomMatrixChar()
-                    });
-                }
-            }
+                        this.bgDrops.push({
+                            x: Math.random() * window.innerWidth,
+                            y: Math.random() * window.innerHeight,
+                            z: Math.random() * 0.7 + 0.04,
+                            glyphScale: 0.62 + Math.random() * 0.86,
+                            speed: dropSpeed,
+                            isFast: isFast,
+                            char: this.getRandomMatrixChar()
+                        });
+                  }
+              }
+
 
             resize() {
                 this.canvas.width = window.innerWidth;
                 this.canvas.height = window.innerHeight;
                 this.textCanvas.width = window.innerWidth;
                 this.textCanvas.height = window.innerHeight;
+                this.initBackgroundDrops();
                 if (this.bgImageObj) {
                     this.cacheAndCalculateTopography();
                 }
@@ -1010,33 +1508,58 @@
                 this.systemGlow = { alpha: 0.8, color: '#FF003C' };
             }
 
-            clearFrame(timestamp = 0) {
-                // 1. Borrado SÚPER sutil en el fondo Matrix para lograr esa estela exagerada
-                this.ctx.fillStyle = 'rgba(10, 10, 12, 0.02)';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+              clearFrame(timestamp = 0) {
+                  this.updateAdaptivePerformance(timestamp);
+                  this.renderFrameCount += 1;
+                  const perfSettings = this.getPerfSettings(this.hackRevealPhase !== 'idle');
 
-                // 2. Borrado TOTAL e INMEDIATO en el lienzo frontal de Texto (Cero estela para las palabras jugables)
-                this.textCtx.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
+                  // 1. Borrado SÚPER sutil en el fondo Matrix para lograr esa estela exagerada
+                  this.ctx.fillStyle = 'rgba(10, 10, 12, 0.02)';
+                  this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-                // NIEBLA PROCEDURAL (Como nube muy suave y letárgica, apenas perceptible)
-                const t = timestamp * 0.00004; 
-                const cx1 = this.canvas.width / 2 + Math.sin(t) * (this.canvas.width * 0.3);
-                const cy1 = this.canvas.height / 2 + Math.cos(t * 0.7) * (this.canvas.height * 0.3);
-                const cx2 = this.canvas.width / 2 + Math.sin(t * 1.2 + Math.PI) * (this.canvas.width * 0.3);
-                const cy2 = this.canvas.height / 2 + Math.cos(t * 0.9 + Math.PI) * (this.canvas.height * 0.3);
+                  // 2. Borrado TOTAL e INMEDIATO en el lienzo frontal de Texto (Cero estela para las palabras jugables)
+                  this.textCtx.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
 
-                // El radio ahora es enorme (1.5x ancho pantalla) para que no se note el borde circular
-                const grad1 = this.ctx.createRadialGradient(cx1, cy1, 0, cx1, cy1, this.canvas.width * 1.5);
-                grad1.addColorStop(0, 'rgba(0, 255, 255, 0.003)'); 
-                grad1.addColorStop(1, 'transparent');
-                this.ctx.fillStyle = grad1;
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                  // Niebla procedural adaptativa: se salta algunos frames fuera de reveal para reducir coste.
+                  const shouldDrawFog = perfSettings.fogSkipFrames === 0 || (this.renderFrameCount % (perfSettings.fogSkipFrames + 1) === 0);
+                  if (shouldDrawFog) {
+                      const t = timestamp * 0.00004;
+                      const cx1 = this.canvas.width / 2 + Math.sin(t) * (this.canvas.width * 0.3);
+                      const cy1 = this.canvas.height / 2 + Math.cos(t * 0.7) * (this.canvas.height * 0.3);
+                      const cx2 = this.canvas.width / 2 + Math.sin(t * 1.2 + Math.PI) * (this.canvas.width * 0.3);
+                      const cy2 = this.canvas.height / 2 + Math.cos(t * 0.9 + Math.PI) * (this.canvas.height * 0.3);
 
-                const grad2 = this.ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, this.canvas.width * 1.5);
-                grad2.addColorStop(0, 'rgba(0, 255, 100, 0.002)'); 
-                grad2.addColorStop(1, 'transparent');
-                this.ctx.fillStyle = grad2;
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                      const grad1 = this.ctx.createRadialGradient(cx1, cy1, 0, cx1, cy1, this.canvas.width * 1.5);
+                      grad1.addColorStop(0, 'rgba(0, 255, 255, 0.003)');
+                      grad1.addColorStop(1, 'transparent');
+                      this.ctx.fillStyle = grad1;
+                      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                      const grad2 = this.ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, this.canvas.width * 1.5);
+                      grad2.addColorStop(0, 'rgba(0, 255, 100, 0.0012)');
+                      grad2.addColorStop(1, 'transparent');
+                      this.ctx.fillStyle = grad2;
+                      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                  }
+
+                      if (this.hackRevealPhase === 'morph') {
+                          const elapsed = timestamp - this.hackRevealStartTime;
+                          const linearProgress = Math.max(0, Math.min(1, elapsed / this.hackRevealDurationMs));
+                          this.hackReveal = linearProgress;
+                          if (linearProgress >= 1) {
+                              this.hackReveal = 1;
+                              this.hackRevealActive = false;
+                              this.hackRevealPhase = 'hold';
+                              this.hackRevealHoldUntil = timestamp + this.hackRevealHoldDurationMs;
+                          }
+                      } else if (this.hackRevealPhase === 'hold') {
+
+                      this.hackReveal = 1;
+                      if (timestamp >= this.hackRevealHoldUntil) {
+                          this.hackRevealActive = false;
+                      }
+                  }
+
 
                 if (this.systemGlow.alpha > 0) {
                     this.systemGlow.alpha -= 0.025;
@@ -1044,48 +1567,104 @@
                 }
             }
 
-            updateAndDrawBackground(progress = 0) {
-                for (let key in this.activeHighlights) {
-                    this.activeHighlights[key] -= 0.05;
-                    if (this.activeHighlights[key] <= 0) delete this.activeHighlights[key];
-                }
+              updateAndDrawBackground(progress = 0) {
+                  for (let key in this.activeHighlights) {
+                      this.activeHighlights[key] -= 0.05;
+                      if (this.activeHighlights[key] <= 0) delete this.activeHighlights[key];
+                  }
 
-                const hasTopology = this.imageGrid && this.imageGrid.length > 0;
+                    const hasTopology = this.imageGrid && this.imageGrid.length > 0;
+                    const revealTransform = this.hackReveal;
+                    const isRevealActive = this.hackRevealPhase !== 'idle';
+                    const perfSettings = this.getPerfSettings(isRevealActive);
+                    this.adaptiveParticleQuality = perfSettings.particleQuality;
+                    this.maxParticles = Math.max(220, Math.floor(this.maxParticlesBase * perfSettings.particleQuality));
+
+                      // 10s total reveal with explicit 80/20 split:
+                      // Phase 1 (0-0.80): green rain -> fully image-tinted character image
+                      // Phase 2 (0.80-1.00): characters keep raining while shrinking into near-pixel size
+                        const phase1Progress = Math.min(1, revealTransform / 0.8);
+                      const phase2Progress = revealTransform <= 0.8 ? 0 : Math.min(1, (revealTransform - 0.8) / 0.2);
+                      const phase1BurstRaw = Math.max(0, Math.min(1, (phase1Progress - 0.9) / 0.1));
+                      const phase1Burst = Math.pow(phase1BurstRaw, 0.55);
+                      const tintPhase = Math.pow(phase1Progress, 0.52);
+                      const reliefPhase = Math.pow(phase1Progress, 0.72);
+                      const shrinkPhase = Math.pow(phase2Progress, 1.02);
+                      const pixelPhase = Math.pow(phase2Progress, 1.08);
+                      const rainVisibility = Math.max(0, 1 - Math.pow(phase2Progress, 2.35));
+                      const shouldTintRain = perfSettings.allowRainTintSampling && (isRevealActive || progress > 0.12);
+
+
+                      if (this.bgImageObj && this.bgDrawRect && phase2Progress > 0.22) {
+                            this.ctx.save();
+                            this.ctx.globalAlpha = Math.pow((phase2Progress - 0.22) / 0.78, 2.35);
+                            const rect = this.bgDrawRect;
+                            const revealFinalImage = this.bgImageOriginalObj || this.bgImageObj;
+                            this.ctx.drawImage(revealFinalImage, rect.x, rect.y, rect.w, rect.h);
+                            this.ctx.restore();
+                        }
+
+
+
+
+
+
 
                 // ACTUALIZACIÓN DE GOTAS DE LLUVIA
-                for (let drop of this.bgDrops) {
+                const activeGlow = this.systemGlow.alpha > 0 ? this.systemGlow : null;
+                let glowR = 0, glowG = 255, glowB = 255;
+                if (activeGlow) {
+                    const glowMatch = activeGlow.color.match(/#(..)(..)(..)/);
+                    if (glowMatch) {
+                        glowR = parseInt(glowMatch[1], 16);
+                        glowG = parseInt(glowMatch[2], 16);
+                        glowB = parseInt(glowMatch[3], 16);
+                    }
+                }
+
+                const activeDropCount = Math.max(1, Math.min(this.bgDrops.length, perfSettings.activeDropCount));
+                for (let dropIndex = 0; dropIndex < activeDropCount; dropIndex++) {
+                    const drop = this.bgDrops[dropIndex];
                     drop.y += drop.speed * drop.z;
-                    
+
                     if (drop.y > this.canvas.height) {
                         drop.y = -20;
                         drop.x = Math.random() * this.canvas.width;
                     }
-                    if (Math.random() < 0.05) drop.char = this.getRandomMatrixChar();
+                    if (Math.random() < perfSettings.dropCharRefreshChance) drop.char = this.getRandomMatrixChar();
+
+                      if (rainVisibility <= 0.004) continue;
+
 
                     if (hasTopology) {
                         const c = Math.floor(drop.x / this.gridSize);
                         const r = Math.floor(drop.y / this.gridSize);
-                        
+
                         if (c >= 0 && c < this.gridCols && r >= 0 && r < this.gridRows) {
                             const cell = this.imageGrid[c][r];
-                            if (cell) {
-                                cell.wake = Math.max(cell.wake, drop.z * 1.5);
-                                
-                                if (progress > 0 && cell.edge > 12 && Math.random() < progress * 0.8) {
-                                    
-                                    drop.y -= drop.speed * drop.z * (Math.random() * 2.5 + 1.0); 
-                                    drop.x += (Math.random() - 0.5) * this.gridSize * 1.5;
-                                    
+                                if (cell) {
+                                    const canWakeTopology = progress > 0.08 || this.hackRevealPhase !== 'idle';
+                                    if (canWakeTopology) {
+                                        const reliefWakeBoost = this.hackRevealPhase === 'idle' ? 1 : (0.5 + reliefPhase * 0.75);
+                                        cell.wake = Math.max(cell.wake, drop.z * 1.5 * rainVisibility * reliefWakeBoost);
+                                    }
+
+
+                                  if (progress > 0 && cell.edge > 12 && Math.random() < progress * 0.8 * rainVisibility) {
+                                      drop.y -= drop.speed * drop.z * (Math.random() * 2.5 + 1.0);
+                                      drop.x += (Math.random() - 0.5) * this.gridSize * 1.5;
+
+
                                     // Chispas ralentizadas para acentuar físicas
-                                    if (Math.random() < 0.25) {
+                                    if (Math.random() < 0.25 * rainVisibility && this.particles.length < this.maxParticles) {
                                         this.particles.push({
-                                            type: 'pixel', 
+                                            type: 'pixel',
                                             x: drop.x, y: drop.y, w: 2, h: 2,
                                             // Saltan con menos velocidad
                                             vx: (Math.random()-0.5)*1.5, vy: -(Math.random()*1.0 + 0.2),
                                             // Viven más tiempo
-                                            life: 1.0, decay: 0.01, 
-                                            color: '#39FF14' 
+                                            life: 1.0, decay: 0.01,
+                                            color: '#39FF14'
                                         });
                                     }
                                 }
@@ -1094,152 +1673,295 @@
                     } 
                     
                     let dropCharLower = drop.char.toLowerCase();
-                    if (this.systemGlow.alpha > 0) {
-                        this.ctx.fillStyle = this.systemGlow.color;
-                        this.ctx.globalAlpha = Math.min(1, (drop.z * 0.4) + this.systemGlow.alpha);
-                        this.ctx.shadowBlur = 15 * this.systemGlow.alpha;
-                        this.ctx.shadowColor = this.systemGlow.color;
+                        const sampledCell = shouldTintRain && this.bgImageObj ? this.sampleCellAt(drop.x, drop.y) : null;
+                        const imageTintStrength = sampledCell ? (0.25 + tintPhase * 0.75) : 0;
+
+                        const imgR = sampledCell ? sampledCell.r : 0;
+                        const imgG = sampledCell ? sampledCell.g : 255;
+                        const imgB = sampledCell ? sampledCell.b : 70;
+                        const revealRainBoost = this.hackRevealPhase === 'morph'
+                            ? (0.2 + (1 - pixelPhase) * 0.26 + phase1Burst * 0.34)
+                            : 0;
+
+
+                    if (activeGlow) {
+                        const glowToImageMix = imageTintStrength * 0.75;
+                        const mixR = Math.floor(glowR * (1 - glowToImageMix) + imgR * glowToImageMix);
+                        const mixG = Math.floor(glowG * (1 - glowToImageMix) + imgG * glowToImageMix);
+                        const mixB = Math.floor(glowB * (1 - glowToImageMix) + imgB * glowToImageMix);
+                        this.ctx.fillStyle = `rgba(${mixR}, ${mixG}, ${mixB}, ${Math.min(1, ((drop.z * 0.4) + activeGlow.alpha + revealRainBoost) * rainVisibility)})`;
+                        this.ctx.globalAlpha = 1;
+                        this.ctx.shadowBlur = 15 * activeGlow.alpha;
+                        this.ctx.shadowColor = `rgb(${mixR}, ${mixG}, ${mixB})`;
                     } else if (this.activeHighlights[dropCharLower]) {
-                        const intensity = this.activeHighlights[dropCharLower];
-                        this.ctx.fillStyle = `rgba(0, 255, 255, ${intensity})`;
+                        const intensity = this.activeHighlights[dropCharLower] * rainVisibility;
+                        const baseR = 0;
+                        const baseG = 255;
+                        const baseB = 255;
+                        const r = Math.floor(baseR * (1 - imageTintStrength) + imgR * imageTintStrength);
+                        const g = Math.floor(baseG * (1 - imageTintStrength) + imgG * imageTintStrength);
+                        const b = Math.floor(baseB * (1 - imageTintStrength) + imgB * imageTintStrength);
+                        this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(1, intensity + revealRainBoost * 0.8)})`;
                         this.ctx.shadowBlur = 10 * intensity;
-                        this.ctx.shadowColor = '#00FFFF';
+                        this.ctx.shadowColor = `rgb(${r}, ${g}, ${b})`;
                     } else if (drop.isFast) {
-                        this.ctx.fillStyle = `rgba(255, 255, 255, ${drop.z + 0.2})`;
-                        this.ctx.shadowBlur = 8;
-                        this.ctx.shadowColor = '#39FF14'; 
+                        const baseR = 180;
+                        const baseG = 255;
+                        const baseB = 210;
+                        const r = Math.floor(baseR * (1 - imageTintStrength) + imgR * imageTintStrength);
+                        const g = Math.floor(baseG * (1 - imageTintStrength) + imgG * imageTintStrength);
+                        const b = Math.floor(baseB * (1 - imageTintStrength) + imgB * imageTintStrength);
+                        this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(1, ((drop.z + 0.2) + revealRainBoost) * rainVisibility)})`;
+                        this.ctx.shadowBlur = 8 * rainVisibility;
+                        this.ctx.shadowColor = `rgb(${r}, ${g}, ${b})`;
                     } else {
-                        this.ctx.fillStyle = `rgba(0, 255, 0, ${drop.z * 0.6})`; 
+                        const baseR = 0;
+                        const baseG = 255;
+                        const baseB = 0;
+                        const r = Math.floor(baseR * (1 - imageTintStrength) + imgR * imageTintStrength);
+                        const g = Math.floor(baseG * (1 - imageTintStrength) + imgG * imageTintStrength);
+                        const b = Math.floor(baseB * (1 - imageTintStrength) + imgB * imageTintStrength);
+                        this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(1, ((drop.z * 0.6) + revealRainBoost) * rainVisibility)})`;
                         this.ctx.shadowBlur = 0;
                     }
 
-                    const size = Math.max(10, Math.floor(28 * drop.z));
-                    this.ctx.font = `${size}px 'Share Tech Mono'`;
-                    this.ctx.fillText(drop.char, drop.x, drop.y);
+                        const cinematicDropShrink = Math.min(0.9, 0.42 * Math.pow(shrinkPhase, 0.72) + 0.48 * Math.pow(shrinkPhase, 2.0));
+                          const shrinkScale = 1 - cinematicDropShrink;
+                          const variableSizeFactor = drop.glyphScale || 1;
+                          const burstBoost = 1 + phase1Burst * 0.28;
+                          const size = Math.max(2, Math.floor((22 * drop.z * variableSizeFactor * burstBoost) * shrinkScale));
+                        this.ctx.font = `${size}px 'Share Tech Mono'`;
+                        this.ctx.fillText(drop.char, drop.x, drop.y);
+
+
                     this.ctx.globalAlpha = 1.0; 
                     this.ctx.shadowBlur = 0; 
                 }
 
-                // DIBUJADO DE LA IMAGEN DE FONDO
-                if (hasTopology) {
-                    this.ctx.font = `${this.gridSize}px 'Share Tech Mono'`;
-                    this.ctx.textAlign = "left";
-                    this.ctx.textBaseline = "top";
-                    
-                    for (let c = 0; c < this.gridCols; c++) {
-                        for (let r = 0; r < this.gridRows; r++) {
-                            const cell = this.imageGrid[c][r];
-                            if (cell) {
-                                let staticBaseVis = 0;
-                                if (progress > 0) {
-                                    const edgeWeight = Math.min(1.0, cell.edge / 40);
-                                    const fillWeight = cell.luma / 255;
-                                    
-                                    // Aumentamos muchísimo el revelado final exponencial de la luminosidad
-                                    // Cuando el progreso se acerca a 1.0, la imagen se hace nítida e inconfundible.
-                                    const revealPower = Math.pow(progress, 1.5);
-                                    staticBaseVis = (progress * edgeWeight * 0.6) + (revealPower * fillWeight * 1.5); 
+                        // DIBUJADO DE LA IMAGEN DE FONDO
+                        if (hasTopology) {
+                            this.ctx.textAlign = "left";
+                            this.ctx.textBaseline = "top";
+                            const topologyVisibility = Math.max(0, 1 - Math.pow(pixelPhase, 1.25));
+                            const topologyCells = this.topologyCells || [];
+                            const revealFloor = this.hackRevealPhase === 'morph'
+                                ? (0.08 + phase1Progress * 0.52 + phase1Burst * 0.24)
+                                : 0;
+                            const revealPower = progress > 0 ? Math.pow(progress, 1.42) : 0;
+                            const charTint = Math.min(1, 0.24 + tintPhase * 0.76 + phase1Burst * 0.28);
+                            const cinematicShrink = Math.min(0.92, 0.48 * Math.pow(shrinkPhase, 0.78) + 0.44 * Math.pow(shrinkPhase, 2.1));
+                            const canMorphToImage = isRevealActive && pixelPhase > 0.08 && !!this.bgImageObj;
+                            const morphChance = canMorphToImage ? Math.pow(pixelPhase, 1.55) * 0.88 : 0;
+                            const pixelSize = canMorphToImage ? Math.max(1, Math.floor(this.gridSize * (0.14 + pixelPhase * 0.86))) : 0;
+
+                            // Optimización: en juego normal renderizamos una submalla (intercalada por frame)
+                            // y mantenemos full-res durante reveal para conservar la cinematica.
+                            const defaultStride = isRevealActive ? 1 : (progress > 0.55 ? 1 : (progress > 0.28 ? 2 : 3));
+                            const stride = perfSettings.topologyStride ? Math.max(defaultStride, perfSettings.topologyStride) : defaultStride;
+                            const frameOffset = isRevealActive ? 0 : (this.topologyFrameCounter++ % stride);
+
+                            const cellBudget = isRevealActive
+                                ? topologyCells.length
+                                : Math.min(topologyCells.length, perfSettings.topologyCellBudget);
+                            const totalSlots = Math.max(1, Math.ceil((topologyCells.length - frameOffset) / stride));
+                            const processedSlots = Math.max(1, Math.min(totalSlots, cellBudget));
+                            const startSlot = isRevealActive
+                                ? 0
+                                : (this.topologyCursor % totalSlots);
+                            this.topologyCursor = (startSlot + processedSlots) % totalSlots;
+
+                        for (let slot = 0; slot < processedSlots; slot++) {
+                            const logicalSlot = (startSlot + slot) % totalSlots;
+                            const i = frameOffset + logicalSlot * stride;
+                            if (i >= topologyCells.length) continue;
+                            const cell = topologyCells[i];
+
+                            let staticBaseVis = revealFloor;
+                            if (progress > 0) {
+                                const edgeWeight = Math.min(1.0, cell.edge / 36);
+                                const fillWeight = cell.luma / 255;
+                                staticBaseVis = Math.max(staticBaseVis, (progress * edgeWeight * 0.72) + (revealPower * fillWeight * 1.58));
+                            }
+
+                            const activeIllumination = Math.min(1.0, Math.max(cell.wake, staticBaseVis)) * topologyVisibility;
+
+                            if (activeIllumination > 0.004) {
+                                let baseG = Math.floor(10 + (cell.luma / 255) * 245);
+                                let baseR = 0;
+                                let baseB = 0;
+
+                                if (cell.wake > 0.7) {
+                                    baseR = 150;
+                                    baseB = 150;
+                                    baseG = 255;
                                 }
-                                
-                                const activeIllumination = Math.min(1.0, Math.max(cell.wake, staticBaseVis));
-                                
-                                if (activeIllumination > 0.005) {
-                                    // Genera el volumen a través del tono Verde
-                                    let baseG = Math.floor(10 + (cell.luma / 255) * 245); 
-                                    let baseR = 0;
-                                    let baseB = 0;
-                                    
-                                    if (cell.wake > 0.7) {
-                                        baseR = 150;
-                                        baseB = 150;
-                                        baseG = 255;
-                                    }
 
-                                    if (this.systemGlow.alpha > 0 && Math.random() > 0.5) {
-                                        this.ctx.fillStyle = this.systemGlow.color;
-                                    } else {
-                                        this.ctx.fillStyle = `rgba(${baseR}, ${baseG}, ${baseB}, ${activeIllumination})`;
-                                    }
+                                const charR = Math.floor(baseR * (1 - charTint) + cell.r * charTint);
+                                const charG = Math.floor(baseG * (1 - charTint) + cell.g * charTint);
+                                const charB = Math.floor(baseB * (1 - charTint) + cell.b * charTint);
 
-                                    if (Math.random() < 0.01) cell.char = this.getRandomMatrixChar();
-                                    
+                                if (isRevealActive && Math.random() < (perfSettings.topologyCharRefreshChance + phase1Burst * 0.07)) {
+                                    cell.char = this.getRandomMatrixChar();
+                                }
+
+                                const shouldMorphToImage = canMorphToImage && Math.random() < morphChance;
+                                if (shouldMorphToImage) {
+                                    const pixelAlpha = Math.min(1, Math.pow(pixelPhase, 1.34) * 1.05) * activeIllumination;
+                                    this.ctx.fillStyle = `rgba(${cell.r}, ${cell.g}, ${cell.b}, ${pixelAlpha})`;
+                                    this.ctx.fillRect(cell.x, cell.y, pixelSize, pixelSize);
+                                } else {
+                                    const cellScale = cell.glyphScale || 1;
+                                    const cellCharSize = Math.max(2, Math.floor(this.gridSize * cellScale * (1 - cinematicShrink)));
+                                    this.ctx.font = `${cellCharSize}px 'Share Tech Mono'`;
+                                if (activeGlow && Math.random() < perfSettings.glowChance) {
+                                    this.ctx.fillStyle = activeGlow.color;
+                                } else {
+
+                                        this.ctx.fillStyle = `rgba(${charR}, ${charG}, ${charB}, ${activeIllumination})`;
+                                    }
                                     this.ctx.fillText(cell.char, cell.x, cell.y);
                                 }
-                                
-                                cell.wake -= 0.005;
-                                if(cell.wake < 0) cell.wake = 0;
                             }
+
+                            cell.wake -= 0.005;
+                            if (cell.wake < 0) cell.wake = 0;
                         }
                     }
-                }
+
+
             }
 
-            drawStream(stream) {
-                // Dibujamos las palabras EN EL TEXT CANVAS. 
-                // Sin estela, más grande, en negrita y SIEMPRE por encima de todo.
-                const ctx = this.textCtx;
-                
-                ctx.font = "bold 38px 'Share Tech Mono'";
-                const x = stream.x;
-                const y = stream.y;
+              drawStream(stream, isGuided = false, timestamp = 0) {
+                  // Dibujamos las palabras EN EL TEXT CANVAS.
+                  // Sin estela, más grande, en negrita y SIEMPRE por encima de todo.
+                  const ctx = this.textCtx;
 
-                // Contorno negro sólido detrás de cada letra para hacerlas ultra-legibles 
-                // incluso contra fondos verdes muy saturados.
-                ctx.lineWidth = 5;
-                ctx.strokeStyle = '#000000';
-                ctx.lineJoin = 'round';
-                ctx.strokeText(stream.text, x, y);
+                  ctx.font = "bold 38px 'Share Tech Mono'";
+                  const x = stream.x;
+                  const y = stream.y;
 
-                // Glow reducido (al 50%)
-                ctx.shadowBlur = 5;
-                ctx.shadowColor = stream.color;
+                  // Contorno negro sólido detrás de cada letra para hacerlas ultra-legibles
+                  // incluso contra fondos verdes muy saturados.
+                  ctx.lineWidth = 5;
+                  ctx.strokeStyle = '#000000';
+                  ctx.lineJoin = 'round';
+                  ctx.strokeText(stream.text, x, y);
+
+                  // Glow base
+                  ctx.shadowBlur = isGuided ? 10 : 5;
+                  ctx.shadowColor = stream.color;
+
+                  // Secuencia activa: doble glow + reborde neón alrededor de cada carácter
+                  if (isGuided) {
+                      const guidePulse = 0.6 + 0.4 * Math.sin(timestamp * 0.01);
+                      ctx.globalAlpha = 0.8 + guidePulse * 0.2;
+                      ctx.lineWidth = 2.5;
+                      ctx.strokeStyle = stream.color;
+                      ctx.shadowBlur = 22 + guidePulse * 18;
+                      ctx.shadowColor = stream.color;
+                      ctx.strokeText(stream.text, x, y);
+                      ctx.globalAlpha = 1;
+                      ctx.shadowBlur = 10;
+                  }
+
 
                 if (stream.typedLength > 0) {
                     const typedStr = stream.text.substring(0, stream.typedLength);
-                    const remainingStr = stream.text.substring(stream.typedLength);
-                    
-                    ctx.fillStyle = '#ffffff'; 
+                    const nextChar = stream.text.substring(stream.typedLength, stream.typedLength + 1);
+                    const tailStr = stream.text.substring(stream.typedLength + 1);
+
+                    ctx.fillStyle = '#ffffff';
                     ctx.fillText(typedStr, x, y);
-                    
+
                     const offset = ctx.measureText(typedStr).width;
-                    ctx.fillStyle = stream.color;
-                    ctx.fillText(remainingStr, x + offset, y);
-                } else {
+
+                      if (isGuided && nextChar) {
+                          const pulse = 0.55 + 0.45 * Math.sin(timestamp * 0.012);
+                          const activeGlowColor = Math.sin(timestamp * 0.018) >= 0 ? stream.color : '#FF8C00';
+                            ctx.globalAlpha = 0.78 + pulse * 0.22;
+                            ctx.shadowBlur = 28 + pulse * 32;
+                            ctx.shadowColor = activeGlowColor;
+                            ctx.fillStyle = '#ffffff';
+                            ctx.strokeStyle = activeGlowColor;
+                            ctx.lineWidth = 2;
+                            ctx.strokeText(nextChar, x + offset, y);
+                            ctx.fillText(nextChar, x + offset, y);
+
+                            ctx.globalAlpha = 1;
+                            ctx.shadowBlur = 16;
+                            ctx.fillStyle = stream.color;
+                          if (tailStr) ctx.fillText(tailStr, x + offset + ctx.measureText(nextChar).width, y);
+                      } else {
+
+                        ctx.fillStyle = stream.color;
+                        ctx.fillText(nextChar + tailStr, x + offset, y);
+                    }
+                  } else if (isGuided && stream.text.length > 0) {
+                      const pulse = 0.55 + 0.45 * Math.sin(timestamp * 0.012);
+                      const activeGlowColor = Math.sin(timestamp * 0.018) >= 0 ? stream.color : '#FF8C00';
+                      const nextChar = stream.text[0];
+                      const tailStr = stream.text.substring(1);
+
+                        ctx.globalAlpha = 0.78 + pulse * 0.22;
+                        ctx.shadowBlur = 28 + pulse * 32;
+                        ctx.shadowColor = activeGlowColor;
+                        ctx.fillStyle = '#ffffff';
+                        ctx.strokeStyle = activeGlowColor;
+                        ctx.lineWidth = 2;
+                        ctx.strokeText(nextChar, x, y);
+                        ctx.fillText(nextChar, x, y);
+
+                        ctx.globalAlpha = 1;
+                        ctx.shadowBlur = 16;
+                        ctx.fillStyle = stream.color;
+                      if (tailStr) ctx.fillText(tailStr, x + ctx.measureText(nextChar).width, y);
+                  } else {
+
                     ctx.fillStyle = stream.color;
                     ctx.fillText(stream.text, x, y);
                 }
 
+                ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
             }
 
             createDataBurst(x, y, color, isOnFire) {
-                // Las explosiones se quedan en el lienzo principal (ctx) 
+                // Las explosiones se quedan en el lienzo principal (ctx)
                 // para que dejen estela junto a la lluvia Matrix
-                const numWaves = isOnFire ? 3 : 1;
-                for (let i = 0; i < numWaves; i++) {
+                const q = this.adaptiveParticleQuality || 1;
+                const availableBudget = Math.max(0, this.maxParticles - this.particles.length);
+                if (availableBudget <= 0) return;
+
+                const numWaves = Math.max(1, Math.round((isOnFire ? 3 : 1) * (0.7 + q * 0.3)));
+                const waveCount = Math.min(numWaves, availableBudget);
+                const baseRingGap = isOnFire ? 15 : 8;
+                const ringGap = baseRingGap * 1.5; // +50% de separacion entre ondas concentricas
+                for (let i = 0; i < waveCount; i++) {
                     this.particles.push({
                         type: 'shockwave',
                         x: x, y: y,
                         radius: 5,
-                        maxRadius: isOnFire ? 37 + (i * 15) : 17, 
+                        maxRadius: isOnFire ? 37 + (i * ringGap) : 17 + (i * ringGap),
                         expansionSpeed: isOnFire ? 3.75 - (i * 0.25) : 2,
                         life: 1.0,
                         decay: isOnFire ? 0.025 : 0.05,
-                        color: isOnFire && i % 2 === 1 ? '#FFFFFF' : color, 
+                        color: isOnFire && i % 2 === 1 ? '#FFFFFF' : color,
                         lineWidth: isOnFire ? 3 : 2
                     });
                 }
 
-                const numPixels = isOnFire ? 40 : 20; 
+                const remainingBudget = Math.max(0, this.maxParticles - this.particles.length);
+                const desiredPixels = Math.max(8, Math.round((isOnFire ? 40 : 20) * (0.45 + q * 0.55)));
+                const numPixels = Math.min(desiredPixels, remainingBudget);
                 for (let i = 0; i < numPixels; i++) {
                     const angle = Math.random() * Math.PI * 2;
-                    const speed = (Math.random() * 4 + 1); 
-                    const size = (Math.random() * 2.5 + 1); 
+                    const speed = (Math.random() * 4 + 1);
+                    const size = (Math.random() * 2.5 + 1);
                     this.particles.push({
-                        type: 'pixel', 
+                        type: 'pixel',
                         x: x, y: y, w: size, h: size,
                         vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-                        life: 1.0, decay: Math.random() * 0.06 + 0.03, 
+                        life: 1.0, decay: Math.random() * 0.06 + 0.03,
                         color: Math.random() > 0.15 ? color : '#FFFFFF'
                     });
                 }
@@ -1251,20 +1973,28 @@
             }
 
             createGlitchEffect(x, y, color, text) {
-                for (let i = 0; i < 10; i++) {
+                const q = this.adaptiveParticleQuality || 1;
+                const availableBudget = Math.max(0, this.maxParticles - this.particles.length);
+                if (availableBudget <= 0) return;
+
+                const blockCount = Math.min(Math.max(4, Math.round(10 * (0.5 + q * 0.5))), availableBudget);
+                for (let i = 0; i < blockCount; i++) {
                     this.particles.push({
                         type: 'block',
                         x: x + (Math.random() - 0.5) * 50,
                         y: y - 15 + (Math.random() * 30),
                         w: Math.random() * 40 + 10,
                         h: Math.random() * 5 + 1,
-                        vx: (Math.random() - 0.5) * 2, 
+                        vx: (Math.random() - 0.5) * 2,
                         life: 1.0,
                         decay: Math.random() * 0.1 + 0.05,
                         color: Math.random() > 0.5 ? color : '#ffffff'
                     });
                 }
-                for (let i = 0; i < 3; i++) {
+
+                const remainingBudget = Math.max(0, this.maxParticles - this.particles.length);
+                const textCount = Math.min(Math.max(1, Math.round(3 * (0.55 + q * 0.45))), remainingBudget);
+                for (let i = 0; i < textCount; i++) {
                     this.particles.push({
                         type: 'text',
                         char: text[Math.floor(Math.random() * text.length)] || "0",
@@ -1280,9 +2010,10 @@
             }
 
             updateAndDrawParticles() {
+                const particleVisibility = Math.max(0, 1 - this.hackReveal);
                 for (let i = this.particles.length - 1; i >= 0; i--) {
                     let p = this.particles[i];
-                    
+
                     // GRAVEDAD: Ahora caen más suave, acentuando que es un fluido
                     if (p.type === 'pixel') {
                         p.vy += 0.04; // Fuerza de gravedad tirando hacia abajo muy poco a poco
@@ -1290,14 +2021,14 @@
 
                     if (p.vx) p.x += p.vx;
                     if (p.vy) p.y += p.vy;
-                    p.life -= p.decay;
+                    p.life -= p.decay * (1 + this.hackReveal * 2.5);
 
-                    if (p.life <= 0) {
+                    if (p.life <= 0 || particleVisibility <= 0.01) {
                         this.particles.splice(i, 1);
                     } else {
-                        this.ctx.globalAlpha = p.life;
+                        this.ctx.globalAlpha = p.life * particleVisibility;
                         this.ctx.fillStyle = p.color;
-                        this.ctx.shadowBlur = p.type === 'pixel' ? 5 : 10; 
+                        this.ctx.shadowBlur = (p.type === 'pixel' ? 5 : 10) * particleVisibility;
                         this.ctx.shadowColor = p.color;
                         
                         if (p.type === 'shockwave') {
@@ -1404,46 +2135,145 @@
         class VirtualKeyboard {
             constructor() {
                 this.container = document.getElementById('keyboard-container');
-                this.keyElements = {}; 
+                this.keyElements = {};
+                this.keyMeta = {};
+                this.guideLayer = document.createElement('div');
+                this.guideLayer.className = 'finger-guide-layer';
+                this.guideDots = [];
+                this.guideTimers = [];
+                this.guideTimeout = null;
+            }
+
+            getActiveChars(pool = []) {
+                const chars = new Set();
+                pool.forEach(item => {
+                    for (const ch of item) chars.add(ch.toLowerCase());
+                });
+                return chars;
             }
 
             build(layoutId, lang = 'en', pool = []) {
                 this.container.innerHTML = '';
                 this.keyElements = {};
+                this.keyMeta = {};
+                this.clearGuide();
                 const layout = KeyboardLayouts[layoutId] || KeyboardLayouts['ansi-us'];
                 const spaceText = UIText[lang].spacebar;
 
-                const activeChars = new Set();
-                pool.forEach(item => {
-                    for (let char of item) {
-                        activeChars.add(char.toLowerCase());
-                    }
-                });
+                const activeChars = this.getActiveChars(pool);
 
                 layout.forEach((row, rowIndex) => {
                     const rowEl = document.createElement('div');
                     rowEl.className = 'key-row';
-                    
-                    if (rowIndex === 1) rowEl.style.paddingLeft = '22px';
-                    if (rowIndex === 2) rowEl.style.paddingLeft = '33px';
-                    if (rowIndex === 3) rowEl.style.paddingLeft = '56px';
+
+                        if (rowIndex === 1) rowEl.style.paddingLeft = '15px';
+                        if (rowIndex === 2) rowEl.style.paddingLeft = '18px';
+                        if (rowIndex === 3) rowEl.style.paddingLeft = '22px';
 
                     row.forEach(keyData => {
                         const keyEl = document.createElement('div');
                         const lowerChar = keyData.c.toLowerCase();
-                        
+                        const displayLabel = keyData.isSpace ? spaceText : (keyData.l || keyData.c);
+
                         const isKeyActive = activeChars.has(lowerChar);
                         const fingerClass = isKeyActive ? `finger-${keyData.f}` : 'finger-inactive';
-                        
+
                         keyEl.className = `key ${fingerClass}`;
                         if (keyData.isSpace) keyEl.classList.add('spacebar');
-                        keyEl.innerText = keyData.isSpace ? spaceText : keyData.c;
-                        
+                        if (keyData.w) keyEl.classList.add(`wide-${keyData.w}`);
+                        keyEl.innerText = displayLabel;
+
                         this.keyElements[lowerChar] = keyEl;
+                        this.keyMeta[lowerChar] = { el: keyEl, finger: keyData.f, active: isKeyActive };
                         rowEl.appendChild(keyEl);
                     });
                     this.container.appendChild(rowEl);
                 });
+
+                this.container.appendChild(this.guideLayer);
+            }
+
+            getKeyCenter(char) {
+                const meta = this.keyMeta[char?.toLowerCase()];
+                if (!meta) return null;
+                const keyRect = meta.el.getBoundingClientRect();
+                const containerRect = this.container.getBoundingClientRect();
+                return {
+                    x: keyRect.left - containerRect.left + keyRect.width / 2,
+                    y: keyRect.top - containerRect.top + keyRect.height / 2
+                };
+            }
+
+            chooseGuideTargets(pool = []) {
+                const activeChars = this.getActiveChars(pool);
+                const byFinger = new Map();
+                for (const [char, meta] of Object.entries(this.keyMeta)) {
+                    if (!meta.active || !activeChars.has(char)) continue;
+                    if (!byFinger.has(meta.finger)) byFinger.set(meta.finger, []);
+                    byFinger.get(meta.finger).push(char);
+                }
+                return byFinger;
+            }
+
+            showLevelGuide(pool = [], durationMs = 2600) {
+                this.clearGuide();
+                if (!pool.length) return;
+
+                const homeByFinger = {
+                    0: ['a', 'q'],
+                    1: ['s', 'w'],
+                    2: ['d', 'e'],
+                    3: ['f', 'r'],
+                    4: [' '],
+                    5: ['j', 'u'],
+                    6: ['k', 'i'],
+                    7: ['l', 'o'],
+                    8: [';', 'ñ', 'p']
+                };
+
+                const targetsByFinger = this.chooseGuideTargets(pool);
+                for (const [finger, chars] of targetsByFinger.entries()) {
+                    const fingerNum = Number(finger);
+                    const uniqueChars = Array.from(new Set(chars));
+                    if (!uniqueChars.length) continue;
+
+                    const homes = homeByFinger[fingerNum] || [];
+                    const startChar = homes.find(ch => this.keyMeta[ch]) || uniqueChars[0];
+                    const endChar = uniqueChars.find(ch => ch !== startChar) || uniqueChars[0];
+                    const start = this.getKeyCenter(startChar);
+                    const end = this.getKeyCenter(endChar);
+                    if (!start) continue;
+
+                    const dot = document.createElement('div');
+                    dot.className = `finger-guide-dot finger-${fingerNum}`;
+                    dot.style.left = `${start.x}px`;
+                    dot.style.top = `${start.y}px`;
+                    this.guideLayer.appendChild(dot);
+                    this.guideDots.push(dot);
+
+                    if (end && (end.x !== start.x || end.y !== start.y)) {
+                        let atEnd = false;
+                        const timer = setInterval(() => {
+                            atEnd = !atEnd;
+                            dot.style.left = `${atEnd ? end.x : start.x}px`;
+                            dot.style.top = `${atEnd ? end.y : start.y}px`;
+                        }, 500);
+                        this.guideTimers.push(timer);
+                    }
+                }
+
+                this.guideTimeout = setTimeout(() => this.clearGuide(), durationMs);
+            }
+
+            clearGuide() {
+                this.guideTimers.forEach(t => clearInterval(t));
+                this.guideTimers = [];
+                if (this.guideTimeout) {
+                    clearTimeout(this.guideTimeout);
+                    this.guideTimeout = null;
+                }
+                this.guideDots = [];
+                this.guideLayer.innerHTML = '';
             }
 
             press(char) {
@@ -1460,8 +2290,27 @@
                 }
             }
 
-            show() { this.container.style.display = 'flex'; }
-            hide() { this.container.style.display = 'none'; }
+            show() {
+                this.container.classList.remove('reveal-fading');
+                this.container.style.opacity = '0.8';
+                this.container.style.display = 'flex';
+            }
+
+            fadeOutForReveal() {
+                this.clearGuide();
+                if (this.container.style.display === 'none') return;
+                this.container.classList.add('reveal-fading');
+                window.setTimeout(() => {
+                    this.container.style.display = 'none';
+                }, 560);
+            }
+
+            hide() {
+                this.clearGuide();
+                this.container.classList.remove('reveal-fading');
+                this.container.style.opacity = '0.8';
+                this.container.style.display = 'none';
+            }
         }
 
         // ==========================================
@@ -1476,10 +2325,48 @@
                 window.addEventListener('keyup', (e) => this.handleKeyUp(e));
             }
 
-            handleKey(e) {
-                if (this.game.audio) this.game.audio.resume();
+              handleKey(e) {
+                    if (this.game.audio) this.game.audio.resume();
 
-                if (e.key === 'Escape') {
+                      if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === 'j') {
+                          this.game.toggleFpsCounter();
+                          e.preventDefault();
+                          return;
+                      }
+
+                      if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === 'h') {
+                          if (this.game.state === 'PLAYING') {
+                              this.game.triggerHackCompleteCheat();
+                              e.preventDefault();
+                          }
+                          return;
+                      }
+
+
+                    if (this.game.state === 'REVEAL') {
+                        const now = performance.now();
+                        if (now < this.game.revealInputLockedUntil) {
+                            e.preventDefault();
+                            return;
+                        }
+
+                        if (this.game.isAwaitingRevealEnd) {
+                            const skipped = this.game.skipRevealTransition();
+                            if (skipped) {
+                                e.preventDefault();
+                                return;
+                            }
+                        }
+
+                        if (this.game.revealReadyForContinue) {
+                            this.game.continueAfterRevealKey();
+                            e.preventDefault();
+                            return;
+                        }
+                    }
+
+
+                  if (e.key === 'Escape') {
                     if (this.game.state === 'PLAYING') {
                         this.game.pauseGame();
                     } else if (this.game.state === 'PAUSED') {
@@ -1599,21 +2486,35 @@
         // ENGINE: MAIN GAME LOOP
         // ==========================================
         class Game {
-            constructor() {
-                this.audio = new AudioManager();
-                this.userManager = new UserManager();
-                // Ahora indicamos al renderer ambos IDs de canvas
-                this.renderer = new Renderer('gameCanvas', 'textCanvas');
-                this.virtualKeyboard = new VirtualKeyboard();
-                this.gemini = new GeminiService();
-                this.spawner = new Spawner(this, this.renderer.textCanvas.width);
-                this.inputHandler = new InputHandler(this);
-                
-                this.state = 'MENU'; 
+              constructor() {
+                  this.audio = new AudioManager();
+                  this.userManager = new UserManager();
+                  // Ahora indicamos al renderer ambos IDs de canvas
+                  this.renderer = new Renderer('gameCanvas', 'textCanvas');
+                  this.virtualKeyboard = new VirtualKeyboard();
+                  this.gemini = new GeminiService();
+                  this.spawner = new Spawner(this, this.renderer.textCanvas.width);
+                  this.inputHandler = new InputHandler(this);
+                  this.fpsCounterEl = document.getElementById('fps-counter');
+                  this.fpsCounterVisible = false;
+                  this.fpsSampleLastTs = 0;
+                  this.fpsSampleFrames = 0;
+                  this.fpsDisplayValue = 0;
+                  
+                  this.state = 'MENU'; 
+
                 this.levelNum = 1;
                 this.customLevelData = null; 
                 this.score = 0;
-                this.health = 100;
+                this.godModeEnabled = false;
+                this.pendingLevelSelectFocus = null;
+                  this.isAwaitingRevealEnd = false;
+                  this.pendingWinFeedbackPromise = null;
+                  this.revealInputLockedUntil = 0;
+                  this.revealHintShown = false;
+                  this.revealReadyForContinue = false;
+                  this.revealHintTimer = null;
+                  this.health = 100;
                 this.maxHealth = 100;
                 this.speedMultiplier = 1.0; 
                 this.combo = 0; 
@@ -1698,11 +2599,29 @@
                 this.bindAudioToButtons(list);
             }
 
-            updateUILanguage() {
-                const lang = this.userManager.profile?.preferences?.language || 'en';
-                const t = UIText[lang];
+                updateUILanguage() {
+                    const lang = this.userManager.profile?.preferences?.language || 'en';
+                    const t = UIText[lang];
 
-                document.getElementById('lbl-hud-alias').innerText = t.hudAlias;
+                      const revealHintEl = document.getElementById('reveal-skip-hint');
+                      if (revealHintEl) {
+                          revealHintEl.innerText = this.revealReadyForContinue ? t.revealContinueHint : t.revealSkipHint;
+                      }
+
+                    const bgAggLabelEl = document.getElementById('lbl-settings-bg-aggr');
+                    const bgAggPrefixEl = document.getElementById('txt-bg-aggr-prefix');
+                    const bgAggSoftEl = document.getElementById('txt-bg-aggr-soft');
+                    const bgAggMediumEl = document.getElementById('txt-bg-aggr-medium');
+                    const bgAggStrongEl = document.getElementById('txt-bg-aggr-strong');
+                    if (bgAggLabelEl) bgAggLabelEl.innerText = t.lblSettingsBgAgg;
+                    if (bgAggPrefixEl) bgAggPrefixEl.innerText = t.descSettingsBgAgg;
+                    if (bgAggSoftEl) bgAggSoftEl.innerText = t.bgAggSoft;
+                    if (bgAggMediumEl) bgAggMediumEl.innerText = t.bgAggMedium;
+                    if (bgAggStrongEl) bgAggStrongEl.innerText = t.bgAggStrong;
+
+
+                  document.getElementById('lbl-hud-alias').innerText = t.hudAlias;
+
                 document.getElementById('lbl-hud-score').innerText = t.hudScore;
                 document.getElementById('lbl-hud-level').innerText = t.hudLevel;
                 document.getElementById('lbl-hud-integrity').innerText = t.hudIntegrity;
@@ -1763,14 +2682,25 @@
 
                 this.bindAudioToButtons(document.body);
 
+                window.addEventListener('resize', () => {
+                    const levelsScreen = document.getElementById('screen-levels');
+                    if (levelsScreen && !levelsScreen.classList.contains('hidden')) {
+                        this.populateLevelSelect();
+                    }
+                });
+
                 window.addEventListener('keydown', (e) => {
                     if (this.state === 'PLAYING') return;
 
                     if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === 'g') {
                         const levelsScreen = document.getElementById('screen-levels');
                         if (!levelsScreen.classList.contains('hidden')) {
-                            this.userManager.unlockLevel(20); 
-                            this.populateLevelSelect(); 
+                            this.godModeEnabled = !this.godModeEnabled;
+                            this.populateLevelSelect();
+                            const msg = this.godModeEnabled
+                                ? 'Modo Dios ACTIVADO (solo temporal en esta sesión).'
+                                : 'Modo Dios DESACTIVADO.';
+                            alert(msg);
                             e.preventDefault();
                             return;
                         }
@@ -1786,31 +2716,54 @@
 
                         let currentIndex = navigables.indexOf(document.activeElement);
                         
-                        // Navegación espacial 2D específica para la cuadrícula de niveles
-                        const grid = document.getElementById('level-grid');
-                        if (grid && grid.contains(document.activeElement) && activeScreen.id === 'screen-levels') {
-                            const items = Array.from(grid.querySelectorAll('button'));
-                            let cols = 1;
-                            
-                            // Calcular automáticamente cuántas columnas tiene la cuadrícula
-                            for (let i = 1; i < items.length; i++) {
-                                if (items[i].offsetTop > items[0].offsetTop) {
-                                    cols = i;
-                                    break;
-                                }
-                            }
-                            
-                            let itemIndex = items.indexOf(document.activeElement);
-                            if (e.key === 'ArrowRight') itemIndex = Math.min(itemIndex + 1, items.length - 1);
-                            else if (e.key === 'ArrowLeft') itemIndex = Math.max(itemIndex - 1, 0);
-                            else if (e.key === 'ArrowDown') itemIndex = Math.min(itemIndex + cols, items.length - 1);
-                            else if (e.key === 'ArrowUp') itemIndex = Math.max(itemIndex - cols, 0);
-                            
-                            items[itemIndex].focus();
-                            this.audio.hover();
-                            e.preventDefault();
-                            return;
-                        }
+                          // Navegación espacial 2D específica para la cuadrícula de niveles
+                          const grid = document.getElementById('level-grid');
+                          const levelsBackBtn = document.getElementById('btn-levels-back');
+                          if (grid && activeScreen.id === 'screen-levels') {
+                              const items = Array.from(grid.querySelectorAll('button'));
+                              const focusedEl = document.activeElement;
+
+                              if (items.includes(focusedEl)) {
+                                  let cols = 1;
+
+                                  // Calcular automáticamente cuántas columnas tiene la cuadrícula
+                                  for (let i = 1; i < items.length; i++) {
+                                      if (items[i].offsetTop > items[0].offsetTop) {
+                                          cols = i;
+                                          break;
+                                      }
+                                  }
+
+                                  let itemIndex = items.indexOf(focusedEl);
+                                  if (e.key === 'ArrowRight') itemIndex = Math.min(itemIndex + 1, items.length - 1);
+                                  else if (e.key === 'ArrowLeft') itemIndex = Math.max(itemIndex - 1, 0);
+                                  else if (e.key === 'ArrowDown') {
+                                      const nextIndex = itemIndex + cols;
+                                      if (nextIndex >= items.length && levelsBackBtn) {
+                                          levelsBackBtn.focus();
+                                          this.audio.hover();
+                                          e.preventDefault();
+                                          return;
+                                      }
+                                      itemIndex = Math.min(nextIndex, items.length - 1);
+                                  } else if (e.key === 'ArrowUp') itemIndex = Math.max(itemIndex - cols, 0);
+
+                                  items[itemIndex].focus();
+                                  this.audio.hover();
+                                  e.preventDefault();
+                                  return;
+                              }
+
+                              if (focusedEl === levelsBackBtn && (e.key === 'ArrowUp' || e.key === 'ArrowLeft')) {
+                                  const lastItem = items[items.length - 1];
+                                  if (lastItem) {
+                                      lastItem.focus();
+                                      this.audio.hover();
+                                      e.preventDefault();
+                                      return;
+                                  }
+                              }
+                          }
 
                         // Navegación estándar de listas/menús con cualquier cursor
                         if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
@@ -1850,6 +2803,7 @@
                 });
 
                 document.getElementById('btn-to-levels').addEventListener('click', () => {
+                    this.pendingLevelSelectFocus = null;
                     this.populateLevelSelect();
                     this.showScreen('levels');
                 });
@@ -1878,8 +2832,9 @@
                     loadingText.style.display = 'none';
                     topicInput.value = '';
 
-                    const maxLevel = this.userManager.profile.progress.highestLevelUnlocked || 1;
-                    const baseLevelSpeed = Dictionaries[lang][`level_${Math.min(maxLevel, 20)}`].fallSpeed;
+                      const maxLevel = this.userManager.profile.progress.highestLevelUnlocked || 1;
+                      const baseLevelSpeed = Dictionaries[lang][`level_${Math.min(maxLevel, TOTAL_LEVELS)}`].fallSpeed;
+
 
                     this.customLevelData = {
                         id: "lvl_ai",
@@ -1898,12 +2853,17 @@
                     this.showMainMenu();
                 });
 
-                document.getElementById('btn-to-settings').addEventListener('click', () => {
-                    const prefs = this.userManager.profile.preferences;
-                    document.getElementById('select-lang').value = prefs.language;
-                    document.getElementById('select-layout').value = prefs.layout;
-                    this.showScreen('settings');
-                });
+                  document.getElementById('btn-to-settings').addEventListener('click', () => {
+                      const prefs = this.userManager.profile.preferences;
+                      document.getElementById('select-lang').value = prefs.language;
+                      document.getElementById('select-layout').value = prefs.layout;
+                      const bgAggInput = document.getElementById('input-bg-aggr');
+                      const bgAggValue = document.getElementById('val-bg-aggr');
+                      const initialAgg = Math.max(0, Math.min(100, Math.round(prefs.bgRemovalAggression ?? 50)));
+                      if (bgAggInput) bgAggInput.value = String(initialAgg);
+                      if (bgAggValue) bgAggValue.innerText = String(initialAgg);
+                      this.showScreen('settings');
+                  });
 
                 document.getElementById('btn-switch-profile').addEventListener('click', () => {
                     this.userManager.activeAlias = null; 
@@ -1911,47 +2871,46 @@
                     this.showScreen('profiles');
                 });
 
-                document.getElementById('input-bg-image').addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const img = new Image();
-                        img.onload = () => {
-                            const MAX_SIZE = 600;
-                            let w = img.width;
-                            let h = img.height;
-                            if (w > MAX_SIZE || h > MAX_SIZE) {
-                                const ratio = Math.min(MAX_SIZE/w, MAX_SIZE/h);
-                                w *= ratio;
-                                h *= ratio;
-                            }
-                            const tmpCanvas = document.createElement('canvas');
-                            tmpCanvas.width = w;
-                            tmpCanvas.height = h;
-                            const tmpCtx = tmpCanvas.getContext('2d');
-                            tmpCtx.drawImage(img, 0, 0, w, h);
-                            
-                            const base64 = tmpCanvas.toDataURL('image/jpeg', 0.6);
-                            this.userManager.updateBgImage(base64);
-                            this.renderer.setBgImage(base64); 
-                            alert("¡Imagen cargada correctamente en tu perfil!");
-                        };
-                        img.src = event.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                });
+                  const bgAggInput = document.getElementById('input-bg-aggr');
+                  const bgAggValue = document.getElementById('val-bg-aggr');
+                  if (bgAggInput && bgAggValue) {
+                      bgAggInput.addEventListener('input', () => {
+                          bgAggValue.innerText = String(Math.round(Number(bgAggInput.value) || 0));
+                      });
+                  }
+
+                  document.getElementById('input-bg-image').addEventListener('change', (e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = async (event) => {
+                          const sourceBase64 = event.target?.result;
+                          if (typeof sourceBase64 !== 'string') return;
+                          try {
+                              const aggr = Math.max(0, Math.min(100, Math.round(Number(document.getElementById('input-bg-aggr')?.value ?? 50))));
+                              const processed = await this.processUploadedBackgroundImage(sourceBase64, aggr);
+                              this.userManager.updateBgImage(processed.transparentPng, processed.originalBase64);
+                              this.renderer.setBgImage(processed.transparentPng, processed.originalBase64);
+                              alert("¡Imagen cargada correctamente en tu perfil!");
+                          } catch (err) {
+                              alert("No se pudo procesar la imagen seleccionada.");
+                          }
+                      };
+                      reader.readAsDataURL(file);
+                  });
+
 
                 document.getElementById('btn-clear-bg').addEventListener('click', () => {
                     this.userManager.updateBgImage(null);
-                    this.renderer.setBgImage(null);
+                    this.renderer.setBgImage(null, null);
                     document.getElementById('input-bg-image').value = '';
                 });
 
                 document.getElementById('btn-save-settings').addEventListener('click', () => {
                     const lang = document.getElementById('select-lang').value;
                     const layout = document.getElementById('select-layout').value;
-                    this.userManager.updateSettings(lang, layout);
+                    const aggr = Math.max(0, Math.min(100, Math.round(Number(document.getElementById('input-bg-aggr')?.value ?? 50))));
+                    this.userManager.updateSettings(lang, layout, aggr);
                     this.updateUILanguage(); 
                     this.showMainMenu();
                 });
@@ -1969,12 +2928,14 @@
                 });
 
                 document.getElementById('btn-continue').addEventListener('click', () => {
-                    if (this.levelNum === 'AI') {
-                        this.showMainMenu();
-                    } else {
-                        this.showScreen('levels'); 
-                        this.populateLevelSelect();
-                    }
+                      if (this.levelNum === 'AI') {
+                          this.showMainMenu();
+                      } else {
+                          this.pendingLevelSelectFocus = Math.min(TOTAL_LEVELS, this.levelNum + 1);
+                          this.showScreen('levels'); 
+                          this.populateLevelSelect();
+                      }
+
                 });
                 
                 document.getElementById('btn-exit-win').addEventListener('click', () => {
@@ -1990,53 +2951,268 @@
                     this.showScreen('levels');
                     this.state = 'MENU';
                 });
-            }
+              }
 
-            populateLevelSelect() {
-                const grid = document.getElementById('level-grid');
-                grid.innerHTML = '';
-                const lang = this.userManager.profile.preferences.language;
-                const maxLevel = this.userManager.profile.progress.highestLevelUnlocked || 1;
-                
-                for (let i = 1; i <= 20; i++) {
-                    const levelData = Dictionaries[lang][`level_${i}`];
-                    if (!levelData) continue;
+              async decodeImage(base64) {
+                  return await new Promise((resolve, reject) => {
+                      const img = new Image();
+                      img.onload = () => resolve(img);
+                      img.onerror = () => reject(new Error('image_decode_error'));
+                      img.src = base64;
+                  });
+              }
 
-                    const btn = document.createElement('button');
-                    btn.title = levelData.name;
-                    btn.style.margin = '0';
-                    btn.style.width = '100%';
-                    btn.style.minHeight = '80px';
-                    btn.style.padding = '10px 5px';
-                    btn.style.display = 'flex';
-                    btn.style.flexDirection = 'column';
-                    btn.style.justifyContent = 'center';
-                    btn.style.alignItems = 'center';
-                    
-                    if (i <= maxLevel) {
-                        btn.className = 'btn-cyan';
-                        btn.innerHTML = `
-                            <span style="font-size: 1.5rem; font-weight: bold;">${i}</span>
-                            <span style="font-size: 0.8rem; margin-top: 5px; color: #fff; text-shadow: none;">${levelData.name}</span>
-                        `;
-                        btn.addEventListener('click', () => {
-                            this.startGame(i);
-                        });
-                    } else {
-                        btn.className = '';
-                        btn.style.border = '2px solid #333';
-                        btn.style.color = '#555';
-                        btn.style.cursor = 'not-allowed';
-                        btn.style.boxShadow = 'none';
-                        btn.innerHTML = `
-                            <span style="font-size: 1.2rem;">🔒 ${i}</span>
-                            <span style="font-size: 0.75rem; margin-top: 5px; opacity: 0.5;">${levelData.name}</span>
-                        `;
+                removeBackgroundFromCanvas(ctx, width, height, aggression = 50) {
+                    const imageData = ctx.getImageData(0, 0, width, height);
+                    const data = imageData.data;
+                    const borderSamples = [];
+                    const sampleStep = Math.max(1, Math.floor(Math.min(width, height) / 200));
+                    const normalizedAggression = Math.max(0, Math.min(100, Math.round(aggression)));
+                    const aggressionFactor = normalizedAggression / 100;
+
+                    for (let x = 0; x < width; x += sampleStep) {
+                        borderSamples.push([x, 0], [x, height - 1]);
                     }
-                    grid.appendChild(btn);
+                    for (let y = sampleStep; y < height - 1; y += sampleStep) {
+                        borderSamples.push([0, y], [width - 1, y]);
+                    }
+
+                    let meanR = 0;
+                    let meanG = 0;
+                    let meanB = 0;
+                    for (const [x, y] of borderSamples) {
+                        const idx = (y * width + x) * 4;
+                        meanR += data[idx];
+                        meanG += data[idx + 1];
+                        meanB += data[idx + 2];
+                    }
+
+                    const sampleCount = Math.max(1, borderSamples.length);
+                    meanR /= sampleCount;
+                    meanG /= sampleCount;
+                    meanB /= sampleCount;
+
+                    let variance = 0;
+                    for (const [x, y] of borderSamples) {
+                        const idx = (y * width + x) * 4;
+                        const dr = data[idx] - meanR;
+                        const dg = data[idx + 1] - meanG;
+                        const db = data[idx + 2] - meanB;
+                        variance += dr * dr + dg * dg + db * db;
+                    }
+                    const stdDev = Math.sqrt(variance / sampleCount);
+                    const hardBase = Math.max(24, stdDev * 1.2);
+                    const softDeltaBase = Math.max(34, stdDev * 1.8);
+                    const hardThreshold = Math.max(10, hardBase * (1.26 - aggressionFactor * 0.62));
+                    const softThreshold = hardThreshold + Math.max(12, softDeltaBase * (1.22 - aggressionFactor * 0.72));
+
+                    for (let i = 0; i < data.length; i += 4) {
+                        const dr = data[i] - meanR;
+                        const dg = data[i + 1] - meanG;
+                        const db = data[i + 2] - meanB;
+                        const distance = Math.sqrt(dr * dr + dg * dg + db * db);
+
+                        if (distance <= hardThreshold) {
+                            data[i + 3] = 0;
+                        } else if (distance < softThreshold) {
+                            const keep = (distance - hardThreshold) / (softThreshold - hardThreshold);
+                            data[i + 3] = Math.min(255, Math.max(0, Math.floor(data[i + 3] * keep)));
+                        }
+                    }
+
+                    ctx.putImageData(imageData, 0, 0);
                 }
-                this.bindAudioToButtons(grid);
-            }
+
+                async processUploadedBackgroundImage(sourceBase64, aggression = 50) {
+                    const img = await this.decodeImage(sourceBase64);
+                    const MAX_SIZE = 600;
+                    let w = img.width;
+                    let h = img.height;
+
+                    if (w > MAX_SIZE || h > MAX_SIZE) {
+                        const ratio = Math.min(MAX_SIZE / w, MAX_SIZE / h);
+                        w = Math.max(1, Math.round(w * ratio));
+                        h = Math.max(1, Math.round(h * ratio));
+                    }
+
+                    const workCanvas = document.createElement('canvas');
+                    workCanvas.width = w;
+                    workCanvas.height = h;
+                    const workCtx = workCanvas.getContext('2d', { willReadFrequently: true });
+                    workCtx.drawImage(img, 0, 0, w, h);
+
+                    const originalBase64 = workCanvas.toDataURL('image/jpeg', 0.82);
+                    this.removeBackgroundFromCanvas(workCtx, w, h, aggression);
+                    const transparentPng = workCanvas.toDataURL('image/png');
+
+                    return { transparentPng, originalBase64 };
+                }
+
+
+              toggleFpsCounter() {
+                  this.fpsCounterVisible = !this.fpsCounterVisible;
+                  this.fpsSampleLastTs = 0;
+                  this.fpsSampleFrames = 0;
+                  if (!this.fpsCounterEl) return;
+                  if (this.fpsCounterVisible) {
+                      this.fpsCounterEl.textContent = 'FPS: --';
+                      this.fpsCounterEl.classList.remove('hidden');
+                      this.fpsCounterEl.classList.add('visible');
+                  } else {
+                      this.fpsCounterEl.classList.remove('visible');
+                      this.fpsCounterEl.classList.add('hidden');
+                  }
+              }
+
+              updateFpsCounter(timestamp) {
+                  if (!this.fpsCounterVisible || !this.fpsCounterEl) return;
+                  if (!this.fpsSampleLastTs) {
+                      this.fpsSampleLastTs = timestamp;
+                      this.fpsSampleFrames = 0;
+                      return;
+                  }
+
+                  this.fpsSampleFrames += 1;
+                  const elapsed = timestamp - this.fpsSampleLastTs;
+                  if (elapsed >= 250) {
+                      this.fpsDisplayValue = Math.max(1, Math.round((this.fpsSampleFrames * 1000) / elapsed));
+                      this.fpsCounterEl.textContent = `FPS: ${this.fpsDisplayValue}`;
+                      this.fpsSampleFrames = 0;
+                      this.fpsSampleLastTs = timestamp;
+                  }
+              }
+
+                    populateLevelSelect() {
+
+                      const grid = document.getElementById('level-grid');
+                      const panel = document.getElementById('level-select-panel');
+                      grid.innerHTML = '';
+
+                      const lang = this.userManager.profile.preferences.language;
+                      const maxLevel = this.userManager.profile.progress.highestLevelUnlocked || 1;
+                      const effectiveMaxLevel = this.godModeEnabled ? TOTAL_LEVELS : maxLevel;
+
+                      // Reveal levels by packs of 5 to avoid overwhelming the player.
+                      const visibleLevels = Math.min(
+                          TOTAL_LEVELS,
+                          Math.max(5, Math.ceil(effectiveMaxLevel / 5) * 5)
+                      );
+                        const viewportW = window.innerWidth;
+                        const viewportH = window.innerHeight;
+
+                        let columns = 6;
+                        if (viewportW < 700) columns = 2;
+                        else if (viewportW < 940) columns = 3;
+                        else if (viewportW < 1180) columns = 4;
+                        else if (viewportW < 1440) columns = 5;
+
+                        const visibleRows = Math.ceil(visibleLevels / columns);
+                        const panelWidthCap = columns >= 6 ? 1220 : (columns === 5 ? 1080 : (columns === 4 ? 900 : (columns === 3 ? 710 : 530)));
+                        const panelWidthPx = Math.min(Math.floor(viewportW * 0.97), panelWidthCap);
+                        const panelHeightPx = Math.floor(viewportH * 0.94);
+                        const compact = viewportH < 800;
+                        const ultraCompact = viewportH < 660;
+                        const panelPaddingPx = ultraCompact ? 8 : (compact ? 10 : 14);
+                        const titleBlockPx = ultraCompact ? 40 : (compact ? 48 : 56);
+                        const backButtonBlockPx = ultraCompact ? 44 : (compact ? 50 : 56);
+                        const gridVerticalBudget = Math.max(180, panelHeightPx - (panelPaddingPx * 2) - titleBlockPx - backButtonBlockPx);
+                        const gapPx = visibleRows >= 8 ? 4 : (visibleRows >= 6 ? 6 : 8);
+                        const baseCellHeight = Math.max(24, Math.min(90, Math.floor((gridVerticalBudget - (gapPx * Math.max(0, visibleRows - 1))) / Math.max(1, visibleRows))));
+                        const miniBossHeight = Math.min(98, Math.floor(baseCellHeight * (visibleRows >= 7 ? 1.04 : 1.1)));
+
+                        if (panel) {
+                            panel.style.width = `${panelWidthPx}px`;
+                            panel.style.maxWidth = `${panelWidthPx}px`;
+                            panel.style.maxHeight = `${panelHeightPx}px`;
+                            panel.style.padding = `${panelPaddingPx}px`;
+                        }
+
+                        grid.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
+                        grid.style.gap = `${gapPx}px`;
+                        grid.style.overflowY = 'hidden';
+                        grid.style.overflowX = 'hidden';
+
+                        const miniBossTag = lang === 'es' ? 'MINI BOSS' : 'MINI BOSS';
+                        const finalBossTag = lang === 'es' ? 'BOSS FINAL' : 'FINAL BOSS';
+
+
+                      for (let i = 1; i <= visibleLevels; i++) {
+                          const levelData = Dictionaries[lang][`level_${i}`];
+                          if (!levelData) continue;
+
+                          const isMiniBoss = i % 5 === 0;
+                          const isFinalBoss = i === TOTAL_LEVELS;
+
+                          const btn = document.createElement('button');
+                          btn.title = levelData.name;
+                            btn.style.margin = '0';
+                            btn.style.width = '100%';
+                            btn.style.minHeight = `${isMiniBoss ? miniBossHeight : baseCellHeight}px`;
+                            btn.style.padding = compact
+                                ? (isMiniBoss ? '8px 4px' : '6px 4px')
+                                : (isMiniBoss ? '10px 6px' : '8px 5px');
+                            btn.style.display = 'flex';
+                            btn.style.flexDirection = 'column';
+                            btn.style.justifyContent = 'center';
+                            btn.style.alignItems = 'center';
+                            btn.style.lineHeight = '1.08';
+
+
+                          if (i <= effectiveMaxLevel) {
+                              btn.className = isMiniBoss ? 'btn-yellow' : 'btn-cyan';
+                              if (isFinalBoss) {
+                                  btn.className = 'btn-red';
+                              }
+                                const numberSize = compact ? (isMiniBoss ? '1.35rem' : '1.2rem') : (isMiniBoss ? '1.65rem' : '1.45rem');
+                                const nameSize = compact ? '0.64rem' : '0.76rem';
+                                const bossTagSize = compact ? '0.56rem' : '0.66rem';
+                                const spacingTop = compact ? 2 : 4;
+                                btn.innerHTML = `
+                                    <span style="font-size: ${numberSize}; font-weight: bold;">${i}</span>
+                                    <span style="font-size: ${nameSize}; margin-top: ${spacingTop}px; color: #fff; text-shadow: none;">${levelData.name}</span>
+                                    ${isMiniBoss ? `<span style="font-size: ${bossTagSize}; margin-top: ${spacingTop}px; opacity: 0.95; color: ${isFinalBoss ? '#ffcccc' : '#111'}; text-shadow: none;">${isFinalBoss ? finalBossTag : miniBossTag}</span>` : ''}
+                                `;
+                              btn.dataset.levelNumber = String(i);
+                              btn.addEventListener('click', () => {
+                                  this.startGame(i);
+                              });
+                          } else {
+                              btn.className = '';
+                              btn.style.border = isMiniBoss ? '2px solid #665500' : '2px solid #333';
+                              btn.style.color = isMiniBoss ? '#887a2a' : '#555';
+                              btn.style.cursor = 'not-allowed';
+                              btn.style.boxShadow = isMiniBoss ? '0 0 10px rgba(255, 255, 0, 0.18)' : 'none';
+                              btn.style.background = isMiniBoss ? 'rgba(40, 35, 10, 0.35)' : 'rgba(10, 10, 12, 0.45)';
+                                const lockNumberSize = compact ? (isMiniBoss ? '1.15rem' : '1.05rem') : (isMiniBoss ? '1.28rem' : '1.15rem');
+                                const lockNameSize = compact ? '0.60rem' : '0.70rem';
+                                const lockTagSize = compact ? '0.54rem' : '0.62rem';
+                                const lockSpacing = compact ? 2 : 4;
+                                btn.innerHTML = `
+                                    <span style="font-size: ${lockNumberSize};">🔒 ${i}</span>
+                                    <span style="font-size: ${lockNameSize}; margin-top: ${lockSpacing}px; opacity: 0.65;">${levelData.name}</span>
+                                    ${isMiniBoss ? `<span style="font-size: ${lockTagSize}; margin-top: ${lockSpacing}px; opacity: 0.7; color: #aa9f55;">${isFinalBoss ? finalBossTag : miniBossTag}</span>` : ''}
+                                `;
+                            }
+
+                            if (isMiniBoss) {
+                                btn.style.transform = compact ? 'scale(1.01)' : 'scale(1.03)';
+                            }
+
+
+                          grid.appendChild(btn);
+                      }
+
+                      this.bindAudioToButtons(grid);
+
+                      if (this.pendingLevelSelectFocus !== null) {
+                          const targetLevel = String(this.pendingLevelSelectFocus);
+                          const levelButton = grid.querySelector(`button[data-level-number="${targetLevel}"]`);
+                          if (levelButton) {
+                              setTimeout(() => levelButton.focus(), 10);
+                          }
+                          this.pendingLevelSelectFocus = null;
+                      }
+                  }
 
             startGame(levelNumber) {
                 this.levelNum = levelNumber;
@@ -2049,7 +3225,12 @@
                 const lang = this.userManager.profile.preferences.language;
                 const layout = this.userManager.profile.preferences.layout;
                 
-                this.renderer.setBgImage(this.userManager.profile.preferences.bgImage || null);
+                  this.renderer.setBgImage(
+                      this.userManager.profile.preferences.bgImage || null,
+                      this.userManager.profile.preferences.bgImageOriginal || null
+                  );
+
+                this.renderer.resetForNewLevel();
                 
                 let levelData;
                 if (levelNumber === 'AI') {
@@ -2076,16 +3257,23 @@
                 this.updateScore();
                 this.updateHealth();
 
-                this.showScreen('playing');
-                this.state = 'PLAYING';
-            }
+                  this.showScreen('playing');
+                  this.state = 'PLAYING';
 
-            showScreen(screen) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-                document.getElementById('hud').style.display = 'none';
-                this.virtualKeyboard.hide();
+                  requestAnimationFrame(() => {
+                      this.virtualKeyboard.showLevelGuide(levelData.pool, 2800);
+                  });
+              }
 
-                const target = document.getElementById(`screen-${screen}`);
+
+              showScreen(screen) {
+                  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+                  document.getElementById('hud').style.display = 'none';
+                  this.virtualKeyboard.hide();
+                  this.hideRevealSkipHint();
+
+                  const target = document.getElementById(`screen-${screen}`);
+
                 if (target) target.classList.remove('hidden');
                 
                 if (screen === 'playing') {
@@ -2182,28 +3370,138 @@
             }
 
             triggerGlitch() {
-                const body = document.body;
-                body.classList.remove('glitch-active');
-                void body.offsetWidth; 
-                body.classList.add('glitch-active');
+                  const body = document.body;
+                  body.classList.remove('glitch-active');
+                  void body.offsetWidth; 
+                  body.classList.add('glitch-active');
+              }
+
+              triggerHackCompleteCheat() {
+                  if (this.state !== 'PLAYING') return;
+
+                  let targetScore;
+                  if (this.levelNum === 'AI') {
+                      targetScore = this.customLevelData?.targetScore || 0;
+                  } else {
+                      const lang = this.userManager.profile.preferences.language;
+                      targetScore = Dictionaries[lang][`level_${this.levelNum}`]?.targetScore || 0;
+                  }
+
+                  if (targetScore > 0) {
+                      this.score = targetScore;
+                      this.updateScore();
+                  }
+
+                  this.levelComplete();
+              }
+
+                async levelComplete() {
+
+                  if (this.levelNum !== 'AI') {
+                      this.userManager.unlockLevel(this.levelNum + 1);
+                  }
+
+                this.renderer.triggerHackReveal(true);
+                this.isAwaitingRevealEnd = true;
+                this.pendingWinFeedbackPromise = null;
+                this.state = 'REVEAL';
+                this.revealReadyForContinue = false;
+                this.revealHintShown = false;
+                this.revealInputLockedUntil = performance.now() + 3000;
+                if (this.revealHintTimer) {
+                    clearTimeout(this.revealHintTimer);
+                    this.revealHintTimer = null;
+                }
+                this.showScreen('playing');
+                this.virtualKeyboard.fadeOutForReveal();
+
+                this.revealHintTimer = setTimeout(() => {
+                    this.revealHintTimer = null;
+                    if (this.state !== 'REVEAL') return;
+                    this.revealHintShown = true;
+                    this.showRevealSkipHint();
+                }, 3000);
+
+                this.pendingWinFeedbackPromise = this.gemini.generateFeedback(true, this.score, this.combo, this.userManager.profile.preferences.language)
+                    .catch(() => "System breached.");
+              }
+
+            skipRevealTransition() {
+                if (this.state !== 'REVEAL' || !this.isAwaitingRevealEnd) return false;
+                this.renderer.skipHackReveal();
+                this.finalizeLevelReveal();
+                return true;
             }
 
-            async levelComplete() {
-                if (this.levelNum !== 'AI') {
-                    this.userManager.unlockLevel(this.levelNum + 1);
+                showRevealSkipHint() {
+                    const hint = document.getElementById('reveal-skip-hint');
+                    if (!hint) return;
+                    const lang = this.userManager.profile?.preferences?.language || 'en';
+                    const t = UIText[lang] || UIText.en;
+                    hint.innerText = this.revealReadyForContinue ? t.revealContinueHint : t.revealSkipHint;
+                    hint.classList.remove('hidden');
+                    requestAnimationFrame(() => hint.classList.add('visible'));
                 }
-                
-                this.state = 'LEVELUP';
-                const nextLevelName = this.levelNum === 'AI' ? "Custom Node Cleared" : (Dictionaries[this.userManager.profile.preferences.language][`level_${this.levelNum + 1}`]?.name || "END OF SYSTEM");
+
+                hideRevealSkipHint() {
+                    const hint = document.getElementById('reveal-skip-hint');
+                    if (!hint) return;
+                    hint.classList.remove('visible');
+                    hint.classList.add('hidden');
+                }
+
+
+            finalizeLevelReveal() {
+
+                if (!this.isAwaitingRevealEnd) return;
+                this.isAwaitingRevealEnd = false;
+                this.revealReadyForContinue = true;
+
+                if (this.revealHintTimer) {
+                    clearTimeout(this.revealHintTimer);
+                    this.revealHintTimer = null;
+                }
+
+                this.showRevealSkipHint();
+            }
+
+            continueAfterRevealKey() {
+                if (this.state !== 'REVEAL' || !this.revealReadyForContinue) return;
+
+                this.revealReadyForContinue = false;
+                this.revealInputLockedUntil = 0;
+                this.revealHintShown = false;
+                this.hideRevealSkipHint();
+
+                const nextLevelName = this.levelNum === 'AI'
+                    ? "Custom Node Cleared"
+                    : (Dictionaries[this.userManager.profile.preferences.language][`level_${this.levelNum + 1}`]?.name || "END OF SYSTEM");
                 document.getElementById('next-level-name').innerText = `Next: ${nextLevelName}`;
-                
+
                 const feedbackEl = document.getElementById('ai-feedback-win');
                 feedbackEl.innerText = "Analyzing system logs... ✨";
+                this.state = 'LEVELUP';
                 this.showScreen('levelup');
 
-                const feedback = await this.gemini.generateFeedback(true, this.score, this.combo, this.userManager.profile.preferences.language);
-                feedbackEl.innerText = `"${feedback}"`;
+                const feedbackPromise = this.pendingWinFeedbackPromise;
+                this.pendingWinFeedbackPromise = null;
+                if (feedbackPromise) {
+                    feedbackPromise
+                        .then((feedback) => {
+                            if (this.state === 'LEVELUP') {
+                                feedbackEl.innerText = `"${feedback}"`;
+                            }
+                        })
+                        .catch(() => {
+                            if (this.state === 'LEVELUP') {
+                                feedbackEl.innerText = '"System breached."';
+                            }
+                        });
+                } else {
+                    feedbackEl.innerText = '"System breached."';
+                }
             }
+
 
             async gameOver() {
                 this.state = 'GAMEOVER';
@@ -2217,8 +3515,10 @@
                 feedbackEl.innerText = `"${feedback}"`;
             }
 
-            loop(timestamp) {
-                let progress = 0;
+              loop(timestamp) {
+                  this.updateFpsCounter(timestamp);
+                  let progress = 0;
+
                 if (this.state === 'PLAYING') {
                     let targetScore;
                     if (this.levelNum === 'AI') {
@@ -2236,10 +3536,29 @@
 
                 if (this.state === 'PLAYING') {
                     this.spawner.update(timestamp, this.renderer.canvas.height, (s) => this.handleMiss(s));
-                    
-                    for (let s of this.spawner.streams) {
-                        this.renderer.drawStream(s);
+
+                    let guidedStreamIndex = this.inputHandler.activeStreamIndex;
+                    if (guidedStreamIndex === -1) {
+                        let bestY = -Infinity;
+                        for (let i = 0; i < this.spawner.streams.length; i++) {
+                            const s = this.spawner.streams[i];
+                            if (s.typedLength > 0) continue;
+                            if (s.y > bestY) {
+                                bestY = s.y;
+                                guidedStreamIndex = i;
+                            }
+                        }
                     }
+
+                    for (let i = 0; i < this.spawner.streams.length; i++) {
+                        const s = this.spawner.streams[i];
+                        const isGuided = i === guidedStreamIndex;
+                        this.renderer.drawStream(s, isGuided, timestamp);
+                    }
+                }
+
+                if (this.state === 'REVEAL' && this.renderer.isHackRevealCompleted(timestamp)) {
+                    this.finalizeLevelReveal();
                 }
 
                 requestAnimationFrame((t) => this.loop(t));
