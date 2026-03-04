@@ -1,47 +1,54 @@
-🟢 NEON STREAM: Typing Hacker
+# 🟢 NEON STREAM: Typing Hacker
 
-Bienvenido a Neon Stream, un simulador de hackeo inmersivo y juego de mecanografía en el que tus pulsaciones controlan el flujo de datos. Sobrevive a las defensas del sistema, mantén tu racha de precisión y desvela los secretos ocultos en el código.
+Bienvenido a **Neon Stream**, un simulador de hackeo inmersivo y juego de mecanografía donde tus pulsaciones controlan el flujo de datos. Sobrevive a las defensas del sistema, mantén tu racha de precisión y desvela los secretos ocultos en el código.
 
-🚀 Características Principales
+## 🚀 Características Principales
 
-Lluvia de Matrix en 3D: Un motor gráfico de partículas con físicas personalizadas. Sube una imagen en los ajustes y mira cómo la lluvia de caracteres colisiona con la topología 3D de la figura para revelarla de forma monocromática.
+*   **Lluvia de Matrix en 3D:** Un motor gráfico de partículas con físicas personalizadas. Sube una imagen en los ajustes y mira cómo la lluvia de caracteres colisiona con la topología 3D de la figura para revelarla de forma monocromática.
+*   **Curriculum de Hacker (30 Niveles):** Un curso de mecanografía completo disfrazado de ciberataque.
+    *   **Fase 1 (Niveles 1-6):** Fila Base (Home Row). Índices, Corazón, Anular y Meñique.
+    *   **Fase 2 (Niveles 7-12):** Fila Superior.
+    *   **Fase 3 (Niveles 13-18):** Fila Inferior.
+    *   **Fase 4 (Niveles 19-24):** Mayúsculas y Tildes (Validación estricta de Shift).
+    *   **Fase 5 (Niveles 25-29):** Números y Símbolos de Código.
+    *   **Nivel 30:** El Arquitecto (Boss Final).
+*   **Briefing Inmersivo:** Antes de cada nivel, el sistema se comunica contigo mediante una terminal de texto ("Wake up, Neo..."), enseñándote visualmente qué dedos usar en el teclado virtual.
+*   **Jefes y Mini-Bosses:** Enfrentamientos de alta velocidad contra protocolos de seguridad cada 5 niveles.
+*   **Módulo IA (Gemini 2.5 Flash):** Conéctate al "Supervisor IA" para generar nodos de hackeo infinitos sobre cualquier tema que elijas (requiere API Key).
+*   **Dificultad Dinámica:** La velocidad aumenta con tu precisión y se reduce si cometes errores.
+*   **Teclado Virtual Interactivo:** Muestra qué dedos debes usar y qué teclas están activas en tiempo real.
 
-Dificultad Dinámica: El sistema se adapta a ti. La velocidad aumenta con tu precisión (hasta un 250%) y se reduce si cometes errores, dándote un respiro.
+## 🎮 Cómo Jugar
 
-Progresión de 20 Niveles: Desde lo más básico (teclas centrales) hasta jerga de ciberseguridad y fragmentos de código real.
+No requiere instalación ni servidores complejos. Todo el juego está contenido en un único archivo HTML portátil:
 
-Módulo IA: Conéctate al "Overseer" para generar nodos de hackeo personalizados sobre cualquier tema que elijas.
+1.  Descarga el archivo `index.html`.
+2.  Ábrelo en cualquier navegador web moderno (Chrome, Firefox, Edge, Safari).
+3.  Crea tu alias de hacker y comienza la infiltración.
 
-Teclado Virtual Interactivo: Muestra qué dedos debes usar y qué teclas están activas en el nivel actual.
+## ⚙️ Ajustes del Sistema
 
-🎮 Cómo Jugar
+Dentro del juego (Menú > Settings), puedes configurar:
 
-No requiere instalación ni servidores complejos. Al estar construido en Vanilla HTML, CSS y JavaScript (Zero dependencias), puedes jugar al instante:
+*   **Idioma:** Inglés / Español.
+*   **Distribución de Teclado:** ANSI-US / ISO-ES.
+*   **Gemini API Key:** Introduce tu propia clave de API de Google Gemini para habilitar las funciones de IA. (Se guarda localmente en tu navegador).
+*   **Topología 3D:** Carga una imagen personal para el efecto de fondo Matrix.
+*   **Gestión de Datos:** Borrar progreso o resetear configuración.
 
-Clona o descarga este repositorio.
+## 💻 Tecnologías Utilizadas
 
-Abre el archivo index.html en cualquier navegador web moderno (Chrome, Firefox, Edge, Safari).
+*   **HTML5 Canvas:** Renderizado de alto rendimiento para miles de partículas y texto dinámico.
+*   **CSS3:** Efectos de neón (`text-shadow`, `box-shadow`), animaciones glitch y diseño responsivo.
+*   **Vanilla JavaScript (ES6+):**
+    *   Arquitectura "Single File" (todo el código en un solo archivo para máxima portabilidad).
+    *   Lógica orientada a objetos (POO) para el motor del juego.
+    *   Gestión de estado y físicas de partículas.
+*   **Web Audio API:** Sintetizadores procedurales para sonidos retro-cibernéticos.
+*   **Google Gemini API:** Integración con el modelo `gemini-2.5-flash` para la generación procedimental de contenido.
 
-Crea tu alias de hacker y comienza a infiltrarte en los nodos.
+## 🛠️ Herramientas de Desarrollo
 
-⚙️ Ajustes del Sistema
-
-Dentro del juego, puedes acceder al panel de configuración para:
-
-Cambiar el idioma (Inglés / Español).
-
-Ajustar la distribución del teclado (ANSI-US / ISO-ES).
-
-Topología 3D: Carga una imagen personal para que el motor Matrix trace su relieve mediante colisiones de caracteres.
-
-💻 Tecnologías Utilizadas
-
-HTML5 Canvas: Renderizado de alto rendimiento para miles de partículas y texto dinámico.
-
-CSS3: Efectos de neón (box-shadow), animaciones de glitch e interfaces translúcidas.
-
-Vanilla JavaScript (ES6+): Lógica orientada a objetos (POO), físicas de partículas, manejo de audio web y gestión de estado.
-
-Web Audio API: Sintetizadores procedurales para sonidos retro-cibernéticos y confirmaciones de hackeo.
-
-Gemini API: Integración para generación de niveles dinámicos y retroalimentación interactiva del sistema.
+El repositorio incluye scripts de utilidad para probar la integración con la IA (requieren Node.js):
+*   `test_gemini.js`: Prueba la conexión y validez de tu API Key.
+*   `list_models.js`: Lista los modelos disponibles en tu cuenta de Google AI.
