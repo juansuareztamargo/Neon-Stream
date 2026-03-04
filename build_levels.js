@@ -356,7 +356,13 @@ const curriculum = [
 // Helper to calculate target scores based on pool complexity
 const calculateStats = (lvl, index) => {
     const isWord = lvl.type === 'words';
-    const baseSpeed = 0.5 + (index * 0.05);
+    let baseSpeed = 0.5 + (index * 0.05);
+    
+    // Double speed for levels 1-5 (indices 0-4) as per user request
+    if (index < 5) {
+        baseSpeed *= 2;
+    }
+
     const baseSpawn = Math.max(700, 2100 - (index * 45));
     const target = 450 + (index * 420);
     return { targetScore: target, fallSpeed: baseSpeed, spawnRate: baseSpawn };
