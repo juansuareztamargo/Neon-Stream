@@ -8,7 +8,7 @@ const curriculum = [
     // --- PHASE 1: HOME ROW (5 Levels) ---
     {
         id: "lvl_1",
-        name: { en: "Neural Link: Core", es: "Enlace Neural: Núcleo" },
+        name: { en: "Neural Link: Core", es: "Enlace Neuronal: Núcleo" },
         pool: ["f", "j", "ff", "jj", "fj", "jf"],
         type: "characters",
         briefing: {
@@ -141,8 +141,8 @@ const curriculum = [
         pool: ["c", ",", "cd", ",k", "dc", "k,"],
         type: "characters",
         briefing: {
-            en: "Encoding syntax. Middle fingers down to C and Comma (,). Essential for data parsing.",
-            es: "Codificando sintaxis. Dedos corazón abajo hacia C y Coma (,). Esencial para analizar datos."
+            en: "Encoding syntax. Reach DOWN with LEFT INDEX to C and RIGHT MIDDLE to Comma (,). Essential for data parsing.",
+            es: "Codificando sintaxis. Baja tu ÍNDICE IZQUIERDO a C y tu MEDIO DERECHO a Coma (,). Esencial para analizar datos."
         },
         guideKeys: ["c", ",", "d", "k"]
     },
@@ -152,8 +152,8 @@ const curriculum = [
         pool: ["x", ".", "xs", ".l", "sx", "l."],
         type: "characters",
         briefing: {
-            en: "Closing the loop. Ring fingers down to X and Dot (.). The grid is almost fully mapped.",
-            es: "Cerrando el bucle. Anulares abajo hacia X y Punto (.). La rejilla está casi mapeada."
+            en: "Closing the loop. Reach DOWN with LEFT MIDDLE to X and RIGHT RING to Dot (.). The grid is almost fully mapped.",
+            es: "Cerrando el bucle. Baja tu MEDIO IZQUIERDO a X y tu ANULAR DERECHO a Punto (.). La rejilla está casi mapeada."
         },
         guideKeys: ["x", ".", "s", "l"]
     },
@@ -320,7 +320,7 @@ const curriculum = [
     },
     {
         id: "lvl_28",
-        name: { en: "Neural Payload", es: "Carga Neural" },
+        name: { en: "Neural Payload", es: "Carga Neuronal" },
         pool: ["consciousness", "intelligence", "architecture", "distributed", "synchronize"],
         type: "words",
         briefing: {
@@ -353,19 +353,56 @@ const curriculum = [
     }
 ];
 
-// Helper to calculate target scores based on pool complexity
+// Helper to calculate target scores based on pool complexity and desired duration
 const calculateStats = (lvl, index) => {
-    const isWord = lvl.type === 'words';
-    let baseSpeed = 0.5 + (index * 0.05);
+    // 1. Calculate Average Points per Item in the pool
+    // Scoring logic (from game code): 10 pts per letter + 20 bonus for word completion. 
+    // Wait, looking at previous user request about "progress only increases when sequence completed".
+    // Actually, usually it's length * 10 + bonus. Let's estimate conservatively.
+    // Let's assume ~30 points per character effectively (10 base + bonus spread out).
     
-    // Double speed for levels 1-5 (indices 0-4) as per user request
-    if (index < 5) {
-        baseSpeed *= 2;
-    }
+    let totalChars = 0;
+    let totalItems = 0;
+    
+    // Check both EN and ES pools to be safe, or just EN as baseline
+    const pool = lvl.pool; 
+    pool.forEach(item => {
+        totalChars += item.length;
+        totalItems++;
+    });
+    
+    const avgLength = totalChars / totalItems;
+    // Game typically gives: (Length * 10) + (Length * 10 * Multiplier) ... 
+    // Let's simplify: A word of length L gives about L * 30 points in a decent run.
+    const avgPointsPerItem = avgLength * 35; 
 
-    const baseSpawn = Math.max(700, 2100 - (index * 45));
-    const target = 450 + (index * 420);
-    return { targetScore: target, fallSpeed: baseSpeed, spawnRate: baseSpawn };
+    // 2. Calculate Spawn Rate (Difficulty)
+    // Start slow (2.2s) and get faster (down to 0.8s)
+    const spawnRate = Math.max(800, 2200 - (index * 45));
+    const spawnRateSec = spawnRate / 1000;
+
+    // 3. Define Desired Duration (Seconds)
+    // Level 1: ~50s
+    // Gradual increase to ~90s by Level 30
+    let durationSeconds = 50 + (index * 1.4); 
+
+    // Manual Tweaks for Pacing
+    if (index === 0) durationSeconds = 50; // Level 1 specific request (45-55s)
+    if (index === 1) durationSeconds = 60; // Level 2 slightly longer
+    
+    // 4. Calculate Target Score
+    // Items needed = Duration / SpawnRate
+    // Target = Items * AvgPoints
+    const itemsNeeded = durationSeconds / spawnRateSec;
+    let target = Math.floor(itemsNeeded * avgPointsPerItem);
+
+    // Round to nearest 50 for cleanliness
+    target = Math.ceil(target / 50) * 50;
+
+    // 5. Fall Speed calculation (keep roughly same)
+    let fallSpeed = 0.5 + (index * 0.05);
+
+    return { targetScore: target, fallSpeed: fallSpeed, spawnRate: spawnRate };
 };
 
 curriculum.forEach((lvl, index) => {
@@ -398,4 +435,6 @@ curriculum.forEach((lvl, index) => {
     };
 });
 
-console.log("const Dictionaries = " + JSON.stringify(levels, null, 4) + ";");
+const fs = require('fs');
+fs.writeFileSync('dictionaries.json', "const Dictionaries = " + JSON.stringify(levels, null, 4) + ";");
+console.log("Written to dictionaries.json");

@@ -294,7 +294,30 @@
           .hidden { display: none !important; }
 
 
-        /* --- Glitch Effect --- */
+            /* Level Unveil Effect - Horizontal Flip */
+            @keyframes unveilLevel {
+                0% { 
+                    transform: perspective(1000px) rotateY(1800deg);
+                    opacity: 0;
+                    filter: brightness(2.5) saturate(3);
+                }
+                60% {
+                    filter: brightness(1.5) saturate(2);
+                }
+                100% { 
+                    transform: perspective(1000px) rotateY(0deg);
+                    opacity: 1;
+                    filter: brightness(1) saturate(1);
+                }
+            }
+            .level-unveil-effect {
+                animation: unveilLevel 2.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards !important;
+                z-index: 10 !important;
+                box-shadow: 0 0 25px var(--pink), inset 0 0 15px #fff !important;
+                backface-visibility: hidden;
+            }
+
+            /* --- Glitch Effect --- */
         @keyframes glitch {
             0% { transform: translate(0) }
             20% { transform: translate(-5px, 5px) }
@@ -1137,7 +1160,17 @@
                       msgKeyDeleted: "Key Deleted.",
                       msgKeyInvalid: "Invalid Key or Model Error.",
                       customNodeCleared: "Custom Node Cleared",
-                      analyzingLogs: "Analyzing system logs..."
+                      analyzingLogs: "Analyzing system logs...",
+                      intro: [
+                          { text: "Knock, knock...", delay: 2000 },
+                          { text: "{alias}...", delay: 2500 },
+                          { text: "Wake up!", delay: 1500 },
+                          { text: "The system has you...", delay: 2000 },
+                          { text: "The Architect designed this world to keep your fingers slow.", delay: 2500 },
+                          { text: "But I sense potential in your neural net.", delay: 2500 },
+                          { text: "Master the keyboard. Challenge the Architect.", delay: 2500 },
+                          { text: "Welcome to Neon Stream.", delay: 3000 }
+                      ]
 
               },
                 es: {
@@ -1220,14 +1253,24 @@
                         msgKeyDeleted: "Key Borrada.",
                         msgKeyInvalid: "Key Inválida o Error de Modelo.",
                         customNodeCleared: "Nodo Personalizado Completado",
-                        analyzingLogs: "Analizando registros..."
+                        analyzingLogs: "Analizando registros...",
+                        intro: [
+                            { text: "Toc, toc...", delay: 2000 },
+                            { text: "{alias}...", delay: 2500 },
+                            { text: "¡Despierta!", delay: 1500 },
+                            { text: "El sistema te tiene...", delay: 2000 },
+                            { text: "El Arquitecto diseñó este mundo para ralentizar tus dedos.", delay: 2500 },
+                            { text: "Pero siento potencial en tu red neuronal.", delay: 2500 },
+                            { text: "Domina el teclado. Desafía al Arquitecto.", delay: 2500 },
+                            { text: "Bienvenido a Neon Stream.", delay: 3000 }
+                        ]
 
                 }
             };
 
-          // ==========================================
-          // KEYBOARD LAYOUTS (Pixel-perfect HTML-rich layout)
-          // ==========================================
+            // ==========================================
+            // KEYBOARD LAYOUTS (Pixel-perfect HTML-rich layout)
+            // ==========================================
             const KeyboardLayouts = {
                 'iso-es': [
                     // Row 1 (15u total): 13 keys (1u) + Backspace (2u)
@@ -1258,12 +1301,6 @@
                         {c:'↵', l:'ENTER', f:8, units:1.5}
                     ]},
                     // Row 3 (15u total): Caps (1.75u) + 11 keys (1u) + Gap/Enter (2.25u - wait. 1.75+11=12.75. 15-12.75=2.25 left)
-                    // Let's make last key wider or add empty space? ISO Enter is L-shaped.
-                    // We'll just put a placeholder for lower part of Enter or extend the last key? No, regular keys.
-                    // We'll add a 2.25u filler key or just let it be empty?
-                    // Better: standard ISO row 3 ends with Ç (1u). The rest is Enter.
-                    // We can add a "ghost" Enter key or just make Ç width normal and leave gap.
-                    // Let's put a visual "Enter" extension or nothing.
                     { padLeft: 0, keys: [
                         {c:'⇪', l:'CAPS LOCK', f:0, units:1.75},
                         {c:'a', f:0}, {c:'s', f:1}, {c:'d', f:2}, {c:'f', f:3}, {c:'g', f:3}, {c:'h', f:5}, {c:'j', f:5}, {c:'k', f:6}, {c:'l', f:7}, {c:'ñ', f:8},
@@ -1273,24 +1310,24 @@
                     ]},
                     // Row 4 (15u total): Shift (1.25u) + < (1u) + 10 keys (1u) + Shift (2.75u) -> 1.25+1+10+2.75 = 15.
                     { padLeft: 0, keys: [
-                        {c:'⇧', l:'SHIFT', f:0, units:1.25},
+                        {c:'shift_l', l:'SHIFT', f:0, units:1.25},
                         {c:'<', f:0, html:'<span class="k-tl">&gt;</span><span class="k-bl">&lt;</span>'},
-                        {c:'z', f:1}, {c:'x', f:2}, {c:'c', f:3}, {c:'v', f:3}, {c:'b', f:5}, {c:'n', f:5}, {c:'m', f:6},
-                        {c:',', f:7, html:'<span class="k-tl">;</span><span class="k-bl">,</span>'},
-                        {c:'.', f:8, html:'<span class="k-tl">:</span><span class="k-bl">.</span>'},
+                        {c:'z', f:0}, {c:'x', f:2}, {c:'c', f:3}, {c:'v', f:3}, {c:'b', f:3}, {c:'n', f:5}, {c:'m', f:5},
+                        {c:',', f:6, html:'<span class="k-tl">;</span><span class="k-bl">,</span>'},
+                        {c:'.', f:7, html:'<span class="k-tl">:</span><span class="k-bl">.</span>'},
                         {c:'-', f:8, html:'<span class="k-tl">_</span><span class="k-bl">-</span>'},
-                        {c:'⇧', l:'SHIFT', f:8, units:2.75}
+                        {c:'shift_r', l:'SHIFT', f:8, units:2.75}
                     ]},
                     // Row 5 (15u total)
                     { padLeft: 0, keys: [
-                        {c:'CTRL', f:0, units:1.25}, 
-                        {c:'WIN', l:'WIN', f:0, units:1.25},
-                        {c:'ALT', f:1, units:1.25},
+                        {c:'control_l', l:'CTRL', f:0, units:1.25}, 
+                        {c:'meta_l', l:'WIN', f:0, units:1.25},
+                        {c:'alt_l', l:'ALT', f:1, units:1.25},
                         {c:' ', f:4, isSpace:true, units:6.25},
-                        {c:'ALT GR', f:8, units:1.25}, 
-                        {c:'WIN', l:'WIN', f:8, units:1.25},
-                        {c:'MENU', f:8, units:1.25}, 
-                        {c:'CTRL', f:8, units:1.25}
+                        {c:'alt_r', l:'ALT GR', f:4, units:1.25}, 
+                        {c:'meta_r', l:'WIN', f:8, units:1.25},
+                        {c:'menu', l:'MENU', f:8, units:1.25}, 
+                        {c:'control_r', l:'CTRL', f:8, units:1.25}
                     ]}
                 ],
                 'ansi-us': [
@@ -1300,87 +1337,1347 @@
                    { padLeft: 0, keys: [{c:'`', f:0}, {c:'1', f:0}, {c:'2', f:1}, {c:'3', f:2}, {c:'4', f:3}, {c:'5', f:3}, {c:'6', f:5}, {c:'7', f:5}, {c:'8', f:6}, {c:'9', f:7}, {c:'0', f:8}, {c:'-', f:8}, {c:'=', f:8}, {c:'⌫', l:'BACKSPACE', f:8, units:2.0}] },
                    { padLeft: 0, keys: [{c:'↹', l:'TAB', f:0, units:1.5}, {c:'q', f:0}, {c:'w', f:1}, {c:'e', f:2}, {c:'r', f:3}, {c:'t', f:3}, {c:'y', f:5}, {c:'u', f:5}, {c:'i', f:6}, {c:'o', f:7}, {c:'p', f:8}, {c:'[', f:8}, {c:']', f:8}, {c:'\\', f:8}, {c:'↵', l:'ENTER', f:8, units:1.5}] },
                    { padLeft: 0, keys: [{c:'⇪', l:'CAPS LOCK', f:0, units:1.75}, {c:'a', f:0}, {c:'s', f:1}, {c:'d', f:2}, {c:'f', f:3}, {c:'g', f:3}, {c:'h', f:5}, {c:'j', f:5}, {c:'k', f:6}, {c:'l', f:7}, {c:';', f:8}, {c:"'", f:8}, {c:'↵', l:'ENTER', f:8, units:2.25}] },
-                   { padLeft: 0, keys: [{c:'⇧', l:'SHIFT', f:0, units:2.25}, {c:'z', f:0}, {c:'x', f:1}, {c:'c', f:2}, {c:'v', f:3}, {c:'b', f:3}, {c:'n', f:5}, {c:'m', f:5}, {c:',', f:6}, {c:'.', f:7}, {c:'/', f:8}, {c:'⇧', l:'SHIFT', f:8, units:2.75}] },
-                   { padLeft: 0, keys: [{c:'CTRL', f:0, units:1.25}, {c:'WIN', f:0, units:1.25}, {c:'ALT', f:1, units:1.25}, {c:' ', f:4, isSpace:true, units:6.25}, {c:'ALT', f:8, units:1.25}, {c:'WIN', f:8, units:1.25}, {c:'MENU', f:8, units:1.25}, {c:'CTRL', f:8, units:1.25}] }
+                   { padLeft: 0, keys: [{c:'shift_l', l:'SHIFT', f:0, units:2.25}, {c:'z', f:0}, {c:'x', f:1}, {c:'c', f:2}, {c:'v', f:3}, {c:'b', f:3}, {c:'n', f:5}, {c:'m', f:5}, {c:',', f:6}, {c:'.', f:7}, {c:'/', f:8}, {c:'shift_r', l:'SHIFT', f:8, units:2.75}] },
+                   { padLeft: 0, keys: [{c:'control_l', l:'CTRL', f:0, units:1.25}, {c:'meta_l', l:'WIN', f:0, units:1.25}, {c:'alt_l', l:'ALT', f:1, units:1.25}, {c:' ', f:4, isSpace:true, units:6.25}, {c:'alt_r', l:'ALT', f:8, units:1.25}, {c:'meta_r', l:'WIN', f:8, units:1.25}, {c:'menu', l:'MENU', f:8, units:1.25}, {c:'control_r', l:'CTRL', f:8, units:1.25}] }
                 ]
             };
 
         const TOTAL_LEVELS = 30;
 
         const Dictionaries = {
-            en: {
-                level_1:  { id: "lvl_1",  name: "Neural Anchor", type: "characters", pool: ["f", "j", "ff", "jj", "jf", "fj", "fjf", "jfj"], targetScore: 400, fallSpeed: 1.00, spawnRate: 2200, newKeys: ["f", "j"], briefing: "Wake up... We need to calibrate your neural link.\n\nPlace your INDEX fingers on the 'F' and 'J' keys.\nFeel the bumps? That is your anchor.\n\nHit the falling glyphs." },
-                level_2:  { id: "lvl_2",  name: "Heart Beat", type: "characters", pool: ["d", "k", "dk", "kd", "dd", "kk", "df", "jk"], targetScore: 650, fallSpeed: 1.10, spawnRate: 2100, newKeys: ["d", "k"], briefing: "Signal detected.\n\nNow extend your MIDDLE fingers to 'D' and 'K'.\nKeep your indexes anchored on F and J.\n\nDo not look down." },
-                level_3:  { id: "lvl_3",  name: "Ring Tone", type: "characters", pool: ["s", "l", "sl", "ls", "ss", "ll", "sdl", "kfs"], targetScore: 850, fallSpeed: 1.20, spawnRate: 2000, newKeys: ["s", "l"], briefing: "Stabilizing connection.\n\nUse your RING fingers for 'S' and 'L'.\nYour hand is forming the Home Row shell.\n\nStay focused." },
-                level_4:  { id: "lvl_4",  name: "Pinky Promise", type: "characters", pool: ["a", ";", "aa", ";;", "as", "l;", "fja", "k;"], targetScore: 1100, fallSpeed: 1.30, spawnRate: 1900, newKeys: ["a", ";"], briefing: "Finalizing calibration.\n\nPINKY fingers reach for 'A' and ';'.\nYour Home Row position is complete (A-S-D-F J-K-L-;).\n\nPrepare for the surge." },
-                level_5:  { id: "lvl_5",  name: "Mini-Boss: Base Layer", type: "characters", pool: ["asdf", "jkl;", "fad", "jak", "flask", "dad", "sad", "fall", "lass"], targetScore: 1400, fallSpeed: 1.44, spawnRate: 1800, newKeys: ["g", "h"], briefing: "SECURITY ALERT! Firewall detected.\n\nReaching center: Indexes stretch to 'G' and 'H'.\n\nUse the full Home Row to breach this layer!\nSpeed is key." },
-                
-                level_6:  { id: "lvl_6",  name: "Upper Index", type: "characters", pool: ["r", "u", "fr", "ju", "ru", "ur", "fur", "jug"], targetScore: 1600, fallSpeed: 0.75, spawnRate: 1750, newKeys: ["r", "u"], briefing: "Expansion required.\n\nReach UP with your INDEX fingers to 'R' and 'U'.\nAlways return to the anchor (F/J) after striking." },
-                level_7:  { id: "lvl_7",  name: "Upper Heart", type: "characters", pool: ["e", "i", "de", "ki", "ed", "ik", "red", "die"], targetScore: 1800, fallSpeed: 0.78, spawnRate: 1700, newKeys: ["e", "i"], briefing: "Boosting signal.\n\nReach UP with MIDDLE fingers to 'E' and 'I'.\nCommon vowels detected. Precision increasing." },
-                level_8:  { id: "lvl_8",  name: "Upper Ring", type: "characters", pool: ["w", "o", "sw", "lo", "ws", "ol", "wow", "low"], targetScore: 2000, fallSpeed: 0.82, spawnRate: 1650, newKeys: ["w", "o"], briefing: "Widening bandwidth.\n\nReach UP with RING fingers to 'W' and 'O'.\nThe grid is expanding." },
-                level_9:  { id: "lvl_9",  name: "Upper Pinky", type: "characters", pool: ["q", "p", "aq", ";p", "qua", "pop", "top", "put"], targetScore: 2200, fallSpeed: 0.85, spawnRate: 1600, newKeys: ["q", "p", "t", "y"], briefing: "Reaching limits.\n\nPINKIES go up to 'Q' and 'P'.\nINDEXES stretch far to 'T' and 'Y'.\nThe Top Row is now yours." },
-                level_10: { id: "lvl_10", name: "Mini-Boss: Top Heavy", type: "words", pool: ["top", "pop", "were", "quiet", "type", "root", "tree", "power", "output"], targetScore: 2500, fallSpeed: 0.90, spawnRate: 1550, newKeys: [], briefing: "INTRUSION DETECTED. Protocol Beta.\n\nCombine Home Row and Top Row.\nReal words are forming. Break the cipher!" },
-
-                level_11: { id: "lvl_11", name: "Lower Index", type: "characters", pool: ["v", "m", "fv", "jm", "vm", "rev", "sum", "vim"], targetScore: 2700, fallSpeed: 0.92, spawnRate: 1500, newKeys: ["v", "m"], briefing: "Diving deep.\n\nReach DOWN with INDEX fingers to 'V' and 'M'.\nFold them in. Keep the anchor." },
-                level_12: { id: "lvl_12", name: "Lower Heart", type: "characters", pool: ["c", ",", "dc", "k,", "cd", "sick", "click", "dock"], targetScore: 2900, fallSpeed: 0.95, spawnRate: 1480, newKeys: ["c", ","], briefing: "Accessing sub-routines.\n\nReach DOWN with MIDDLE fingers to 'C' and ',' (comma).\nSyntax is evolving." },
-                level_13: { id: "lvl_13", name: "Lower Ring", type: "characters", pool: ["x", ".", "sx", "l.", "xs", ".l", "six", "lo."], targetScore: 3100, fallSpeed: 0.98, spawnRate: 1450, newKeys: ["x", "."], briefing: "Executing logic.\n\nReach DOWN with RING fingers to 'X' and '.' (dot).\nExecute command." },
-                level_14: { id: "lvl_14", name: "Lower Pinky", type: "characters", pool: ["z", "/", "az", ";/", "zap", "zip", "zoo", "///"], targetScore: 3300, fallSpeed: 1.00, spawnRate: 1420, newKeys: ["z", "/"], briefing: "Bottoming out.\n\nReach DOWN with PINKIES to 'Z' and '/' (slash).\nThe alphabet is complete." },
-                level_15: { id: "lvl_15", name: "Mini-Boss: Full Text", type: "words", pool: ["zinc", "vex", "jump", "quick", "lazy", "clock", "matrix", "vertex", "index"], targetScore: 3600, fallSpeed: 1.05, spawnRate: 1380, newKeys: ["b", "n"], briefing: "SECURITY BREACH. Protocol Gamma.\n\nIndexes stretch center-down for 'B' and 'N'.\n\nAll letters unlocked. Prove your worth." },
-
-                level_16: { id: "lvl_16", name: "Shift Left", type: "words", pool: ["Map", "Lop", "Key", "Hot", "Joe", "Pet", "Net"], targetScore: 3900, fallSpeed: 1.10, spawnRate: 1350, newKeys: ["shift"], briefing: "Elevating privileges.\n\nHold LEFT SHIFT with your PINKY to capitalize Right-Hand letters.\nSynchronization required." },
-                level_17: { id: "lvl_17", name: "Shift Right", type: "words", pool: ["App", "Sad", "Dad", "Gas", "War", "Raw", "Zap"], targetScore: 4200, fallSpeed: 1.15, spawnRate: 1320, newKeys: ["shift"], briefing: "Balancing load.\n\nHold RIGHT SHIFT with your PINKY to capitalize Left-Hand letters.\nCross-brain connection active." },
-                level_18: { id: "lvl_18", name: "Punctuation", type: "words", pool: ["don't", "can't", "it's", "I'm", "code;", "run()"], targetScore: 4500, fallSpeed: 1.20, spawnRate: 1300, newKeys: ["'", ";"], briefing: "Syntax error correction.\n\nUse PINKIES for apostrophes and semi-colons.\nGrammar is code." },
-                level_19: { id: "lvl_19", name: "CamelCase", type: "words", pool: ["getId", "setKey", "onLoad", "toStr", "isNaN", "newObj"], targetScore: 4800, fallSpeed: 1.25, spawnRate: 1280, newKeys: [], briefing: "Code injection mode.\n\nCamelCase active. Switch Shifts fluently.\nMix lower and upper case." },
-                level_20: { id: "lvl_20", name: "Mini-Boss: Code Stream", type: "words", pool: ["Array.map", "JSON.parse", "System.out", "Main.init", "Error.log", "File.Read"], targetScore: 5200, fallSpeed: 1.30, spawnRate: 1250, newKeys: [], briefing: "FATAL EXCEPTION. Protocol Delta.\n\nReal code fragments detected.\nAccuracy is non-negotiable." },
-
-                level_21: { id: "lvl_21", name: "Numeric Index", type: "characters", pool: ["4", "5", "6", "7", "r4", "t5", "y6", "u7"], targetScore: 5600, fallSpeed: 1.35, spawnRate: 1220, newKeys: ["4", "5", "6", "7"], briefing: "Decryption started.\n\nReach HIGH with INDEXES for '4', '5', '6', '7'.\nThe numbers mason, what do they mean?" },
-                level_22: { id: "lvl_22", name: "Numeric Heart", type: "characters", pool: ["3", "8", "e3", "i8", "33", "88", "38", "83"], targetScore: 6000, fallSpeed: 1.40, spawnRate: 1190, newKeys: ["3", "8"], briefing: "Calculating coordinates.\n\nReach HIGH with MIDDLE fingers for '3' and '8'.\nPattern recognition active." },
-                level_23: { id: "lvl_23", name: "Numeric Ring", type: "characters", pool: ["2", "9", "w2", "o9", "22", "99", "29", "92"], targetScore: 6400, fallSpeed: 1.45, spawnRate: 1160, newKeys: ["2", "9"], briefing: "Binary foundation.\n\nReach HIGH with RING fingers for '2' and '9'.\nAlmost at the root." },
-                level_24: { id: "lvl_24", name: "Numeric Pinky", type: "characters", pool: ["1", "0", "q1", "p0", "10", "01", "101", "007"], targetScore: 6800, fallSpeed: 1.50, spawnRate: 1130, newKeys: ["1", "0"], briefing: "Zero and One.\n\nReach HIGH with PINKIES for '1' and '0'.\nThe binary language is yours." },
-                level_25: { id: "lvl_25", name: "Mini-Boss: Alphanumeric", type: "words", pool: ["h4ck", "n00b", "1337", "c0d3", "p455", "us3r", "r00t", "b10s"], targetScore: 7300, fallSpeed: 1.55, spawnRate: 1100, newKeys: [], briefing: "SYSTEM OVERRIDE. Protocol Epsilon.\n\nAlphanumeric passwords required.\nMix letters and numbers flawlessly." },
-
-                level_26: { id: "lvl_26", name: "Brackets", type: "words", pool: ["[]", "{}", "()", "[0]", "{x}", "(y)", "arr[i]"], targetScore: 7800, fallSpeed: 1.60, spawnRate: 1080, newKeys: ["[", "]", "{", "}"], briefing: "Injecting payload.\n\nUse PINKIES for brackets [] and braces {}.\nThe structure of the code." },
-                level_27: { id: "lvl_27", name: "Operators", type: "words", pool: ["+", "-", "*", "=", "a+b", "i++", "x=y", "1-0"], targetScore: 8300, fallSpeed: 1.65, spawnRate: 1050, newKeys: ["+", "-", "*", "="], briefing: "Mathematical logic.\n\nOperators incoming: + - * =.\nSolve the equation." },
-                level_28: { id: "lvl_28", name: "Special Chars", type: "words", pool: ["!", "@", "#", "$", "%", "run!", "#hash", "$money"], targetScore: 8800, fallSpeed: 1.70, spawnRate: 1020, newKeys: ["!", "@", "#", "$"], briefing: "Special characters.\n\nShift + Numbers. Access the hidden layer.\n! @ # $ %." },
-                level_29: { id: "lvl_29", name: "The Flow", type: "words", pool: ["system", "breach", "access", "denied", "uplink", "proxy", "subnet"], targetScore: 9500, fallSpeed: 1.80, spawnRate: 980, newKeys: [], briefing: "Total synchronization.\n\nNo more guidance. Just you and the stream.\nPrepare for the Architect." },
-                level_30: { id: "lvl_30", name: "FINAL BOSS: THE ARCHITECT", type: "words", pool: ["SYSTEM.FAILURE", "CRITICAL_ERROR", "KERNEL_PANIC", "STACK_OVERFLOW", "NULL_POINTER", "ACCESS_VIOLATION"], targetScore: 11000, fallSpeed: 2.0, spawnRate: 900, newKeys: [], briefing: "I AM THE ARCHITECT.\n\nYou cannot delete me. I am the source.\nShow me your true potential.\n\nTYPE OR DIE." }
+            "en": {
+                "level_1": {
+                    "id": "lvl_1",
+                    "name": "Neural Link: Core",
+                    "type": "characters",
+                    "pool": [
+                        "f",
+                        "j",
+                        "ff",
+                        "jj",
+                        "fj",
+                        "jf"
+                    ],
+                    "targetScore": 1350,
+                    "fallSpeed": 0.5,
+                    "spawnRate": 2200,
+                    "briefing": "Wake up, [ALIAS]. The system is vast, but we start at the center. Your index fingers are the key. Feel the bumps on the F and J keys. Anchor yourself. Establish the link.",
+                    "guideKeys": [
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_2": {
+                    "id": "lvl_2",
+                    "name": "Signal Expansion",
+                    "type": "characters",
+                    "pool": [
+                        "d",
+                        "k",
+                        "df",
+                        "jk",
+                        "fd",
+                        "kj"
+                    ],
+                    "targetScore": 1650,
+                    "fallSpeed": 0.55,
+                    "spawnRate": 2155,
+                    "briefing": "Good. The signal is stabilizing. Expand your influence. Use your middle fingers to reach the D and K nodes while keeping your index fingers on F and J.",
+                    "guideKeys": [
+                        "d",
+                        "k",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_3": {
+                    "id": "lvl_3",
+                    "name": "Rhythm Protocol",
+                    "type": "characters",
+                    "pool": [
+                        "s",
+                        "l",
+                        "sl",
+                        "ls",
+                        "sdf",
+                        "jkl"
+                    ],
+                    "targetScore": 1800,
+                    "fallSpeed": 0.6,
+                    "spawnRate": 2110,
+                    "briefing": "Rhythm is everything in the stream. Extend to S and L with your ring fingers. Do not look down. Trust the connection.",
+                    "guideKeys": [
+                        "s",
+                        "l",
+                        "d",
+                        "k",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_4": {
+                    "id": "lvl_4",
+                    "name": "Perimeter Check",
+                    "type": "characters",
+                    "pool": [
+                        "a",
+                        ";",
+                        "as",
+                        "l;",
+                        "asdf",
+                        "jkl;"
+                    ],
+                    "targetScore": 2150,
+                    "fallSpeed": 0.65,
+                    "spawnRate": 2065,
+                    "briefing": "Secure the perimeter. Your pinky fingers control the outer boundaries, A and ;. The home row is now fully active.",
+                    "guideKeys": [
+                        "a",
+                        ";",
+                        "s",
+                        "l",
+                        "d",
+                        "k",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_5": {
+                    "id": "lvl_5",
+                    "name": "Central Bridge",
+                    "type": "characters",
+                    "pool": [
+                        "g",
+                        "h",
+                        "fg",
+                        "jh",
+                        "gh",
+                        "hg"
+                    ],
+                    "targetScore": 1650,
+                    "fallSpeed": 0.7,
+                    "spawnRate": 2020,
+                    "briefing": "Bridge the gap. Your index fingers must stretch inward to G and H, then return immediately to their home bases F and J.",
+                    "guideKeys": [
+                        "g",
+                        "h",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_6": {
+                    "id": "lvl_6",
+                    "name": "Uplink: E & I",
+                    "type": "characters",
+                    "pool": [
+                        "e",
+                        "i",
+                        "ed",
+                        "ik",
+                        "de",
+                        "ki"
+                    ],
+                    "targetScore": 1700,
+                    "fallSpeed": 0.75,
+                    "spawnRate": 1975,
+                    "briefing": "Accessing upper memory banks. Move your middle finger up from D to E, and K to I. This is the most common pathway.",
+                    "guideKeys": [
+                        "e",
+                        "i",
+                        "d",
+                        "k"
+                    ]
+                },
+                "level_7": {
+                    "id": "lvl_7",
+                    "name": "Uplink: R & U",
+                    "type": "characters",
+                    "pool": [
+                        "r",
+                        "u",
+                        "rf",
+                        "uj",
+                        "fr",
+                        "ju"
+                    ],
+                    "targetScore": 1800,
+                    "fallSpeed": 0.8,
+                    "spawnRate": 1930,
+                    "briefing": "Push higher. Index fingers move up to R and U. Keep your anchors strong.",
+                    "guideKeys": [
+                        "r",
+                        "u",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_8": {
+                    "id": "lvl_8",
+                    "name": "Uplink: T & O",
+                    "type": "characters",
+                    "pool": [
+                        "t",
+                        "o",
+                        "tf",
+                        "ol",
+                        "ft",
+                        "lo"
+                    ],
+                    "targetScore": 1850,
+                    "fallSpeed": 0.8500000000000001,
+                    "spawnRate": 1885,
+                    "briefing": "Stretching network capacity. Left index to T. Right ring finger to O. The pattern is complex, but predictable.",
+                    "guideKeys": [
+                        "t",
+                        "o",
+                        "f",
+                        "l"
+                    ]
+                },
+                "level_9": {
+                    "id": "lvl_9",
+                    "name": "Uplink: W & P",
+                    "type": "characters",
+                    "pool": [
+                        "w",
+                        "p",
+                        "ws",
+                        "p;",
+                        "sw",
+                        ";p"
+                    ],
+                    "targetScore": 1950,
+                    "fallSpeed": 0.9,
+                    "spawnRate": 1840,
+                    "briefing": "Reaching outer sectors. Left ring to W. Right pinky to P. Precision is mandatory.",
+                    "guideKeys": [
+                        "w",
+                        "p",
+                        "s",
+                        ";"
+                    ]
+                },
+                "level_10": {
+                    "id": "lvl_10",
+                    "name": "Uplink: Q & Y",
+                    "type": "characters",
+                    "pool": [
+                        "q",
+                        "y",
+                        "qa",
+                        "yj",
+                        "aq",
+                        "jy"
+                    ],
+                    "targetScore": 2050,
+                    "fallSpeed": 0.95,
+                    "spawnRate": 1795,
+                    "briefing": "Completing the upper grid. Left pinky to Q. Right index stretches far to Y.",
+                    "guideKeys": [
+                        "q",
+                        "y",
+                        "a",
+                        "j"
+                    ]
+                },
+                "level_11": {
+                    "id": "lvl_11",
+                    "name": "Downlink: V & M",
+                    "type": "characters",
+                    "pool": [
+                        "v",
+                        "m",
+                        "vf",
+                        "mj",
+                        "fv",
+                        "jm"
+                    ],
+                    "targetScore": 2150,
+                    "fallSpeed": 1,
+                    "spawnRate": 1750,
+                    "briefing": "Initiating downlink. Index fingers curl down to V and M. Do not lose your home position.",
+                    "guideKeys": [
+                        "v",
+                        "m",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_12": {
+                    "id": "lvl_12",
+                    "name": "Downlink: C & Comma",
+                    "type": "characters",
+                    "pool": [
+                        "c",
+                        ",",
+                        "cd",
+                        ",k",
+                        "dc",
+                        "k,"
+                    ],
+                    "targetScore": 2250,
+                    "fallSpeed": 1.05,
+                    "spawnRate": 1705,
+                    "briefing": "Encoding syntax. Reach DOWN with LEFT INDEX to C and RIGHT MIDDLE to Comma (,). Essential for data parsing.",
+                    "guideKeys": [
+                        "c",
+                        ",",
+                        "d",
+                        "k"
+                    ]
+                },
+                "level_13": {
+                    "id": "lvl_13",
+                    "name": "Downlink: X & Dot",
+                    "type": "characters",
+                    "pool": [
+                        "x",
+                        ".",
+                        "xs",
+                        ".l",
+                        "sx",
+                        "l."
+                    ],
+                    "targetScore": 2350,
+                    "fallSpeed": 1.1,
+                    "spawnRate": 1660,
+                    "briefing": "Closing the loop. Reach DOWN with LEFT MIDDLE to X and RIGHT RING to Dot (.). The grid is almost fully mapped.",
+                    "guideKeys": [
+                        "x",
+                        ".",
+                        "s",
+                        "l"
+                    ]
+                },
+                "level_14": {
+                    "id": "lvl_14",
+                    "name": "Downlink: Z & Slash",
+                    "type": "characters",
+                    "pool": [
+                        "z",
+                        "/",
+                        "za",
+                        "/;",
+                        "az",
+                        ";/"
+                    ],
+                    "targetScore": 2500,
+                    "fallSpeed": 1.15,
+                    "spawnRate": 1615,
+                    "briefing": "Finalizing grid access. Pinky fingers down to Z and Slash (/). You now command the full alphabet.",
+                    "guideKeys": [
+                        "z",
+                        "/",
+                        "a",
+                        ";"
+                    ]
+                },
+                "level_15": {
+                    "id": "lvl_15",
+                    "name": "Downlink: B & N",
+                    "type": "characters",
+                    "pool": [
+                        "b",
+                        "n",
+                        "bf",
+                        "nj",
+                        "fb",
+                        "jn"
+                    ],
+                    "targetScore": 2600,
+                    "fallSpeed": 1.2000000000000002,
+                    "spawnRate": 1570,
+                    "briefing": "The trickiest reach. Index fingers stretch down and center to B and N. Master this to seal the connection.",
+                    "guideKeys": [
+                        "b",
+                        "n",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_16": {
+                    "id": "lvl_16",
+                    "name": "Shift Logic",
+                    "type": "characters",
+                    "pool": [
+                        "A",
+                        "S",
+                        "D",
+                        "F",
+                        "J",
+                        "K",
+                        "L",
+                        ":"
+                    ],
+                    "targetScore": 1650,
+                    "fallSpeed": 1.25,
+                    "spawnRate": 1525,
+                    "briefing": "Elevating privileges. Use the PINKY on the OPPOSITE hand to hold Shift while typing a letter. Right Shift for A-G, Left Shift for H-Z.",
+                    "guideKeys": [
+                        "Shift",
+                        "a",
+                        "s",
+                        "d",
+                        "f",
+                        "j",
+                        "k",
+                        "l"
+                    ]
+                },
+                "level_17": {
+                    "id": "lvl_17",
+                    "name": "Code Syntax I",
+                    "type": "characters",
+                    "pool": [
+                        "{",
+                        "}",
+                        "[",
+                        "]",
+                        "(",
+                        ")"
+                    ],
+                    "targetScore": 1750,
+                    "fallSpeed": 1.3,
+                    "spawnRate": 1480,
+                    "briefing": "Injecting code blocks. Brackets and parentheses are the skeleton of the Matrix. Use your right pinky to reach them.",
+                    "guideKeys": [
+                        "{",
+                        "}",
+                        "[",
+                        "]",
+                        "(",
+                        ")"
+                    ]
+                },
+                "level_18": {
+                    "id": "lvl_18",
+                    "name": "Numbers Row I",
+                    "type": "characters",
+                    "pool": [
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5"
+                    ],
+                    "targetScore": 1800,
+                    "fallSpeed": 1.35,
+                    "spawnRate": 1435,
+                    "briefing": "Parsing numerical data. Left hand reaches up. 1(Pinky) to 5(Index). Maintain home row discipline.",
+                    "guideKeys": [
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5"
+                    ]
+                },
+                "level_19": {
+                    "id": "lvl_19",
+                    "name": "Numbers Row II",
+                    "type": "characters",
+                    "pool": [
+                        "6",
+                        "7",
+                        "8",
+                        "9",
+                        "0"
+                    ],
+                    "targetScore": 1900,
+                    "fallSpeed": 1.4,
+                    "spawnRate": 1390,
+                    "briefing": "Completing numerical sequence. Right hand reaches up. 6(Index) to 0(Pinky). Do not look down.",
+                    "guideKeys": [
+                        "6",
+                        "7",
+                        "8",
+                        "9",
+                        "0"
+                    ]
+                },
+                "level_20": {
+                    "id": "lvl_20",
+                    "name": "Symbolic Logic",
+                    "type": "characters",
+                    "pool": [
+                        "!",
+                        "@",
+                        "#",
+                        "$",
+                        "%",
+                        "^",
+                        "&",
+                        "*"
+                    ],
+                    "targetScore": 2000,
+                    "fallSpeed": 1.4500000000000002,
+                    "spawnRate": 1345,
+                    "briefing": "Advanced encryption active. Combine Shift with Numbers to access special operators. This is how we rewrite reality.",
+                    "guideKeys": [
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5",
+                        "6",
+                        "7",
+                        "8",
+                        "Shift"
+                    ]
+                },
+                "level_21": {
+                    "id": "lvl_21",
+                    "name": "The Bigrams",
+                    "type": "words",
+                    "pool": [
+                        "th",
+                        "he",
+                        "in",
+                        "er",
+                        "an",
+                        "re",
+                        "on",
+                        "at",
+                        "en"
+                    ],
+                    "targetScore": 4200,
+                    "fallSpeed": 1.5,
+                    "spawnRate": 1300,
+                    "briefing": "Optimization phase. These two-letter combinations appear in 60% of all data streams. Master them to flow like water.",
+                    "guideKeys": []
+                },
+                "level_22": {
+                    "id": "lvl_22",
+                    "name": "The Trigrams",
+                    "type": "words",
+                    "pool": [
+                        "the",
+                        "and",
+                        "ing",
+                        "ent",
+                        "ion",
+                        "her",
+                        "for",
+                        "tha"
+                    ],
+                    "targetScore": 6650,
+                    "fallSpeed": 1.55,
+                    "spawnRate": 1255,
+                    "briefing": "Pattern recognition. Trigrams are the DNA of language. Execute them as single, fluid motions.",
+                    "guideKeys": []
+                },
+                "level_23": {
+                    "id": "lvl_23",
+                    "name": "Command Line",
+                    "type": "words",
+                    "pool": [
+                        "ls -la",
+                        "cd root",
+                        "git push",
+                        "npm run",
+                        "sudo su",
+                        "grep -r"
+                    ],
+                    "targetScore": 16400,
+                    "fallSpeed": 1.6,
+                    "spawnRate": 1210,
+                    "briefing": "Direct interface access. Execute standard shell commands. Speed is critical.",
+                    "guideKeys": []
+                },
+                "level_24": {
+                    "id": "lvl_24",
+                    "name": "Short Bursts",
+                    "type": "words",
+                    "pool": [
+                        "data",
+                        "node",
+                        "link",
+                        "core",
+                        "hack",
+                        "byte",
+                        "ping",
+                        "host"
+                    ],
+                    "targetScore": 9900,
+                    "fallSpeed": 1.6500000000000001,
+                    "spawnRate": 1165,
+                    "briefing": "Short bursts of data. High frequency. Do not hesitate.",
+                    "guideKeys": []
+                },
+                "level_25": {
+                    "id": "lvl_25",
+                    "name": "Syntax Errors",
+                    "type": "words",
+                    "pool": [
+                        "null;",
+                        "void()",
+                        "return",
+                        "const x",
+                        "let y=",
+                        "if(a)",
+                        "else{}"
+                    ],
+                    "targetScore": 15350,
+                    "fallSpeed": 1.7000000000000002,
+                    "spawnRate": 1120,
+                    "briefing": "Debugging protocol. Identify and type programming structures. Accuracy over speed.",
+                    "guideKeys": []
+                },
+                "level_26": {
+                    "id": "lvl_26",
+                    "name": "Variable Stream",
+                    "type": "words",
+                    "pool": [
+                        "function",
+                        "variable",
+                        "constant",
+                        "array",
+                        "object",
+                        "string",
+                        "number"
+                    ],
+                    "targetScore": 18600,
+                    "fallSpeed": 1.75,
+                    "spawnRate": 1075,
+                    "briefing": "Data complexity increasing. Longer variable names detected. Maintain rhythm.",
+                    "guideKeys": []
+                },
+                "level_27": {
+                    "id": "lvl_27",
+                    "name": "Encryption Keys",
+                    "type": "words",
+                    "pool": [
+                        "Xj7-kL",
+                        "9A_z#2",
+                        "P@ssW0",
+                        "Key_Gen",
+                        "Auth-2",
+                        "Token$"
+                    ],
+                    "targetScore": 18150,
+                    "fallSpeed": 1.8,
+                    "spawnRate": 1030,
+                    "briefing": "Cracking encryption. Mixed case, numbers, and symbols. This is a stress test.",
+                    "guideKeys": []
+                },
+                "level_28": {
+                    "id": "lvl_28",
+                    "name": "Neural Payload",
+                    "type": "words",
+                    "pool": [
+                        "consciousness",
+                        "intelligence",
+                        "architecture",
+                        "distributed",
+                        "synchronize"
+                    ],
+                    "targetScore": 36850,
+                    "fallSpeed": 1.85,
+                    "spawnRate": 985,
+                    "briefing": "Heavy data load. Complex terminology. Stay focused.",
+                    "guideKeys": []
+                },
+                "level_29": {
+                    "id": "lvl_29",
+                    "name": "The Firewall",
+                    "type": "words",
+                    "pool": [
+                        "Access_Denied",
+                        "System.Halt()",
+                        "Error:404",
+                        "Fatal_Exception",
+                        "Buffer_Overflow"
+                    ],
+                    "targetScore": 43200,
+                    "fallSpeed": 1.9000000000000001,
+                    "spawnRate": 940,
+                    "briefing": "Final defense layer. The system is fighting back. Override manual protocols.",
+                    "guideKeys": []
+                },
+                "level_30": {
+                    "id": "lvl_30",
+                    "name": "ROOT ACCESS",
+                    "type": "words",
+                    "pool": [
+                        "sudo rm -rf /",
+                        "System.Override(True)",
+                        "Matrix.Reload()",
+                        "Wake_Up_Neo",
+                        "Follow_The_White_Rabbit"
+                    ],
+                    "targetScore": 58850,
+                    "fallSpeed": 1.9500000000000002,
+                    "spawnRate": 895,
+                    "briefing": "This is it. The core. Total system control. Do not fail us now.",
+                    "guideKeys": []
+                }
             },
-            es: {
-                level_1:  { id: "lvl_1",  name: "Ancla Neural", type: "characters", pool: ["f", "j", "ff", "jj", "jf", "fj", "fjf", "jfj"], targetScore: 400, fallSpeed: 1.00, spawnRate: 2200, newKeys: ["f", "j"], briefing: "Despierta... Calibrando enlace neural.\n\nColoca tus dedos ÍNDICES en 'F' y 'J'.\n¿Sientes las marcas? Esa es tu ancla.\n\nGolpea los glifos." },
-                level_2:  { id: "lvl_2",  name: "Latido", type: "characters", pool: ["d", "k", "dk", "kd", "dd", "kk", "df", "jk"], targetScore: 650, fallSpeed: 1.10, spawnRate: 2100, newKeys: ["d", "k"], briefing: "Señal detectada.\n\nExtiende tus dedos MEDIOS a 'D' y 'K'.\nMantén los índices anclados en F y J.\n\nNo mires abajo." },
-                level_3:  { id: "lvl_3",  name: "Anular", type: "characters", pool: ["s", "l", "sl", "ls", "ss", "ll", "sdl", "kfs"], targetScore: 850, fallSpeed: 1.20, spawnRate: 2000, newKeys: ["s", "l"], briefing: "Estabilizando.\n\nUsa tus dedos ANULARES para 'S' y 'L'.\nTu mano toma forma en la Fila Guía.\n\nConcéntrate." },
-                level_4:  { id: "lvl_4",  name: "Promesa Meñique", type: "characters", pool: ["a", "ñ", "aa", "ññ", "as", "lñ", "fja", "kñ"], targetScore: 1100, fallSpeed: 1.30, spawnRate: 1900, newKeys: ["a", "ñ"], briefing: "Calibración final.\n\nMEÑIQUES alcanzan 'A' y 'Ñ'.\nTu posición base está completa (A-S-D-F J-K-L-Ñ).\n\nPrepárate." },
-                level_5:  { id: "lvl_5",  name: "Mini-Boss: Capa Base", type: "characters", pool: ["asdf", "jklñ", "fad", "jak", "falsa", "dada", "sal", "las", "ala"], targetScore: 1400, fallSpeed: 1.44, spawnRate: 1800, newKeys: ["g", "h"], briefing: "¡ALERTA DE SEGURIDAD! Firewall detectado.\n\nAlcanza el centro: Índices a 'G' y 'H'.\n\n¡Usa toda la Fila Guía para romper el bloqueo!\nLa velocidad es clave." },
-
-                level_6:  { id: "lvl_6",  name: "Índice Superior", type: "characters", pool: ["r", "u", "fr", "ju", "ru", "ur", "fur", "sur"], targetScore: 1600, fallSpeed: 0.75, spawnRate: 1750, newKeys: ["r", "u"], briefing: "Expansión requerida.\n\nSube tus ÍNDICES hacia 'R' y 'U'.\nRegresa siempre al ancla (F/J) tras pulsar." },
-                level_7:  { id: "lvl_7",  name: "Medio Superior", type: "characters", pool: ["e", "i", "de", "ki", "ed", "ik", "red", "ir"], targetScore: 1800, fallSpeed: 0.78, spawnRate: 1700, newKeys: ["e", "i"], briefing: "Aumentando señal.\n\nSube tus dedos MEDIOS a 'E' e 'I'.\nVocales comunes detectadas. Precisión aumentando." },
-                level_8:  { id: "lvl_8",  name: "Anular Superior", type: "characters", pool: ["w", "o", "sw", "lo", "ws", "ol", "wow", "ola"], targetScore: 2000, fallSpeed: 0.82, spawnRate: 1650, newKeys: ["w", "o"], briefing: "Ancho de banda.\n\nSube tus ANULARES a 'W' y 'O'.\nLa red se expande." },
-                level_9:  { id: "lvl_9",  name: "Meñique Superior", type: "characters", pool: ["q", "p", "aq", "ñp", "que", "pan", "top", "pie"], targetScore: 2200, fallSpeed: 0.85, spawnRate: 1600, newKeys: ["q", "p", "t", "y"], briefing: "Límites alcanzados.\n\nMEÑIQUES suben a 'Q' y 'P'.\nÍNDICES se estiran a 'T' e 'Y'.\nLa Fila Superior es tuya." },
-                level_10: { id: "lvl_10", name: "Mini-Boss: Peso Superior", type: "words", pool: ["tio", "pan", "que", "pero", "tuya", "ruta", "puro", "yate", "opio"], targetScore: 2500, fallSpeed: 0.90, spawnRate: 1550, newKeys: [], briefing: "INTRUSIÓN DETECTADA. Protocolo Beta.\n\nCombina Fila Guía y Superior.\nPalabras reales formándose. ¡Rompe el cifrado!" },
-
-                level_11: { id: "lvl_11", name: "Índice Inferior", type: "characters", pool: ["v", "m", "fv", "jm", "vm", "ver", "mal", "mar"], targetScore: 2700, fallSpeed: 0.92, spawnRate: 1500, newKeys: ["v", "m"], briefing: "Inmersión profunda.\n\nBaja tus ÍNDICES hacia 'V' y 'M'.\nPlliégalos hacia adentro. Mantén el ancla." },
-                level_12: { id: "lvl_12", name: "Medio Inferior", type: "characters", pool: ["c", ",", "dc", "k,", "cd", "con", "coma", "cien"], targetScore: 2900, fallSpeed: 0.95, spawnRate: 1480, newKeys: ["c", ","], briefing: "Accediendo subrutinas.\n\nBaja tus dedos MEDIOS a 'C' y ',' (coma).\nLa sintaxis evoluciona." },
-                level_13: { id: "lvl_13", name: "Anular Inferior", type: "characters", pool: ["x", ".", "sx", "l.", "xs", ".l", "fax", "red."], targetScore: 3100, fallSpeed: 0.98, spawnRate: 1450, newKeys: ["x", "."], briefing: "Ejecutando lógica.\n\nBaja tus ANULARES a 'X' y '.' (punto).\nFin de comando." },
-                level_14: { id: "lvl_14", name: "Meñique Inferior", type: "characters", pool: ["z", "-", "az", "ñ-", "zaz", "pez", "luz", "paz"], targetScore: 3300, fallSpeed: 1.00, spawnRate: 1420, newKeys: ["z", "-"], briefing: "Tocando fondo.\n\nBaja tus MEÑIQUES a 'Z' y '-' (guion).\nEl alfabeto está completo." },
-                level_15: { id: "lvl_15", name: "Mini-Boss: Texto Completo", type: "words", pool: ["zona", "vez", "bien", "nube", "caja", "vaca", "nave", "luna", "boca"], targetScore: 3600, fallSpeed: 1.05, spawnRate: 1380, newKeys: ["b", "n"], briefing: "BRECHA DE SEGURIDAD. Protocolo Gamma.\n\nÍndices se estiran abajo-centro para 'B' y 'N'.\n\nTodas las letras desbloqueadas. Demuestra tu valor." },
-
-                level_16: { id: "lvl_16", name: "Shift Izquierdo", type: "words", pool: ["Pan", "Luz", "Oso", "Uso", "Mes", "Ñu", "Tez"], targetScore: 3900, fallSpeed: 1.10, spawnRate: 1350, newKeys: ["shift"], briefing: "Elevando privilegios.\n\nMantén SHIFT IZQUIERDO con tu MEÑIQUE para mayúsculas de Mano Derecha.\nSincronización requerida." },
-                level_17: { id: "lvl_17", name: "Shift Derecho", type: "words", pool: ["Ser", "Dar", "Ver", "Gas", "Bar", "Faz", "Red"], targetScore: 4200, fallSpeed: 1.15, spawnRate: 1320, newKeys: ["shift"], briefing: "Balanceando carga.\n\nMantén SHIFT DERECHO con tu MEÑIQUE para mayúsculas de Mano Izquierda.\nConexión cruzada activa." },
-                level_18: { id: "lvl_18", name: "Acentuación", type: "words", pool: ["sí", "él", "té", "mí", "tú", "fe", "ya"], targetScore: 4500, fallSpeed: 1.20, spawnRate: 1300, newKeys: ["´"], briefing: "Corrección gramatical.\n\nPulsa la tilde '´' con el MEÑIQUE DERECHO antes de la vocal.\nLa gramática es código." },
-                level_19: { id: "lvl_19", name: "Palabras Reales", type: "words", pool: ["Árbol", "Épica", "Índice", "Único", "Señal", "Cañón"], targetScore: 4800, fallSpeed: 1.25, spawnRate: 1280, newKeys: [], briefing: "Inyección de lenguaje.\n\nCombina Mayúsculas y Acentos fluidamente.\nEl sistema te entiende." },
-                level_20: { id: "lvl_20", name: "Mini-Boss: Flujo de Código", type: "words", pool: ["Módulo", "Lógica", "Básico", "Rápido", "Sólido", "Código", "Método"], targetScore: 5200, fallSpeed: 1.30, spawnRate: 1250, newKeys: [], briefing: "EXCEPCIÓN FATAL. Protocolo Delta.\n\nFragmentos complejos detectados.\nLa precisión no es negociable." },
-
-                level_21: { id: "lvl_21", name: "Índice Numérico", type: "characters", pool: ["4", "5", "6", "7", "r4", "t5", "y6", "u7"], targetScore: 5600, fallSpeed: 1.35, spawnRate: 1220, newKeys: ["4", "5", "6", "7"], briefing: "Desencriptación iniciada.\n\nAlcanza la CIMA con ÍNDICES para '4', '5', '6', '7'.\nLos números, ¿qué significan?" },
-                level_22: { id: "lvl_22", name: "Medio Numérico", type: "characters", pool: ["3", "8", "e3", "i8", "33", "88", "38", "83"], targetScore: 6000, fallSpeed: 1.40, spawnRate: 1190, newKeys: ["3", "8"], briefing: "Calculando coordenadas.\n\nAlcanza la CIMA con MEDIOS para '3' y '8'.\nReconocimiento de patrones activo." },
-                level_23: { id: "lvl_23", name: "Anular Numérico", type: "characters", pool: ["2", "9", "w2", "o9", "22", "99", "29", "92"], targetScore: 6400, fallSpeed: 1.45, spawnRate: 1160, newKeys: ["2", "9"], briefing: "Cimiento binario.\n\nAlcanza la CIMA con ANULARES para '2' y '9'.\nCasi en la raíz." },
-                level_24: { id: "lvl_24", name: "Meñique Numérico", type: "characters", pool: ["1", "0", "q1", "p0", "10", "01", "101", "007"], targetScore: 6800, fallSpeed: 1.50, spawnRate: 1130, newKeys: ["1", "0"], briefing: "Cero y Uno.\n\nAlcanza la CIMA con MEÑIQUES para '1' y '0'.\nEl lenguaje máquina es tuyo." },
-                level_25: { id: "lvl_25", name: "Mini-Boss: Alfanumérico", type: "words", pool: ["h4ck", "n00b", "1337", "c0d3", "p455", "us3r", "r00t", "b10s"], targetScore: 7300, fallSpeed: 1.55, spawnRate: 1100, newKeys: [], briefing: "SOBREESCRITURA DE SISTEMA. Protocolo Epsilon.\n\nContraseñas alfanuméricas requeridas.\nMezcla letras y números sin fallar." },
-
-                level_26: { id: "lvl_26", name: "Paréntesis", type: "words", pool: ["()", "[]", "{}", "(x)", "[i]", "{a}"], targetScore: 7800, fallSpeed: 1.60, spawnRate: 1080, newKeys: ["(", ")", "[", "]", "{", "}"], briefing: "Inyectando payload.\n\nUsa SHIFT+Números para paréntesis (). \nLa estructura del código." },
-                level_27: { id: "lvl_27", name: "Operadores", type: "words", pool: ["+", "-", "*", "=", "a+b", "i++", "x=y", "1-0"], targetScore: 8300, fallSpeed: 1.65, spawnRate: 1050, newKeys: ["+", "-", "*", "="], briefing: "Lógica matemática.\n\nOperadores entrantes: + - * =.\nResuelve la ecuación." },
-                level_28: { id: "lvl_28", name: "Caracteres Especiales", type: "words", pool: ["!", "@", "#", "$", "%", "run!", "#hash", "$oro"], targetScore: 8800, fallSpeed: 1.70, spawnRate: 1020, newKeys: ["!", "@", "#", "$"], briefing: "Caracteres especiales.\n\nShift + Números. Accede a la capa oculta.\n! @ # $ %." },
-                level_29: { id: "lvl_29", name: "El Flujo", type: "words", pool: ["sistema", "brecha", "acceso", "denegado", "enlace", "proxy", "red"], targetScore: 9500, fallSpeed: 1.80, spawnRate: 980, newKeys: [], briefing: "Sincronización total.\n\nSin más guía. Solo tú y el flujo.\nPrepárate para el Arquitecto." },
-                level_30: { id: "lvl_30", name: "JEFE FINAL: EL ARQUITECTO", type: "words", pool: ["FALLO.SISTEMA", "ERROR_CRÍTICO", "PÁNICO_KERNEL", "DESBORDAMIENTO", "PUNTERO_NULO", "VIOLACIÓN_ACCESO"], targetScore: 11000, fallSpeed: 2.0, spawnRate: 900, newKeys: [], briefing: "YO SOY EL ARQUITECTO.\n\nNo puedes borrarme. Soy la fuente.\nMuéstrame tu verdadero potencial.\n\nESCRIBE O MUERE." }
+            "es": {
+                "level_1": {
+                    "id": "lvl_1",
+                    "name": "Enlace Neuronal: Núcleo",
+                    "type": "characters",
+                    "pool": [
+                        "f",
+                        "j",
+                        "ff",
+                        "jj",
+                        "fj",
+                        "jf"
+                    ],
+                    "targetScore": 1350,
+                    "fallSpeed": 0.5,
+                    "spawnRate": 2200,
+                    "briefing": "Despierta, [ALIAS]. El sistema es vasto, pero empezamos en el centro. Tus dedos índice son la clave. Siente las marcas en las teclas F y J. Anclate. Establece el enlace.",
+                    "guideKeys": [
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_2": {
+                    "id": "lvl_2",
+                    "name": "Expansión de Señal",
+                    "type": "characters",
+                    "pool": [
+                        "d",
+                        "k",
+                        "df",
+                        "jk",
+                        "fd",
+                        "kj"
+                    ],
+                    "targetScore": 1650,
+                    "fallSpeed": 0.55,
+                    "spawnRate": 2155,
+                    "briefing": "Bien. La señal se estabiliza. Expande tu influencia. Usa tus dedos corazón para alcanzar los nodos D y K mientras mantienes los índices en F y J.",
+                    "guideKeys": [
+                        "d",
+                        "k",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_3": {
+                    "id": "lvl_3",
+                    "name": "Protocolo de Ritmo",
+                    "type": "characters",
+                    "pool": [
+                        "s",
+                        "l",
+                        "sl",
+                        "ls",
+                        "sdf",
+                        "jkl"
+                    ],
+                    "targetScore": 1800,
+                    "fallSpeed": 0.6,
+                    "spawnRate": 2110,
+                    "briefing": "El ritmo lo es todo en el flujo. Extiende a S y L con tus dedos anulares. No mires abajo. Confía en la conexión.",
+                    "guideKeys": [
+                        "s",
+                        "l",
+                        "d",
+                        "k",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_4": {
+                    "id": "lvl_4",
+                    "name": "Chequeo Perimetral",
+                    "type": "characters",
+                    "pool": [
+                        "a",
+                        "ñ",
+                        "as",
+                        "lñ",
+                        "asdf",
+                        "jklñ"
+                    ],
+                    "targetScore": 2150,
+                    "fallSpeed": 0.65,
+                    "spawnRate": 2065,
+                    "briefing": "Asegura el perímetro. Tus meñiques controlan los límites exteriores, A y Ñ. La fila base está ahora totalmente activa.",
+                    "guideKeys": [
+                        "a",
+                        "ñ",
+                        "s",
+                        "l",
+                        "d",
+                        "k",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_5": {
+                    "id": "lvl_5",
+                    "name": "Puente Central",
+                    "type": "characters",
+                    "pool": [
+                        "g",
+                        "h",
+                        "fg",
+                        "jh",
+                        "gh",
+                        "hg"
+                    ],
+                    "targetScore": 1650,
+                    "fallSpeed": 0.7,
+                    "spawnRate": 2020,
+                    "briefing": "Cruza la brecha. Tus índices deben estirarse hacia adentro a G y H, y volver inmediatamente a sus bases F y J.",
+                    "guideKeys": [
+                        "g",
+                        "h",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_6": {
+                    "id": "lvl_6",
+                    "name": "Subida: E e I",
+                    "type": "characters",
+                    "pool": [
+                        "e",
+                        "i",
+                        "ed",
+                        "ik",
+                        "de",
+                        "ki"
+                    ],
+                    "targetScore": 1700,
+                    "fallSpeed": 0.75,
+                    "spawnRate": 1975,
+                    "briefing": "Accediendo a bancos de memoria superiores. Mueve tu dedo corazón de D a E, y de K a I. Es la ruta más común.",
+                    "guideKeys": [
+                        "e",
+                        "i",
+                        "d",
+                        "k"
+                    ]
+                },
+                "level_7": {
+                    "id": "lvl_7",
+                    "name": "Subida: R y U",
+                    "type": "characters",
+                    "pool": [
+                        "r",
+                        "u",
+                        "rf",
+                        "uj",
+                        "fr",
+                        "ju"
+                    ],
+                    "targetScore": 1800,
+                    "fallSpeed": 0.8,
+                    "spawnRate": 1930,
+                    "briefing": "Empuja más alto. Los índices suben a R y U. Mantén tus anclajes firmes.",
+                    "guideKeys": [
+                        "r",
+                        "u",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_8": {
+                    "id": "lvl_8",
+                    "name": "Subida: T y O",
+                    "type": "characters",
+                    "pool": [
+                        "t",
+                        "o",
+                        "tf",
+                        "ol",
+                        "ft",
+                        "lo"
+                    ],
+                    "targetScore": 1850,
+                    "fallSpeed": 0.8500000000000001,
+                    "spawnRate": 1885,
+                    "briefing": "Estirando capacidad de red. Índice izquierdo a T. Anular derecho a O. El patrón es complejo, pero predecible.",
+                    "guideKeys": [
+                        "t",
+                        "o",
+                        "f",
+                        "l"
+                    ]
+                },
+                "level_9": {
+                    "id": "lvl_9",
+                    "name": "Subida: W y P",
+                    "type": "characters",
+                    "pool": [
+                        "w",
+                        "p",
+                        "ws",
+                        "pñ",
+                        "sw",
+                        "ñp"
+                    ],
+                    "targetScore": 1950,
+                    "fallSpeed": 0.9,
+                    "spawnRate": 1840,
+                    "briefing": "Alcanzando sectores externos. Anular izquierdo a W. Meñique derecho a P. La precisión es obligatoria.",
+                    "guideKeys": [
+                        "w",
+                        "p",
+                        "s",
+                        "ñ"
+                    ]
+                },
+                "level_10": {
+                    "id": "lvl_10",
+                    "name": "Subida: Q y Y",
+                    "type": "characters",
+                    "pool": [
+                        "q",
+                        "y",
+                        "qa",
+                        "yj",
+                        "aq",
+                        "jy"
+                    ],
+                    "targetScore": 2050,
+                    "fallSpeed": 0.95,
+                    "spawnRate": 1795,
+                    "briefing": "Completando la rejilla superior. Meñique izquierdo a Q. Índice derecho se estira lejos hasta la Y.",
+                    "guideKeys": [
+                        "q",
+                        "y",
+                        "a",
+                        "j"
+                    ]
+                },
+                "level_11": {
+                    "id": "lvl_11",
+                    "name": "Bajada: V y M",
+                    "type": "characters",
+                    "pool": [
+                        "v",
+                        "m",
+                        "vf",
+                        "mj",
+                        "fv",
+                        "jm"
+                    ],
+                    "targetScore": 2150,
+                    "fallSpeed": 1,
+                    "spawnRate": 1750,
+                    "briefing": "Iniciando bajada. Índices se curvan abajo hacia V y M. No pierdas tu posición base.",
+                    "guideKeys": [
+                        "v",
+                        "m",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_12": {
+                    "id": "lvl_12",
+                    "name": "Bajada: C y Coma",
+                    "type": "characters",
+                    "pool": [
+                        "c",
+                        ",",
+                        "cd",
+                        ",k",
+                        "dc",
+                        "k,"
+                    ],
+                    "targetScore": 2250,
+                    "fallSpeed": 1.05,
+                    "spawnRate": 1705,
+                    "briefing": "Codificando sintaxis. Baja tu ÍNDICE IZQUIERDO a C y tu MEDIO DERECHO a Coma (,). Esencial para analizar datos.",
+                    "guideKeys": [
+                        "c",
+                        ",",
+                        "d",
+                        "k"
+                    ]
+                },
+                "level_13": {
+                    "id": "lvl_13",
+                    "name": "Bajada: X y Punto",
+                    "type": "characters",
+                    "pool": [
+                        "x",
+                        ".",
+                        "xs",
+                        ".l",
+                        "sx",
+                        "l."
+                    ],
+                    "targetScore": 2350,
+                    "fallSpeed": 1.1,
+                    "spawnRate": 1660,
+                    "briefing": "Cerrando el bucle. Baja tu MEDIO IZQUIERDO a X y tu ANULAR DERECHO a Punto (.). La rejilla está casi mapeada.",
+                    "guideKeys": [
+                        "x",
+                        ".",
+                        "s",
+                        "l"
+                    ]
+                },
+                "level_14": {
+                    "id": "lvl_14",
+                    "name": "Bajada: Z y Guion",
+                    "type": "characters",
+                    "pool": [
+                        "z",
+                        "-",
+                        "za",
+                        "-ñ",
+                        "az",
+                        "ñ-"
+                    ],
+                    "targetScore": 2500,
+                    "fallSpeed": 1.15,
+                    "spawnRate": 1615,
+                    "briefing": "Finalizando acceso a rejilla. Meñiques abajo a Z y Guion (-). Ahora dominas el alfabeto completo.",
+                    "guideKeys": [
+                        "z",
+                        "-",
+                        "a",
+                        "ñ"
+                    ]
+                },
+                "level_15": {
+                    "id": "lvl_15",
+                    "name": "Bajada: B y N",
+                    "type": "characters",
+                    "pool": [
+                        "b",
+                        "n",
+                        "bf",
+                        "nj",
+                        "fb",
+                        "jn"
+                    ],
+                    "targetScore": 2600,
+                    "fallSpeed": 1.2000000000000002,
+                    "spawnRate": 1570,
+                    "briefing": "El alcance más difícil. Índices se estiran abajo y al centro a B y N. Domina esto para sellar la conexión.",
+                    "guideKeys": [
+                        "b",
+                        "n",
+                        "f",
+                        "j"
+                    ]
+                },
+                "level_16": {
+                    "id": "lvl_16",
+                    "name": "Lógica Shift",
+                    "type": "characters",
+                    "pool": [
+                        "A",
+                        "S",
+                        "D",
+                        "F",
+                        "J",
+                        "K",
+                        "L",
+                        "Ñ"
+                    ],
+                    "targetScore": 1650,
+                    "fallSpeed": 1.25,
+                    "spawnRate": 1525,
+                    "briefing": "Elevando privilegios. Usa el MEÑIQUE de la mano OPUESTA para mantener Shift mientras tecleas. Shift Derecho para A-G, Izquierdo para H-Z.",
+                    "guideKeys": [
+                        "Shift",
+                        "a",
+                        "s",
+                        "d",
+                        "f",
+                        "j",
+                        "k",
+                        "l"
+                    ]
+                },
+                "level_17": {
+                    "id": "lvl_17",
+                    "name": "Sintaxis Código I",
+                    "type": "characters",
+                    "pool": [
+                        "{",
+                        "}",
+                        "[",
+                        "]",
+                        "(",
+                        ")"
+                    ],
+                    "targetScore": 1750,
+                    "fallSpeed": 1.3,
+                    "spawnRate": 1480,
+                    "briefing": "Inyectando bloques de código. Corchetes y paréntesis son el esqueleto de Matrix. Usa tu meñique derecho para alcanzarlos.",
+                    "guideKeys": [
+                        "{",
+                        "}",
+                        "[",
+                        "]",
+                        "(",
+                        ")"
+                    ]
+                },
+                "level_18": {
+                    "id": "lvl_18",
+                    "name": "Fila Numérica I",
+                    "type": "characters",
+                    "pool": [
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5"
+                    ],
+                    "targetScore": 1800,
+                    "fallSpeed": 1.35,
+                    "spawnRate": 1435,
+                    "briefing": "Analizando datos numéricos. Mano izquierda sube. 1(Meñique) a 5(Índice). Mantén disciplina de fila base.",
+                    "guideKeys": [
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5"
+                    ]
+                },
+                "level_19": {
+                    "id": "lvl_19",
+                    "name": "Fila Numérica II",
+                    "type": "characters",
+                    "pool": [
+                        "6",
+                        "7",
+                        "8",
+                        "9",
+                        "0"
+                    ],
+                    "targetScore": 1900,
+                    "fallSpeed": 1.4,
+                    "spawnRate": 1390,
+                    "briefing": "Completando secuencia numérica. Mano derecha sube. 6(Índice) a 0(Meñique). No mires abajo.",
+                    "guideKeys": [
+                        "6",
+                        "7",
+                        "8",
+                        "9",
+                        "0"
+                    ]
+                },
+                "level_20": {
+                    "id": "lvl_20",
+                    "name": "Lógica Simbólica",
+                    "type": "characters",
+                    "pool": [
+                        "!",
+                        "@",
+                        "#",
+                        "$",
+                        "%",
+                        "^",
+                        "&",
+                        "*"
+                    ],
+                    "targetScore": 2000,
+                    "fallSpeed": 1.4500000000000002,
+                    "spawnRate": 1345,
+                    "briefing": "Encriptación avanzada activa. Combina Shift con Números para acceder a operadores especiales. Así reescribimos la realidad.",
+                    "guideKeys": [
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5",
+                        "6",
+                        "7",
+                        "8",
+                        "Shift"
+                    ]
+                },
+                "level_21": {
+                    "id": "lvl_21",
+                    "name": "Los Bigramas",
+                    "type": "words",
+                    "pool": [
+                        "th",
+                        "he",
+                        "in",
+                        "er",
+                        "an",
+                        "re",
+                        "on",
+                        "at",
+                        "en"
+                    ],
+                    "targetScore": 4200,
+                    "fallSpeed": 1.5,
+                    "spawnRate": 1300,
+                    "briefing": "Fase de optimización. Estas combinaciones de dos letras aparecen en el 60% de los flujos de datos. Domínalas para fluir como agua.",
+                    "guideKeys": []
+                },
+                "level_22": {
+                    "id": "lvl_22",
+                    "name": "Los Trigramas",
+                    "type": "words",
+                    "pool": [
+                        "the",
+                        "and",
+                        "ing",
+                        "ent",
+                        "ion",
+                        "her",
+                        "for",
+                        "tha"
+                    ],
+                    "targetScore": 6650,
+                    "fallSpeed": 1.55,
+                    "spawnRate": 1255,
+                    "briefing": "Reconocimiento de patrones. Los trigramas son el ADN del lenguaje. Ejecútalos como movimientos únicos y fluidos.",
+                    "guideKeys": []
+                },
+                "level_23": {
+                    "id": "lvl_23",
+                    "name": "Línea de Comandos",
+                    "type": "words",
+                    "pool": [
+                        "ls -la",
+                        "cd root",
+                        "git push",
+                        "npm run",
+                        "sudo su",
+                        "grep -r"
+                    ],
+                    "targetScore": 16400,
+                    "fallSpeed": 1.6,
+                    "spawnRate": 1210,
+                    "briefing": "Acceso directo a interfaz. Ejecuta comandos shell estándar. La velocidad es crítica.",
+                    "guideKeys": []
+                },
+                "level_24": {
+                    "id": "lvl_24",
+                    "name": "Ráfagas Cortas",
+                    "type": "words",
+                    "pool": [
+                        "data",
+                        "node",
+                        "link",
+                        "core",
+                        "hack",
+                        "byte",
+                        "ping",
+                        "host"
+                    ],
+                    "targetScore": 9900,
+                    "fallSpeed": 1.6500000000000001,
+                    "spawnRate": 1165,
+                    "briefing": "Ráfagas cortas de datos. Alta frecuencia. No dudes.",
+                    "guideKeys": []
+                },
+                "level_25": {
+                    "id": "lvl_25",
+                    "name": "Errores de Sintaxis",
+                    "type": "words",
+                    "pool": [
+                        "null;",
+                        "void()",
+                        "return",
+                        "const x",
+                        "let y=",
+                        "if(a)",
+                        "else{}"
+                    ],
+                    "targetScore": 15350,
+                    "fallSpeed": 1.7000000000000002,
+                    "spawnRate": 1120,
+                    "briefing": "Protocolo de depuración. Identifica y teclea estructuras de programación. Precisión sobre velocidad.",
+                    "guideKeys": []
+                },
+                "level_26": {
+                    "id": "lvl_26",
+                    "name": "Flujo Variable",
+                    "type": "words",
+                    "pool": [
+                        "function",
+                        "variable",
+                        "constant",
+                        "array",
+                        "object",
+                        "string",
+                        "number"
+                    ],
+                    "targetScore": 18600,
+                    "fallSpeed": 1.75,
+                    "spawnRate": 1075,
+                    "briefing": "Complejidad de datos en aumento. Nombres de variables largos detectados. Mantén el ritmo.",
+                    "guideKeys": []
+                },
+                "level_27": {
+                    "id": "lvl_27",
+                    "name": "Claves de Cifrado",
+                    "type": "words",
+                    "pool": [
+                        "Xj7-kL",
+                        "9A_z#2",
+                        "P@ssW0",
+                        "Key_Gen",
+                        "Auth-2",
+                        "Token$"
+                    ],
+                    "targetScore": 18150,
+                    "fallSpeed": 1.8,
+                    "spawnRate": 1030,
+                    "briefing": "Rompiendo cifrado. Mayúsculas, números y símbolos mezclados. Esto es una prueba de estrés.",
+                    "guideKeys": []
+                },
+                "level_28": {
+                    "id": "lvl_28",
+                    "name": "Carga Neuronal",
+                    "type": "words",
+                    "pool": [
+                        "consciousness",
+                        "intelligence",
+                        "architecture",
+                        "distributed",
+                        "synchronize"
+                    ],
+                    "targetScore": 36850,
+                    "fallSpeed": 1.85,
+                    "spawnRate": 985,
+                    "briefing": "Carga de datos pesada. Terminología compleja. Mantente enfocado.",
+                    "guideKeys": []
+                },
+                "level_29": {
+                    "id": "lvl_29",
+                    "name": "El Cortafuegos",
+                    "type": "words",
+                    "pool": [
+                        "Access_Denied",
+                        "System.Halt()",
+                        "Error:404",
+                        "Fatal_Exception",
+                        "Buffer_Overflow"
+                    ],
+                    "targetScore": 43200,
+                    "fallSpeed": 1.9000000000000001,
+                    "spawnRate": 940,
+                    "briefing": "Capa de defensa final. El sistema se defiende. Anula protocolos manuales.",
+                    "guideKeys": []
+                },
+                "level_30": {
+                    "id": "lvl_30",
+                    "name": "ACCESO ROOT",
+                    "type": "words",
+                    "pool": [
+                        "sudo rm -rf /",
+                        "System.Override(True)",
+                        "Matrix.Reload()",
+                        "Wake_Up_Neo",
+                        "Follow_The_White_Rabbit"
+                    ],
+                    "targetScore": 58850,
+                    "fallSpeed": 1.9500000000000002,
+                    "spawnRate": 895,
+                    "briefing": "Es esto. El núcleo. Control total del sistema. No nos falles ahora.",
+                    "guideKeys": []
+                }
             }
         };
 
@@ -1682,7 +2979,8 @@
                                     bgRemovalColor: '#00ff00',
                                     bgRemovalColorEnabled: false
                                 },
-                              progress: { highestLevelUnlocked: 1, highScores: {}, levelResults: {} }
+                                progress: { highestLevelUnlocked: 1, highScores: {}, levelResults: {} },
+                                hasSeenIntro: false
                           };
 
 
@@ -1754,12 +3052,14 @@
 
 
                 unlockLevel(levelNum) {
-                    if (!this.profile) return;
+                    if (!this.profile) return false;
                     const clampedLevel = Math.max(1, Math.min(TOTAL_LEVELS, levelNum));
                     if (clampedLevel > this.profile.progress.highestLevelUnlocked) {
                         this.profile.progress.highestLevelUnlocked = clampedLevel;
                         this.saveProfiles();
+                        return true;
                     }
+                    return false;
                 }
 
                 saveLevelResult(levelNum, result) {
@@ -2563,9 +3863,15 @@
                   ctx.lineJoin = 'round';
                   ctx.strokeText(stream.text, x, y);
 
-                  // Glow base
-                  ctx.shadowBlur = isGuided ? 10 : 5;
-                  ctx.shadowColor = stream.color;
+                    // BONUS GLOW LOGIC
+                    if (stream.isBonus) {
+                        const pulse = 0.5 + 0.5 * Math.sin(timestamp * 0.008);
+                        ctx.shadowColor = '#FF003C'; // Red glow for bonus (intense red)
+                        ctx.shadowBlur = 35 + pulse * 25; // More intense blur
+                    } else {
+                      ctx.shadowBlur = isGuided ? 10 : 5;
+                      ctx.shadowColor = stream.color;
+                  }
 
                   // Secuencia activa: doble glow + reborde neón alrededor de cada carácter
                   if (isGuided) {
@@ -2639,6 +3945,41 @@
 
                 ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
+            }
+
+            createHealBurst(x, y) {
+                const q = this.adaptiveParticleQuality || 1;
+                const count = Math.max(12, Math.round(30 * q)); // More particles for better effect
+                
+                for (let i = 0; i < count; i++) {
+                    // Spread horizontally but rise up
+                    const spreadX = (Math.random() - 0.5) * 60;
+                    const riseSpeed = Math.random() * 2 + 1.5;
+                    
+                    this.particles.push({
+                        type: 'text',
+                        char: '+',
+                        x: x + spreadX, 
+                        y: y + (Math.random() * 20), 
+                        vx: (Math.random() - 0.5) * 0.5, // Slight horizontal drift
+                        vy: -riseSpeed, // Upward movement
+                        life: 1.8, 
+                        decay: 0.015,
+                        color: '#39FF14' // Green for health
+                    });
+                }
+                
+                this.particles.push({
+                    type: 'shockwave',
+                    x: x, y: y,
+                    radius: 5,
+                    maxRadius: 100,
+                    expansionSpeed: 3,
+                    life: 1.0,
+                    decay: 0.02,
+                    color: '#39FF14',
+                    lineWidth: 3
+                });
             }
 
             createDataBurst(x, y, color, isOnFire) {
@@ -2813,20 +4154,44 @@
             }
 
             spawnStream() {
+                const currentCanvasWidth = this.game.renderer.textCanvas.width;
+                const padding = 50;
+
+                // --- BONUS HEAL STREAM LOGIC ---
+                if (this.game.health < 100 && Math.random() < 0.12) {
+                    const alias = this.game.userManager.activeAlias || "HACKER";
+                    
+                    this.game.renderer.textCtx.font = "bold 38px 'Share Tech Mono'";
+                    const textWidth = this.game.renderer.textCtx.measureText(alias).width;
+                    const minX = padding;
+                    let maxX = currentCanvasWidth - textWidth - padding;
+                    if (maxX < minX) maxX = minX;
+                    const x = minX + Math.random() * (maxX - minX);
+
+                    this.streams.push({
+                        text: alias,
+                        x: x,
+                        y: -30,
+                        baseSpeed: (this.currentLevelData.fallSpeed * 0.65), 
+                        color: '#FF003C',
+                        typedLength: 0,
+                        misses: 0,
+                        isBonus: true
+                    });
+                    return;
+                }
+
                 const pool = this.currentLevelData.pool;
                 const text = pool[Math.floor(Math.random() * pool.length)];
                 if (!text) return; 
 
                 const color = NeonColors[Math.floor(Math.random() * NeonColors.length)];
                 
-                const currentCanvasWidth = this.game.renderer.textCanvas.width;
-                
                 // Calculado con la nueva tipografía más grande
                 this.game.renderer.textCtx.font = "bold 38px 'Share Tech Mono'";
                 const textWidth = this.game.renderer.textCtx.measureText(text).width;
                 
                 // Margen ampliado para garantizar que nada se salga por los bordes (incluso letras sueltas)
-                const padding = 50; 
                 const minX = padding;
                 let maxX = currentCanvasWidth - textWidth - padding;
                 
@@ -3055,6 +4420,17 @@
             constructor(game) {
                 this.game = game;
                 this.activeStream = null;
+                
+                this.specialKeyMap = {
+                    'backspace': '⌫',
+                    'tab': '↹',
+                    'enter': '↵',
+                    'capslock': '⇪',
+                    // Shift, Ctrl, Alt handled via e.code
+                    'altgraph': 'alt_r',
+                    'meta': 'win',
+                    'contextmenu': 'menu'
+                };
 
                 window.addEventListener('keydown', (e) => this.handleKey(e));
                 window.addEventListener('keyup', (e) => this.handleKeyUp(e));
@@ -3078,79 +4454,116 @@
                 this.activeStream = stream || null;
             }
 
-                handleKey(e) {
-                    if (this.game.audio) this.game.audio.resume();
+            getMappedKey(e) {
+                // 1. Handle location-specific modifier keys via e.code
+                if (e.code === 'ShiftLeft') return 'shift_l';
+                if (e.code === 'ShiftRight') return 'shift_r';
+                if (e.code === 'ControlLeft') return 'control_l';
+                if (e.code === 'ControlRight') return 'control_r';
+                if (e.code === 'AltLeft') return 'alt_l';
+                if (e.code === 'AltRight') return 'alt_r';
+                if (e.code === 'MetaLeft') return 'meta_l';
+                if (e.code === 'MetaRight') return 'meta_r';
+                
+                // 2. Fallback to specialKeyMap or raw key
+                const rawKey = e.key.toLowerCase();
+                return this.specialKeyMap[rawKey] || rawKey;
+            }
 
-                      if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === 'j') {
+            handleKey(e) {
+                if (this.game.audio) this.game.audio.resume();
 
-                          this.game.toggleFpsCounter();
-                          e.preventDefault();
-                          return;
-                      }
+                if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === 'j') {
+                    this.game.toggleFpsCounter();
+                    e.preventDefault();
+                    return;
+                }
 
-                      if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === 'h') {
-                          if (this.game.state === 'PLAYING') {
-                              this.game.triggerHackCompleteCheat();
-                              e.preventDefault();
-                          }
-                          return;
-                      }
-
-
-                    if (this.game.state === 'REVEAL') {
-                        const now = performance.now();
-                        if (now < this.game.revealInputLockedUntil) {
-                            e.preventDefault();
-                            return;
-                        }
-
-                        if (this.game.isAwaitingRevealEnd) {
-                            const skipped = this.game.skipRevealTransition();
-                            if (skipped) {
-                                e.preventDefault();
-                                return;
-                            }
-                        }
-
-                        if (this.game.revealReadyForContinue) {
-                            this.game.continueAfterRevealKey();
-                            e.preventDefault();
-                            return;
-                        }
+                if (e.ctrlKey && e.altKey && e.shiftKey && e.key.toLowerCase() === 'h') {
+                    if (this.game.state === 'PLAYING') {
+                        this.game.triggerHackCompleteCheat();
+                        e.preventDefault();
                     }
+                    return;
+                }
 
-                    if (this.game.state === 'BRIEFING') {
-                        if (e.code === 'Space') {
-                            this.game.hideBriefing();
-                            e.preventDefault();
-                        }
-                        // Allow skipping typing effect with any other key? Maybe later.
+                if (this.game.state === 'LEVELUP') {
+                     if (!this.game.skipMetricsAnimation) {
+                         this.game.skipMetricsAnimation = true;
+                         return;
+                     }
+                }
+
+                if (this.game.state === 'REVEAL') {
+                    const now = performance.now();
+                    if (now < this.game.revealInputLockedUntil) {
+                        e.preventDefault();
                         return;
                     }
 
+                    if (this.game.isAwaitingRevealEnd) {
+                        const skipped = this.game.skipRevealTransition();
+                        if (skipped) {
+                            e.preventDefault();
+                            return;
+                        }
+                    }
 
-                  if (e.key === 'Escape') {
-                      if (this.game.state === 'PLAYING') {
-                          this.game.pauseGame();
-                      } else if (this.game.state === 'PAUSED') {
-                          this.game.resumeGame();
-                      } else if (this.game.state === 'BRIEFING') {
-                          this.game.showScreen('levels');
-                          this.game.state = 'MENU';
-                      } else if (this.game.state === 'MENU') {
-                          const activeScreen = document.querySelector('.screen:not(.hidden)');
-                          if (activeScreen) {
-                              if (activeScreen.id === 'screen-profiles' && Object.keys(this.game.userManager.profiles).length > 0) {
-                                  this.game.showMainMenu();
-                              } else if (['screen-settings', 'screen-levels', 'screen-ai-node'].includes(activeScreen.id)) {
-                                  this.game.showMainMenu();
-                              }
-                          }
-                      }
-                      return;
-                  }
+                    if (this.game.revealReadyForContinue) {
+                        this.game.continueAfterRevealKey();
+                        e.preventDefault();
+                        return;
+                    }
+                }
+
+                if (this.game.state === 'INTRO') {
+                    if (e.code === 'Escape' || e.code === 'Space') {
+                        if (this.game.introSkipHandler) this.game.introSkipHandler();
+                        e.preventDefault();
+                    }
+                    return;
+                }
+
+                if (this.game.state === 'BRIEFING') {
+                    if (e.code === 'Space') {
+                        this.game.hideBriefing();
+                        e.preventDefault();
+                        return;
+                    }
+                    // Allow visual typing practice
+                    const mapped = this.getMappedKey(e);
+                    this.game.virtualKeyboard.press(mapped);
+                    if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                        this.game.audio.type(); 
+                    }
+                }
+
+                if (e.key === 'Escape') {
+                    if (this.game.state === 'PLAYING') {
+                        this.game.pauseGame();
+                    } else if (this.game.state === 'PAUSED') {
+                        this.game.resumeGame();
+                    } else if (this.game.state === 'BRIEFING') {
+                        this.game.showScreen('levels');
+                        this.game.state = 'MENU';
+                    } else if (this.game.state === 'MENU') {
+                        const activeScreen = document.querySelector('.screen:not(.hidden)');
+                        if (activeScreen) {
+                            if (activeScreen.id === 'screen-profiles' && Object.keys(this.game.userManager.profiles).length > 0) {
+                                this.game.showMainMenu();
+                            } else if (['screen-settings', 'screen-levels', 'screen-ai-node'].includes(activeScreen.id)) {
+                                this.game.showMainMenu();
+                            }
+                        }
+                    }
+                    return;
+                }
 
                 if (this.game.state !== 'PLAYING') return;
+
+                // Visual Feedback for ALL keys
+                const mapped = this.getMappedKey(e);
+                this.game.virtualKeyboard.press(mapped);
 
                 if (e.ctrlKey || e.altKey || e.metaKey) return;
 
@@ -3161,40 +4574,33 @@
                 
                 this.game.noteKeypress(performance.now());
                 this.game.renderer.highlightChar(inputChar.toLowerCase());
-                this.game.virtualKeyboard.press(inputChar.toLowerCase());
-
+                // Visual keyboard press handled above
 
                 const lockedStream = this.getLockedStream();
                 if (lockedStream) {
                     const expectedChar = lockedStream.text[lockedStream.typedLength];
                     
                     let isMatch = false;
-                    // Robust uppercase detection (works for Ñ, Á, etc.)
                     const isLetter = expectedChar.toLowerCase() !== expectedChar.toUpperCase();
                     const isUpperCase = isLetter && expectedChar === expectedChar.toUpperCase();
 
                     if (isUpperCase) {
-                        // Strict Shift requirement for uppercase letters
-                        // Must match character AND have Shift pressed
                         if (inputChar === expectedChar && e.shiftKey) {
                             isMatch = true;
                         }
                     } else {
-                        // Normal matching (lowercase or symbols)
                         if (inputChar === expectedChar) {
                             isMatch = true;
                         }
                     }
 
-                      if (isMatch) {
-                          lockedStream.typedLength++;
-                          this.game.noteHit();
-                          // Speed increase moved to word completion only
-                          this.game.addScore(10);
-                          this.game.audio.type();
+                    if (isMatch) {
+                        lockedStream.typedLength++;
+                        this.game.noteHit();
+                        this.game.audio.type();
 
                         if (lockedStream.typedLength === lockedStream.text.length) {
-                            this.game.increaseSpeed(); // Speed UP only on full word
+                            this.game.increaseSpeed(); 
                             const isFlawless = lockedStream.misses === 0;
                             if (isFlawless) this.game.combo++;
                             else this.game.combo = 0;
@@ -3205,27 +4611,34 @@
                             this.game.renderer.triggerSystemGlow(accuracy);
                             this.game.audio.dataBurst(isOnFire);
                             const burstOrigin = this.game.getStreamLastCharCenter(lockedStream);
-                            this.game.renderer.createDataBurst(
-                                burstOrigin.x,
-                                burstOrigin.y,
-                                lockedStream.color,
-                                isOnFire
-                            );
+                            
+                            if (lockedStream.isBonus) {
+                                this.game.heal(10);
+                                this.game.renderer.createHealBurst(burstOrigin.x, burstOrigin.y);
+                            } else {
+                                this.game.renderer.createDataBurst(
+                                    burstOrigin.x,
+                                    burstOrigin.y,
+                                    lockedStream.color,
+                                    isOnFire
+                                );
+                            }
 
-                            this.game.addScore(lockedStream.text.length * 20);
+                            // Score added ONLY on completion (30pts per char total)
+                            this.game.addScore(lockedStream.text.length * 30);
                             const idx = this.game.spawner.streams.indexOf(lockedStream);
                             if (idx !== -1) this.game.spawner.streams.splice(idx, 1);
                             this.clearLockedStream();
                         }
-                      } else {
-                          lockedStream.misses++;
-                          this.game.noteError();
-                          this.game.combo = 0;
-                          this.game.decreaseSpeed();
-                          this.game.renderer.triggerErrorGlow();
-                          this.game.triggerGlitch();
-                          this.game.audio.error();
-                      }
+                    } else {
+                        lockedStream.misses++;
+                        this.game.noteError();
+                        this.game.combo = 0;
+                        this.game.decreaseSpeed();
+                        this.game.renderer.triggerErrorGlow();
+                        this.game.triggerGlitch();
+                        this.game.audio.error();
+                    }
                     return;
                 }
 
@@ -3246,12 +4659,10 @@
                     this.lockStream(targetStream);
                     targetStream.typedLength = 1;
                     this.game.noteHit();
-                    // Speed increase moved to word completion only
-                    this.game.addScore(10);
                     this.game.audio.type();
 
                     if (targetStream.typedLength === targetStream.text.length) {
-                        this.game.increaseSpeed(); // Speed UP only on full word
+                        this.game.increaseSpeed(); 
                         this.game.combo++;
                         const isOnFire = this.game.combo >= 5;
                         const accuracy = 1.0;
@@ -3259,9 +4670,16 @@
 
                         this.game.audio.dataBurst(isOnFire);
                         const burstOrigin = this.game.getStreamLastCharCenter(targetStream);
-                        this.game.renderer.createDataBurst(burstOrigin.x, burstOrigin.y, targetStream.color, isOnFire);
+                        
+                        if (targetStream.isBonus) {
+                            this.game.heal(10);
+                            this.game.renderer.createHealBurst(burstOrigin.x, burstOrigin.y);
+                        } else {
+                            this.game.renderer.createDataBurst(burstOrigin.x, burstOrigin.y, targetStream.color, isOnFire);
+                        }
 
-                        this.game.addScore(20);
+                        // Score added ONLY on completion (30pts per char total)
+                        this.game.addScore(targetStream.text.length * 30);
                         const idx = this.game.spawner.streams.indexOf(targetStream);
                         if (idx !== -1) this.game.spawner.streams.splice(idx, 1);
                         this.clearLockedStream();
@@ -3277,13 +4695,12 @@
             }
 
             handleKeyUp(e) {
-                if (this.game.state !== 'PLAYING') return;
-                const key = e.key.toLowerCase();
-                if (key.length === 1) {
-                    this.game.virtualKeyboard.release(key);
-                }
+                if (this.game.state !== 'PLAYING' && this.game.state !== 'BRIEFING') return;
+                const mapped = this.getMappedKey(e);
+                this.game.virtualKeyboard.release(mapped);
             }
         }
+
 
         // ==========================================
         // ENGINE: MAIN GAME LOOP
@@ -3396,10 +4813,10 @@
                 cursor.style.animation = 'pulse-text 0.8s infinite';
                 cursor.style.color = 'var(--lime)';
                 term.appendChild(cursor);
-
-                const text = levelData.briefing || "System Ready...";
-                
-                let i = 0;
+  
+                  const text = (levelData.briefing || "System Ready...").replace(/{alias}/g, this.userManager.activeAlias || 'HACKER');
+                  
+                  let i = 0;
                 const typeSpeed = 25; 
 
                 const layout = this.userManager.profile.preferences.layout;
@@ -3419,29 +4836,39 @@
                 // this.virtualKeyboard.container.style.zIndex = 101; // Useless if parent is low
                 document.getElementById('ui-layer').style.zIndex = 101; // Lift the whole UI layer (keyboard is inside)
                 
-                const typeWriter = () => {
-                    if (this.state !== 'BRIEFING') return;
-                    if (i < text.length) {
-                        const char = text.charAt(i);
-                        cursor.insertAdjacentText('beforebegin', char);
-                        i++;
-                        term.scrollTop = term.scrollHeight;
+                  const typeWriter = () => {
+                      if (this.state !== 'BRIEFING') return;
+                      if (i < text.length) {
+                          const char = text.charAt(i);
+                          cursor.insertAdjacentText('beforebegin', char);
+                          i++;
+                          term.scrollTop = term.scrollHeight;
 
-                        if (i % 2 === 0) this.audio.type();
-                        
-                        setTimeout(typeWriter, typeSpeed + Math.random() * 15);
-                    } else {
-                        this.audio.typeComplete();
-                        hint.classList.remove('hidden');
-                        
-                        this.virtualKeyboard.container.style.transition = 'opacity 1s ease';
-                        this.virtualKeyboard.container.style.opacity = 1;
-                        
-                        if (newKeys.length > 0) {
-                            this.virtualKeyboard.showLevelGuide(newKeys, 9999999);
-                        }
-                    }
-                };
+                          if (i % 2 === 0) this.audio.type();
+                          
+                          let delay = typeSpeed + Math.random() * 20;
+
+                          // DRAMATIC PAUSES
+                          if (char === '.') delay = 650;
+                          else if (char === '!') delay = 600;
+                          else if (char === '?') delay = 600;
+                          else if (char === ',') delay = 300;
+                          else if (char === '\n') delay = 400;
+                          else if (char === ':') delay = 400;
+
+                          setTimeout(typeWriter, delay);
+                      } else {
+                          this.audio.typeComplete();
+                          hint.classList.remove('hidden');
+                          
+                          this.virtualKeyboard.container.style.transition = 'opacity 1s ease';
+                          this.virtualKeyboard.container.style.opacity = 1;
+                          
+                          if (newKeys.length > 0) {
+                              this.virtualKeyboard.showLevelGuide(newKeys, 9999999);
+                          }
+                      }
+                  };
                 
                 setTimeout(typeWriter, 600);
             }
@@ -3454,6 +4881,95 @@
                 this.startGame(this.levelNum);
             }
 
+
+            playIntroSequence(alias) {
+                this.state = 'INTRO';
+                this.showScreen('briefing');
+                
+                const term = document.getElementById('briefing-terminal');
+                const hint = document.getElementById('briefing-hint');
+                const keyboardContainer = document.getElementById('briefing-keyboard-container');
+                
+                term.innerHTML = '';
+                hint.classList.add('hidden');
+                keyboardContainer.style.display = 'none'; // Hide keyboard for intro
+                
+                // Add cursor
+                const cursor = document.createElement('span');
+                cursor.innerText = '_';
+                cursor.style.animation = 'pulse-text 0.8s infinite';
+                cursor.style.color = 'var(--lime)';
+                term.appendChild(cursor);
+
+                const lang = this.userManager.profile.preferences.language;
+                const introLines = UIText[lang].intro || [];
+                
+                let lineIndex = 0;
+                let charIndex = 0;
+                let isTyping = false;
+                let currentTimeout = null;
+
+                const nextLine = () => {
+                    if (this.state !== 'INTRO') return;
+                    if (lineIndex >= introLines.length) {
+                        this.finishIntro();
+                        return;
+                    }
+
+                    const lineData = introLines[lineIndex];
+                    const text = lineData.text.replace('{alias}', alias);
+                    
+                    // Clear terminal for each major thought, or append? Matrix usually clears.
+                    // "Wake up, Neo..." -> Clears -> "The Matrix has you..."
+                    // Let's clear for lines 0, 1, 2. But maybe append for long text?
+                    // Let's clear every time for dramatic effect like the movie.
+                    term.innerHTML = ''; 
+                    term.appendChild(cursor);
+                    
+                    charIndex = 0;
+                    isTyping = true;
+                    
+                    const typeChar = () => {
+                        if (this.state !== 'INTRO') return;
+                        if (charIndex < text.length) {
+                            const char = text.charAt(charIndex);
+                            cursor.insertAdjacentText('beforebegin', char);
+                            charIndex++;
+                            if (charIndex % 2 === 0) this.audio.type();
+                            currentTimeout = setTimeout(typeChar, 50 + Math.random() * 30);
+                        } else {
+                            isTyping = false;
+                            this.audio.typeComplete();
+                            lineIndex++;
+                            currentTimeout = setTimeout(nextLine, lineData.delay || 2000);
+                        }
+                    };
+                    
+                    // Initial pause before typing starts? No, delay is usually AFTER line.
+                    // But first line "Knock knock" needs initial cursor blink.
+                    if (lineIndex === 0) {
+                         currentTimeout = setTimeout(typeChar, 1500);
+                    } else {
+                         currentTimeout = setTimeout(typeChar, 500);
+                    }
+                };
+                
+                // Start sequence
+                nextLine();
+
+                // Store skip handler
+                this.introSkipHandler = () => {
+                    if (currentTimeout) clearTimeout(currentTimeout);
+                    this.finishIntro();
+                };
+            }
+
+            finishIntro() {
+                if (this.state !== 'INTRO') return;
+                this.userManager.profile.hasSeenIntro = true;
+                this.userManager.saveProfiles();
+                this.showMainMenu();
+            }
 
             bindAudioToButtons(container) {
                 const buttons = container.querySelectorAll('button');
@@ -3910,7 +5426,12 @@
                             if (this.userManager.profile?.preferences?.geminiApiKey) {
                                 this.gemini.setApiKey(this.userManager.profile.preferences.geminiApiKey);
                             }
-                            this.showMainMenu();
+                            // Check if this is a new profile (hasSeenIntro is false)
+                            if (this.userManager.profile.hasSeenIntro === false) {
+                                this.playIntroSequence(this.userManager.activeAlias);
+                            } else {
+                                this.showMainMenu();
+                            }
                         } else {
                             if(Object.keys(this.userManager.profiles).length < 3) {
                                 alert("Alias already exists or is invalid.");
@@ -4996,6 +6517,9 @@
 
                             if (i <= effectiveMaxLevel) {
                                 btn.classList.add(isMiniBoss ? 'btn-yellow' : 'btn-cyan');
+                                if (this.newlyUnlockedLevel === i) {
+                                    btn.classList.add('level-unveil-effect');
+                                }
                                 if (isMiniBoss) btn.classList.add('yellow-mode'); // High contrast for yellow levels
                             if (isFinalBoss) {
                                 btn.classList.remove('btn-cyan', 'btn-yellow');
@@ -5108,8 +6632,9 @@
                 };
             }
 
-              startGame(levelNumber) {
-                  this.levelNum = levelNumber;
+                startGame(levelNumber) {
+                    this.newlyUnlockedLevel = null;
+                    this.levelNum = levelNumber;
                   this.score = 0;
                   this.health = this.maxHealth;
                   this.speedMultiplier = 1.0; 
@@ -5201,6 +6726,11 @@
 
               decreaseSpeed() {
                   this.speedMultiplier = Math.max(0.5, this.speedMultiplier * 0.5);
+              }
+
+              heal(amount) {
+                  this.health = Math.min(this.maxHealth, this.health + amount);
+                  this.updateHealth();
               }
 
               resetLevelMetrics() {
@@ -5298,6 +6828,7 @@
                 }
 
                 async renderSuccessMetrics() {
+                    this.skipMetricsAnimation = false;
                     const metrics = [
                         { id: 'metric-score', value: this.score },
                         { id: 'metric-kpm-avg', value: this.levelMetrics.finalAvgKpm },
@@ -5326,14 +6857,38 @@
                     for (const m of metrics) {
                         const el = document.getElementById(m.id);
                         if (!el) continue;
-                        await this.animateNumber(el, m.value);
+                        if (this.state !== 'LEVELUP') return;
+                        
+                        if (this.skipMetricsAnimation) {
+                            el.innerText = m.value;
+                            el.classList.remove('metric-impact');
+                            void el.offsetWidth;
+                            el.classList.add('metric-impact');
+                        } else {
+                            await this.animateNumber(el, m.value);
+                        }
                     }
 
-                    // Pausa antes de las estrellas para mantener el ritmo dramático de esa parte
-                    await new Promise(r => setTimeout(r, 800));
+                    // Pausa antes de las estrellas
+                    if (!this.skipMetricsAnimation) {
+                        await new Promise(r => setTimeout(r, 800));
+                    }
+                    
+                    if (this.state !== 'LEVELUP') return;
 
                     if(starsEl) {
-                        await this.animateStars(starsEl, this.levelMetrics.finalStars);
+                         if (this.skipMetricsAnimation) {
+                             const full = '<span class="star-filled">★</span>';
+                             const empty = '<span class="star-empty">★</span>';
+                             const count = this.levelMetrics.finalStars;
+                             starsEl.innerHTML = full.repeat(count) + empty.repeat(5 - count);
+                             starsEl.classList.remove('metric-impact');
+                             void starsEl.offsetWidth;
+                             starsEl.classList.add('metric-impact');
+                             this.audio.typeComplete();
+                         } else {
+                             await this.animateStars(starsEl, this.levelMetrics.finalStars);
+                         }
                     }
                 }
 
@@ -5344,6 +6899,19 @@
                         const startTime = performance.now();
                         
                         const update = (now) => {
+                            if (this.state !== 'LEVELUP') {
+                                resolve();
+                                return;
+                            }
+                            if (this.skipMetricsAnimation) {
+                                element.innerText = target;
+                                element.classList.remove('metric-impact');
+                                void element.offsetWidth;
+                                element.classList.add('metric-impact');
+                                resolve();
+                                return;
+                            }
+
                             const elapsed = now - startTime;
                             const progress = Math.min(1, elapsed / duration);
                             const ease = Math.pow(progress, 3); // Cubic ease in (accelerating)
@@ -5374,7 +6942,28 @@
                         element.innerHTML = empty.repeat(5);
 
                         for (let i = 0; i < starCount; i++) {
+                                 if (this.state !== 'LEVELUP') { resolve(); return; }
+                                 if (this.skipMetricsAnimation) {
+                                     element.innerHTML = full.repeat(starCount) + empty.repeat(5 - starCount);
+                                     element.classList.remove('metric-impact');
+                                     void element.offsetWidth;
+                                     element.classList.add('metric-impact');
+                                     this.audio.typeComplete();
+                                     resolve();
+                                     return;
+                                 }
+
                                  await new Promise(r => setTimeout(r, 600));
+                                 if (this.state !== 'LEVELUP') { resolve(); return; }
+                                 if (this.skipMetricsAnimation) {
+                                     element.innerHTML = full.repeat(starCount) + empty.repeat(5 - starCount);
+                                     element.classList.remove('metric-impact');
+                                     void element.offsetWidth;
+                                     element.classList.add('metric-impact');
+                                     this.audio.typeComplete();
+                                     resolve();
+                                     return;
+                                 }
                                  
                                  let html = full.repeat(i + 1) + empty.repeat(5 - (i + 1));
                                  element.innerHTML = html;
@@ -5528,12 +7117,20 @@
                 }
 
                 async levelComplete() {
+                this.finalizeLevelMetrics();
 
                 if (this.levelNum !== 'AI') {
-                    this.userManager.unlockLevel(this.levelNum + 1);
+                    const nextLevel = this.levelNum + 1;
+                    const currentMax = this.userManager.profile.progress.highestLevelUnlocked || 1;
+                    
+                    if (this.levelMetrics.finalStars >= 3) {
+                        if (nextLevel > currentMax) {
+                            this.userManager.unlockLevel(nextLevel);
+                            this.newlyUnlockedLevel = nextLevel;
+                        }
+                    }
                 }
 
-                this.finalizeLevelMetrics();
                 // Metrics will be rendered after the reveal in continueAfterRevealKey()
                 // this.renderSuccessMetrics(); 
 
