@@ -772,6 +772,36 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
+
+        /* --- Score Multiplier Visuals --- */
+        .score-mult-1 { color: var(--cyan); text-shadow: 0 0 5px var(--cyan); transition: color 0.3s; }
+        .score-mult-1-5 { color: var(--lime); text-shadow: 0 0 8px var(--lime); transition: color 0.3s; }
+        .score-mult-2 { color: var(--yellow); text-shadow: 0 0 12px var(--yellow); font-weight: bold; transition: color 0.3s; }
+        .score-mult-3 { 
+            color: var(--pink); 
+            text-shadow: 0 0 15px var(--pink), 0 0 25px var(--red); 
+            font-weight: 800; 
+            animation: scoreMult3Pulse 0.5s infinite alternate;
+        }
+        
+        @keyframes scoreMult3Pulse {
+            from { transform: scale(1); filter: brightness(1); }
+            to { transform: scale(1.05); filter: brightness(1.3); }
+        }
+
+        #hud-mult-indicator {
+            font-size: 0.8rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: all 0.3s ease-out;
+        }
+        #hud-mult-indicator.visible { opacity: 1; transform: translateY(0); }
+        
+        #hud-mult-indicator.mult-x1-5 { color: var(--lime); text-shadow: 0 0 5px var(--lime); }
+        #hud-mult-indicator.mult-x2 { color: var(--yellow); text-shadow: 0 0 8px var(--yellow); font-size: 0.9rem; }
+        #hud-mult-indicator.mult-x3 { color: var(--pink); text-shadow: 0 0 10px var(--pink); font-size: 1.0rem; animation: glitch 0.3s infinite; }
+
     </style>
 </head>
 <body>
@@ -791,10 +821,13 @@
                   <span class="hud-label" id="lbl-hud-alias">Alias</span>
                   <span id="hud-alias">HACKER</span>
               </div>
-              <div class="hud-stat">
-                  <span class="hud-label" id="lbl-hud-score">Score</span>
-                  <span id="hud-score">0</span>
-              </div>
+                <div class="hud-stat">
+                    <span class="hud-label" id="lbl-hud-score">Score</span>
+                    <div style="display:flex; align-items:baseline; gap:8px;">
+                        <span id="hud-score">0</span>
+                        <span id="hud-mult-indicator"></span>
+                    </div>
+                </div>
               <div class="hud-stat">
                   <span class="hud-label" id="lbl-hud-level">Level</span>
                   <span id="hud-level">1</span>
@@ -884,6 +917,15 @@
                     <select id="select-layout">
                         <option value="ansi-us">ANSI (US QWERTY)</option>
                         <option value="iso-es">ISO (ES QWERTY + Ñ)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="lbl-settings-graphics" style="color: var(--lime);">Graphics Quality:</label>
+                    <select id="select-graphics">
+                        <option value="auto" id="opt-graphics-auto">AUTO</option>
+                        <option value="low" id="opt-graphics-low">LOW</option>
+                        <option value="medium" id="opt-graphics-medium">MEDIUM</option>
+                        <option value="high" id="opt-graphics-high">HIGH</option>
                     </select>
                 </div>
                   <div class="form-group">
@@ -999,6 +1041,7 @@
                   <div class="metric-row"><span id="lbl-metric-hits">Hits</span><strong id="metric-hits">0</strong></div>
                   <div class="metric-row"><span id="lbl-metric-errors">Errors</span><strong id="metric-errors">0</strong></div>
                   <div class="metric-row"><span id="lbl-metric-streak">Best Streak</span><strong id="metric-streak">0</strong></div>
+                  <div class="metric-row"><span id="lbl-metric-time">Time</span><strong id="metric-time">00:00</strong></div>
                   <div class="metric-row"><span id="lbl-metric-rating" style="text-transform: uppercase;">Rating</span><strong id="success-stars">☆☆☆☆☆</strong></div>
               </div>
               <p id="ai-feedback-win" style="color: #B026FF; font-style: italic; margin-bottom: 20px; min-height: 48px; font-size: 1.1rem;"></p>
@@ -1095,6 +1138,7 @@
                   metricErrors: "Errors",
                   metricStreak: "Best Streak",
                   metricRating: "Rating",
+                  metricTime: "Time",
                 menuWelcome: "Welcome",
                 btnPlay: "Access Nodes (Play)",
                 btnAINode: "✨ Generate AI Node",
@@ -1151,9 +1195,15 @@
                     btnResume: "Continue Hack",
                   revealSkipHint: "Press any key",
                       revealContinueHint: "Press any key",
+                      briefingHint: "Press [SPACE] to Initialize Sequence",
                       spacebar: "SPACE",
                       nextLevel: "Next:",
                       lblSettingsModel: "Gemini Model Name:",
+                  lblGraphicsQuality: "Graphics Quality:",
+                  optGraphicsAuto: "AUTO (Default)",
+                  optGraphicsLow: "LOW (Performance)",
+                  optGraphicsMedium: "MEDIUM (Balanced)",
+                  optGraphicsHigh: "HIGH (Quality)",
                       btnTestKey: "Test Key",
                       btnDeleteKey: "Delete Key",
                       msgKeyTested: "Key Valid! Model Connected.",
@@ -1187,6 +1237,7 @@
                     metricErrors: "Errores",
                     metricStreak: "Mejor racha",
                     metricRating: "Valoración",
+                    metricTime: "Tiempo",
                   menuWelcome: "Bienvenido",
                   btnPlay: "Nodos de Acceso (Jugar)",
                   btnAINode: "✨ Generar Nodo IA",
@@ -1243,9 +1294,15 @@
                         btnResume: "Continuar Hackeo",
                         revealSkipHint: "Pulsa cualquier tecla",
                         revealContinueHint: "Pulsa cualquier tecla",
+                        briefingHint: "PULSA [ESPACIO] PARA INICIAR SECUENCIA",
                         spacebar: "ESPACIO",
                         nextLevel: "Siguiente:",
-                        lblSettingsModel: "Nombre del Modelo Gemini:",
+                          lblSettingsModel: "Nombre del Modelo Gemini:",
+                          lblGraphicsQuality: "Calidad Gráfica:",
+                          optGraphicsAuto: "AUTO (Defecto)",
+                          optGraphicsLow: "BAJA (Rendimiento)",
+                          optGraphicsMedium: "MEDIA (Equilibrada)",
+                          optGraphicsHigh: "ALTA (Calidad)",
                         btnTestKey: "Probar Key",
                         btnDeleteKey: "Borrar Key",
                         descApiKey: "Necesario para funciones IA. Guardado localmente.",
@@ -1345,1341 +1402,1341 @@
         const TOTAL_LEVELS = 30;
 
         const Dictionaries = {
-            "en": {
-                "level_1": {
-                    "id": "lvl_1",
-                    "name": "Neural Link: Core",
-                    "type": "characters",
-                    "pool": [
-                        "f",
-                        "j",
-                        "ff",
-                        "jj",
-                        "fj",
-                        "jf"
-                    ],
-                    "targetScore": 1350,
-                    "fallSpeed": 0.5,
-                    "spawnRate": 2200,
-                    "briefing": "Wake up, [ALIAS]. The system is vast, but we start at the center. Your index fingers are the key. Feel the bumps on the F and J keys. Anchor yourself. Establish the link.",
-                    "guideKeys": [
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_2": {
-                    "id": "lvl_2",
-                    "name": "Signal Expansion",
-                    "type": "characters",
-                    "pool": [
-                        "d",
-                        "k",
-                        "df",
-                        "jk",
-                        "fd",
-                        "kj"
-                    ],
-                    "targetScore": 1650,
-                    "fallSpeed": 0.55,
-                    "spawnRate": 2155,
-                    "briefing": "Good. The signal is stabilizing. Expand your influence. Use your middle fingers to reach the D and K nodes while keeping your index fingers on F and J.",
-                    "guideKeys": [
-                        "d",
-                        "k",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_3": {
-                    "id": "lvl_3",
-                    "name": "Rhythm Protocol",
-                    "type": "characters",
-                    "pool": [
-                        "s",
-                        "l",
-                        "sl",
-                        "ls",
-                        "sdf",
-                        "jkl"
-                    ],
-                    "targetScore": 1800,
-                    "fallSpeed": 0.6,
-                    "spawnRate": 2110,
-                    "briefing": "Rhythm is everything in the stream. Extend to S and L with your ring fingers. Do not look down. Trust the connection.",
-                    "guideKeys": [
-                        "s",
-                        "l",
-                        "d",
-                        "k",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_4": {
-                    "id": "lvl_4",
-                    "name": "Perimeter Check",
-                    "type": "characters",
-                    "pool": [
-                        "a",
-                        ";",
-                        "as",
-                        "l;",
-                        "asdf",
-                        "jkl;"
-                    ],
-                    "targetScore": 2150,
-                    "fallSpeed": 0.65,
-                    "spawnRate": 2065,
-                    "briefing": "Secure the perimeter. Your pinky fingers control the outer boundaries, A and ;. The home row is now fully active.",
-                    "guideKeys": [
-                        "a",
-                        ";",
-                        "s",
-                        "l",
-                        "d",
-                        "k",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_5": {
-                    "id": "lvl_5",
-                    "name": "Central Bridge",
-                    "type": "characters",
-                    "pool": [
-                        "g",
-                        "h",
-                        "fg",
-                        "jh",
-                        "gh",
-                        "hg"
-                    ],
-                    "targetScore": 1650,
-                    "fallSpeed": 0.7,
-                    "spawnRate": 2020,
-                    "briefing": "Bridge the gap. Your index fingers must stretch inward to G and H, then return immediately to their home bases F and J.",
-                    "guideKeys": [
-                        "g",
-                        "h",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_6": {
-                    "id": "lvl_6",
-                    "name": "Uplink: E & I",
-                    "type": "characters",
-                    "pool": [
-                        "e",
-                        "i",
-                        "ed",
-                        "ik",
-                        "de",
-                        "ki"
-                    ],
-                    "targetScore": 1700,
-                    "fallSpeed": 0.75,
-                    "spawnRate": 1975,
-                    "briefing": "Accessing upper memory banks. Move your middle finger up from D to E, and K to I. This is the most common pathway.",
-                    "guideKeys": [
-                        "e",
-                        "i",
-                        "d",
-                        "k"
-                    ]
-                },
-                "level_7": {
-                    "id": "lvl_7",
-                    "name": "Uplink: R & U",
-                    "type": "characters",
-                    "pool": [
-                        "r",
-                        "u",
-                        "rf",
-                        "uj",
-                        "fr",
-                        "ju"
-                    ],
-                    "targetScore": 1800,
-                    "fallSpeed": 0.8,
-                    "spawnRate": 1930,
-                    "briefing": "Push higher. Index fingers move up to R and U. Keep your anchors strong.",
-                    "guideKeys": [
-                        "r",
-                        "u",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_8": {
-                    "id": "lvl_8",
-                    "name": "Uplink: T & O",
-                    "type": "characters",
-                    "pool": [
-                        "t",
-                        "o",
-                        "tf",
-                        "ol",
-                        "ft",
-                        "lo"
-                    ],
-                    "targetScore": 1850,
-                    "fallSpeed": 0.8500000000000001,
-                    "spawnRate": 1885,
-                    "briefing": "Stretching network capacity. Left index to T. Right ring finger to O. The pattern is complex, but predictable.",
-                    "guideKeys": [
-                        "t",
-                        "o",
-                        "f",
-                        "l"
-                    ]
-                },
-                "level_9": {
-                    "id": "lvl_9",
-                    "name": "Uplink: W & P",
-                    "type": "characters",
-                    "pool": [
-                        "w",
-                        "p",
-                        "ws",
-                        "p;",
-                        "sw",
-                        ";p"
-                    ],
-                    "targetScore": 1950,
-                    "fallSpeed": 0.9,
-                    "spawnRate": 1840,
-                    "briefing": "Reaching outer sectors. Left ring to W. Right pinky to P. Precision is mandatory.",
-                    "guideKeys": [
-                        "w",
-                        "p",
-                        "s",
-                        ";"
-                    ]
-                },
-                "level_10": {
-                    "id": "lvl_10",
-                    "name": "Uplink: Q & Y",
-                    "type": "characters",
-                    "pool": [
-                        "q",
-                        "y",
-                        "qa",
-                        "yj",
-                        "aq",
-                        "jy"
-                    ],
-                    "targetScore": 2050,
-                    "fallSpeed": 0.95,
-                    "spawnRate": 1795,
-                    "briefing": "Completing the upper grid. Left pinky to Q. Right index stretches far to Y.",
-                    "guideKeys": [
-                        "q",
-                        "y",
-                        "a",
-                        "j"
-                    ]
-                },
-                "level_11": {
-                    "id": "lvl_11",
-                    "name": "Downlink: V & M",
-                    "type": "characters",
-                    "pool": [
-                        "v",
-                        "m",
-                        "vf",
-                        "mj",
-                        "fv",
-                        "jm"
-                    ],
-                    "targetScore": 2150,
-                    "fallSpeed": 1,
-                    "spawnRate": 1750,
-                    "briefing": "Initiating downlink. Index fingers curl down to V and M. Do not lose your home position.",
-                    "guideKeys": [
-                        "v",
-                        "m",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_12": {
-                    "id": "lvl_12",
-                    "name": "Downlink: C & Comma",
-                    "type": "characters",
-                    "pool": [
-                        "c",
-                        ",",
-                        "cd",
-                        ",k",
-                        "dc",
-                        "k,"
-                    ],
-                    "targetScore": 2250,
-                    "fallSpeed": 1.05,
-                    "spawnRate": 1705,
-                    "briefing": "Encoding syntax. Reach DOWN with LEFT INDEX to C and RIGHT MIDDLE to Comma (,). Essential for data parsing.",
-                    "guideKeys": [
-                        "c",
-                        ",",
-                        "d",
-                        "k"
-                    ]
-                },
-                "level_13": {
-                    "id": "lvl_13",
-                    "name": "Downlink: X & Dot",
-                    "type": "characters",
-                    "pool": [
-                        "x",
-                        ".",
-                        "xs",
-                        ".l",
-                        "sx",
-                        "l."
-                    ],
-                    "targetScore": 2350,
-                    "fallSpeed": 1.1,
-                    "spawnRate": 1660,
-                    "briefing": "Closing the loop. Reach DOWN with LEFT MIDDLE to X and RIGHT RING to Dot (.). The grid is almost fully mapped.",
-                    "guideKeys": [
-                        "x",
-                        ".",
-                        "s",
-                        "l"
-                    ]
-                },
-                "level_14": {
-                    "id": "lvl_14",
-                    "name": "Downlink: Z & Slash",
-                    "type": "characters",
-                    "pool": [
-                        "z",
-                        "/",
-                        "za",
-                        "/;",
-                        "az",
-                        ";/"
-                    ],
-                    "targetScore": 2500,
-                    "fallSpeed": 1.15,
-                    "spawnRate": 1615,
-                    "briefing": "Finalizing grid access. Pinky fingers down to Z and Slash (/). You now command the full alphabet.",
-                    "guideKeys": [
-                        "z",
-                        "/",
-                        "a",
-                        ";"
-                    ]
-                },
-                "level_15": {
-                    "id": "lvl_15",
-                    "name": "Downlink: B & N",
-                    "type": "characters",
-                    "pool": [
-                        "b",
-                        "n",
-                        "bf",
-                        "nj",
-                        "fb",
-                        "jn"
-                    ],
-                    "targetScore": 2600,
-                    "fallSpeed": 1.2000000000000002,
-                    "spawnRate": 1570,
-                    "briefing": "The trickiest reach. Index fingers stretch down and center to B and N. Master this to seal the connection.",
-                    "guideKeys": [
-                        "b",
-                        "n",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_16": {
-                    "id": "lvl_16",
-                    "name": "Shift Logic",
-                    "type": "characters",
-                    "pool": [
-                        "A",
-                        "S",
-                        "D",
-                        "F",
-                        "J",
-                        "K",
-                        "L",
-                        ":"
-                    ],
-                    "targetScore": 1650,
-                    "fallSpeed": 1.25,
-                    "spawnRate": 1525,
-                    "briefing": "Elevating privileges. Use the PINKY on the OPPOSITE hand to hold Shift while typing a letter. Right Shift for A-G, Left Shift for H-Z.",
-                    "guideKeys": [
-                        "Shift",
-                        "a",
-                        "s",
-                        "d",
-                        "f",
-                        "j",
-                        "k",
-                        "l"
-                    ]
-                },
-                "level_17": {
-                    "id": "lvl_17",
-                    "name": "Code Syntax I",
-                    "type": "characters",
-                    "pool": [
-                        "{",
-                        "}",
-                        "[",
-                        "]",
-                        "(",
-                        ")"
-                    ],
-                    "targetScore": 1750,
-                    "fallSpeed": 1.3,
-                    "spawnRate": 1480,
-                    "briefing": "Injecting code blocks. Brackets and parentheses are the skeleton of the Matrix. Use your right pinky to reach them.",
-                    "guideKeys": [
-                        "{",
-                        "}",
-                        "[",
-                        "]",
-                        "(",
-                        ")"
-                    ]
-                },
-                "level_18": {
-                    "id": "lvl_18",
-                    "name": "Numbers Row I",
-                    "type": "characters",
-                    "pool": [
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5"
-                    ],
-                    "targetScore": 1800,
-                    "fallSpeed": 1.35,
-                    "spawnRate": 1435,
-                    "briefing": "Parsing numerical data. Left hand reaches up. 1(Pinky) to 5(Index). Maintain home row discipline.",
-                    "guideKeys": [
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5"
-                    ]
-                },
-                "level_19": {
-                    "id": "lvl_19",
-                    "name": "Numbers Row II",
-                    "type": "characters",
-                    "pool": [
-                        "6",
-                        "7",
-                        "8",
-                        "9",
-                        "0"
-                    ],
-                    "targetScore": 1900,
-                    "fallSpeed": 1.4,
-                    "spawnRate": 1390,
-                    "briefing": "Completing numerical sequence. Right hand reaches up. 6(Index) to 0(Pinky). Do not look down.",
-                    "guideKeys": [
-                        "6",
-                        "7",
-                        "8",
-                        "9",
-                        "0"
-                    ]
-                },
-                "level_20": {
-                    "id": "lvl_20",
-                    "name": "Symbolic Logic",
-                    "type": "characters",
-                    "pool": [
-                        "!",
-                        "@",
-                        "#",
-                        "$",
-                        "%",
-                        "^",
-                        "&",
-                        "*"
-                    ],
-                    "targetScore": 2000,
-                    "fallSpeed": 1.4500000000000002,
-                    "spawnRate": 1345,
-                    "briefing": "Advanced encryption active. Combine Shift with Numbers to access special operators. This is how we rewrite reality.",
-                    "guideKeys": [
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5",
-                        "6",
-                        "7",
-                        "8",
-                        "Shift"
-                    ]
-                },
-                "level_21": {
-                    "id": "lvl_21",
-                    "name": "The Bigrams",
-                    "type": "words",
-                    "pool": [
-                        "th",
-                        "he",
-                        "in",
-                        "er",
-                        "an",
-                        "re",
-                        "on",
-                        "at",
-                        "en"
-                    ],
-                    "targetScore": 4200,
-                    "fallSpeed": 1.5,
-                    "spawnRate": 1300,
-                    "briefing": "Optimization phase. These two-letter combinations appear in 60% of all data streams. Master them to flow like water.",
-                    "guideKeys": []
-                },
-                "level_22": {
-                    "id": "lvl_22",
-                    "name": "The Trigrams",
-                    "type": "words",
-                    "pool": [
-                        "the",
-                        "and",
-                        "ing",
-                        "ent",
-                        "ion",
-                        "her",
-                        "for",
-                        "tha"
-                    ],
-                    "targetScore": 6650,
-                    "fallSpeed": 1.55,
-                    "spawnRate": 1255,
-                    "briefing": "Pattern recognition. Trigrams are the DNA of language. Execute them as single, fluid motions.",
-                    "guideKeys": []
-                },
-                "level_23": {
-                    "id": "lvl_23",
-                    "name": "Command Line",
-                    "type": "words",
-                    "pool": [
-                        "ls -la",
-                        "cd root",
-                        "git push",
-                        "npm run",
-                        "sudo su",
-                        "grep -r"
-                    ],
-                    "targetScore": 16400,
-                    "fallSpeed": 1.6,
-                    "spawnRate": 1210,
-                    "briefing": "Direct interface access. Execute standard shell commands. Speed is critical.",
-                    "guideKeys": []
-                },
-                "level_24": {
-                    "id": "lvl_24",
-                    "name": "Short Bursts",
-                    "type": "words",
-                    "pool": [
-                        "data",
-                        "node",
-                        "link",
-                        "core",
-                        "hack",
-                        "byte",
-                        "ping",
-                        "host"
-                    ],
-                    "targetScore": 9900,
-                    "fallSpeed": 1.6500000000000001,
-                    "spawnRate": 1165,
-                    "briefing": "Short bursts of data. High frequency. Do not hesitate.",
-                    "guideKeys": []
-                },
-                "level_25": {
-                    "id": "lvl_25",
-                    "name": "Syntax Errors",
-                    "type": "words",
-                    "pool": [
-                        "null;",
-                        "void()",
-                        "return",
-                        "const x",
-                        "let y=",
-                        "if(a)",
-                        "else{}"
-                    ],
-                    "targetScore": 15350,
-                    "fallSpeed": 1.7000000000000002,
-                    "spawnRate": 1120,
-                    "briefing": "Debugging protocol. Identify and type programming structures. Accuracy over speed.",
-                    "guideKeys": []
-                },
-                "level_26": {
-                    "id": "lvl_26",
-                    "name": "Variable Stream",
-                    "type": "words",
-                    "pool": [
-                        "function",
-                        "variable",
-                        "constant",
-                        "array",
-                        "object",
-                        "string",
-                        "number"
-                    ],
-                    "targetScore": 18600,
-                    "fallSpeed": 1.75,
-                    "spawnRate": 1075,
-                    "briefing": "Data complexity increasing. Longer variable names detected. Maintain rhythm.",
-                    "guideKeys": []
-                },
-                "level_27": {
-                    "id": "lvl_27",
-                    "name": "Encryption Keys",
-                    "type": "words",
-                    "pool": [
-                        "Xj7-kL",
-                        "9A_z#2",
-                        "P@ssW0",
-                        "Key_Gen",
-                        "Auth-2",
-                        "Token$"
-                    ],
-                    "targetScore": 18150,
-                    "fallSpeed": 1.8,
-                    "spawnRate": 1030,
-                    "briefing": "Cracking encryption. Mixed case, numbers, and symbols. This is a stress test.",
-                    "guideKeys": []
-                },
-                "level_28": {
-                    "id": "lvl_28",
-                    "name": "Neural Payload",
-                    "type": "words",
-                    "pool": [
-                        "consciousness",
-                        "intelligence",
-                        "architecture",
-                        "distributed",
-                        "synchronize"
-                    ],
-                    "targetScore": 36850,
-                    "fallSpeed": 1.85,
-                    "spawnRate": 985,
-                    "briefing": "Heavy data load. Complex terminology. Stay focused.",
-                    "guideKeys": []
-                },
-                "level_29": {
-                    "id": "lvl_29",
-                    "name": "The Firewall",
-                    "type": "words",
-                    "pool": [
-                        "Access_Denied",
-                        "System.Halt()",
-                        "Error:404",
-                        "Fatal_Exception",
-                        "Buffer_Overflow"
-                    ],
-                    "targetScore": 43200,
-                    "fallSpeed": 1.9000000000000001,
-                    "spawnRate": 940,
-                    "briefing": "Final defense layer. The system is fighting back. Override manual protocols.",
-                    "guideKeys": []
-                },
-                "level_30": {
-                    "id": "lvl_30",
-                    "name": "ROOT ACCESS",
-                    "type": "words",
-                    "pool": [
-                        "sudo rm -rf /",
-                        "System.Override(True)",
-                        "Matrix.Reload()",
-                        "Wake_Up_Neo",
-                        "Follow_The_White_Rabbit"
-                    ],
-                    "targetScore": 58850,
-                    "fallSpeed": 1.9500000000000002,
-                    "spawnRate": 895,
-                    "briefing": "This is it. The core. Total system control. Do not fail us now.",
-                    "guideKeys": []
-                }
-            },
-            "es": {
-                "level_1": {
-                    "id": "lvl_1",
-                    "name": "Enlace Neuronal: Núcleo",
-                    "type": "characters",
-                    "pool": [
-                        "f",
-                        "j",
-                        "ff",
-                        "jj",
-                        "fj",
-                        "jf"
-                    ],
-                    "targetScore": 1350,
-                    "fallSpeed": 0.5,
-                    "spawnRate": 2200,
-                    "briefing": "Despierta, [ALIAS]. El sistema es vasto, pero empezamos en el centro. Tus dedos índice son la clave. Siente las marcas en las teclas F y J. Anclate. Establece el enlace.",
-                    "guideKeys": [
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_2": {
-                    "id": "lvl_2",
-                    "name": "Expansión de Señal",
-                    "type": "characters",
-                    "pool": [
-                        "d",
-                        "k",
-                        "df",
-                        "jk",
-                        "fd",
-                        "kj"
-                    ],
-                    "targetScore": 1650,
-                    "fallSpeed": 0.55,
-                    "spawnRate": 2155,
-                    "briefing": "Bien. La señal se estabiliza. Expande tu influencia. Usa tus dedos corazón para alcanzar los nodos D y K mientras mantienes los índices en F y J.",
-                    "guideKeys": [
-                        "d",
-                        "k",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_3": {
-                    "id": "lvl_3",
-                    "name": "Protocolo de Ritmo",
-                    "type": "characters",
-                    "pool": [
-                        "s",
-                        "l",
-                        "sl",
-                        "ls",
-                        "sdf",
-                        "jkl"
-                    ],
-                    "targetScore": 1800,
-                    "fallSpeed": 0.6,
-                    "spawnRate": 2110,
-                    "briefing": "El ritmo lo es todo en el flujo. Extiende a S y L con tus dedos anulares. No mires abajo. Confía en la conexión.",
-                    "guideKeys": [
-                        "s",
-                        "l",
-                        "d",
-                        "k",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_4": {
-                    "id": "lvl_4",
-                    "name": "Chequeo Perimetral",
-                    "type": "characters",
-                    "pool": [
-                        "a",
-                        "ñ",
-                        "as",
-                        "lñ",
-                        "asdf",
-                        "jklñ"
-                    ],
-                    "targetScore": 2150,
-                    "fallSpeed": 0.65,
-                    "spawnRate": 2065,
-                    "briefing": "Asegura el perímetro. Tus meñiques controlan los límites exteriores, A y Ñ. La fila base está ahora totalmente activa.",
-                    "guideKeys": [
-                        "a",
-                        "ñ",
-                        "s",
-                        "l",
-                        "d",
-                        "k",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_5": {
-                    "id": "lvl_5",
-                    "name": "Puente Central",
-                    "type": "characters",
-                    "pool": [
-                        "g",
-                        "h",
-                        "fg",
-                        "jh",
-                        "gh",
-                        "hg"
-                    ],
-                    "targetScore": 1650,
-                    "fallSpeed": 0.7,
-                    "spawnRate": 2020,
-                    "briefing": "Cruza la brecha. Tus índices deben estirarse hacia adentro a G y H, y volver inmediatamente a sus bases F y J.",
-                    "guideKeys": [
-                        "g",
-                        "h",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_6": {
-                    "id": "lvl_6",
-                    "name": "Subida: E e I",
-                    "type": "characters",
-                    "pool": [
-                        "e",
-                        "i",
-                        "ed",
-                        "ik",
-                        "de",
-                        "ki"
-                    ],
-                    "targetScore": 1700,
-                    "fallSpeed": 0.75,
-                    "spawnRate": 1975,
-                    "briefing": "Accediendo a bancos de memoria superiores. Mueve tu dedo corazón de D a E, y de K a I. Es la ruta más común.",
-                    "guideKeys": [
-                        "e",
-                        "i",
-                        "d",
-                        "k"
-                    ]
-                },
-                "level_7": {
-                    "id": "lvl_7",
-                    "name": "Subida: R y U",
-                    "type": "characters",
-                    "pool": [
-                        "r",
-                        "u",
-                        "rf",
-                        "uj",
-                        "fr",
-                        "ju"
-                    ],
-                    "targetScore": 1800,
-                    "fallSpeed": 0.8,
-                    "spawnRate": 1930,
-                    "briefing": "Empuja más alto. Los índices suben a R y U. Mantén tus anclajes firmes.",
-                    "guideKeys": [
-                        "r",
-                        "u",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_8": {
-                    "id": "lvl_8",
-                    "name": "Subida: T y O",
-                    "type": "characters",
-                    "pool": [
-                        "t",
-                        "o",
-                        "tf",
-                        "ol",
-                        "ft",
-                        "lo"
-                    ],
-                    "targetScore": 1850,
-                    "fallSpeed": 0.8500000000000001,
-                    "spawnRate": 1885,
-                    "briefing": "Estirando capacidad de red. Índice izquierdo a T. Anular derecho a O. El patrón es complejo, pero predecible.",
-                    "guideKeys": [
-                        "t",
-                        "o",
-                        "f",
-                        "l"
-                    ]
-                },
-                "level_9": {
-                    "id": "lvl_9",
-                    "name": "Subida: W y P",
-                    "type": "characters",
-                    "pool": [
-                        "w",
-                        "p",
-                        "ws",
-                        "pñ",
-                        "sw",
-                        "ñp"
-                    ],
-                    "targetScore": 1950,
-                    "fallSpeed": 0.9,
-                    "spawnRate": 1840,
-                    "briefing": "Alcanzando sectores externos. Anular izquierdo a W. Meñique derecho a P. La precisión es obligatoria.",
-                    "guideKeys": [
-                        "w",
-                        "p",
-                        "s",
-                        "ñ"
-                    ]
-                },
-                "level_10": {
-                    "id": "lvl_10",
-                    "name": "Subida: Q y Y",
-                    "type": "characters",
-                    "pool": [
-                        "q",
-                        "y",
-                        "qa",
-                        "yj",
-                        "aq",
-                        "jy"
-                    ],
-                    "targetScore": 2050,
-                    "fallSpeed": 0.95,
-                    "spawnRate": 1795,
-                    "briefing": "Completando la rejilla superior. Meñique izquierdo a Q. Índice derecho se estira lejos hasta la Y.",
-                    "guideKeys": [
-                        "q",
-                        "y",
-                        "a",
-                        "j"
-                    ]
-                },
-                "level_11": {
-                    "id": "lvl_11",
-                    "name": "Bajada: V y M",
-                    "type": "characters",
-                    "pool": [
-                        "v",
-                        "m",
-                        "vf",
-                        "mj",
-                        "fv",
-                        "jm"
-                    ],
-                    "targetScore": 2150,
-                    "fallSpeed": 1,
-                    "spawnRate": 1750,
-                    "briefing": "Iniciando bajada. Índices se curvan abajo hacia V y M. No pierdas tu posición base.",
-                    "guideKeys": [
-                        "v",
-                        "m",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_12": {
-                    "id": "lvl_12",
-                    "name": "Bajada: C y Coma",
-                    "type": "characters",
-                    "pool": [
-                        "c",
-                        ",",
-                        "cd",
-                        ",k",
-                        "dc",
-                        "k,"
-                    ],
-                    "targetScore": 2250,
-                    "fallSpeed": 1.05,
-                    "spawnRate": 1705,
-                    "briefing": "Codificando sintaxis. Baja tu ÍNDICE IZQUIERDO a C y tu MEDIO DERECHO a Coma (,). Esencial para analizar datos.",
-                    "guideKeys": [
-                        "c",
-                        ",",
-                        "d",
-                        "k"
-                    ]
-                },
-                "level_13": {
-                    "id": "lvl_13",
-                    "name": "Bajada: X y Punto",
-                    "type": "characters",
-                    "pool": [
-                        "x",
-                        ".",
-                        "xs",
-                        ".l",
-                        "sx",
-                        "l."
-                    ],
-                    "targetScore": 2350,
-                    "fallSpeed": 1.1,
-                    "spawnRate": 1660,
-                    "briefing": "Cerrando el bucle. Baja tu MEDIO IZQUIERDO a X y tu ANULAR DERECHO a Punto (.). La rejilla está casi mapeada.",
-                    "guideKeys": [
-                        "x",
-                        ".",
-                        "s",
-                        "l"
-                    ]
-                },
-                "level_14": {
-                    "id": "lvl_14",
-                    "name": "Bajada: Z y Guion",
-                    "type": "characters",
-                    "pool": [
-                        "z",
-                        "-",
-                        "za",
-                        "-ñ",
-                        "az",
-                        "ñ-"
-                    ],
-                    "targetScore": 2500,
-                    "fallSpeed": 1.15,
-                    "spawnRate": 1615,
-                    "briefing": "Finalizando acceso a rejilla. Meñiques abajo a Z y Guion (-). Ahora dominas el alfabeto completo.",
-                    "guideKeys": [
-                        "z",
-                        "-",
-                        "a",
-                        "ñ"
-                    ]
-                },
-                "level_15": {
-                    "id": "lvl_15",
-                    "name": "Bajada: B y N",
-                    "type": "characters",
-                    "pool": [
-                        "b",
-                        "n",
-                        "bf",
-                        "nj",
-                        "fb",
-                        "jn"
-                    ],
-                    "targetScore": 2600,
-                    "fallSpeed": 1.2000000000000002,
-                    "spawnRate": 1570,
-                    "briefing": "El alcance más difícil. Índices se estiran abajo y al centro a B y N. Domina esto para sellar la conexión.",
-                    "guideKeys": [
-                        "b",
-                        "n",
-                        "f",
-                        "j"
-                    ]
-                },
-                "level_16": {
-                    "id": "lvl_16",
-                    "name": "Lógica Shift",
-                    "type": "characters",
-                    "pool": [
-                        "A",
-                        "S",
-                        "D",
-                        "F",
-                        "J",
-                        "K",
-                        "L",
-                        "Ñ"
-                    ],
-                    "targetScore": 1650,
-                    "fallSpeed": 1.25,
-                    "spawnRate": 1525,
-                    "briefing": "Elevando privilegios. Usa el MEÑIQUE de la mano OPUESTA para mantener Shift mientras tecleas. Shift Derecho para A-G, Izquierdo para H-Z.",
-                    "guideKeys": [
-                        "Shift",
-                        "a",
-                        "s",
-                        "d",
-                        "f",
-                        "j",
-                        "k",
-                        "l"
-                    ]
-                },
-                "level_17": {
-                    "id": "lvl_17",
-                    "name": "Sintaxis Código I",
-                    "type": "characters",
-                    "pool": [
-                        "{",
-                        "}",
-                        "[",
-                        "]",
-                        "(",
-                        ")"
-                    ],
-                    "targetScore": 1750,
-                    "fallSpeed": 1.3,
-                    "spawnRate": 1480,
-                    "briefing": "Inyectando bloques de código. Corchetes y paréntesis son el esqueleto de Matrix. Usa tu meñique derecho para alcanzarlos.",
-                    "guideKeys": [
-                        "{",
-                        "}",
-                        "[",
-                        "]",
-                        "(",
-                        ")"
-                    ]
-                },
-                "level_18": {
-                    "id": "lvl_18",
-                    "name": "Fila Numérica I",
-                    "type": "characters",
-                    "pool": [
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5"
-                    ],
-                    "targetScore": 1800,
-                    "fallSpeed": 1.35,
-                    "spawnRate": 1435,
-                    "briefing": "Analizando datos numéricos. Mano izquierda sube. 1(Meñique) a 5(Índice). Mantén disciplina de fila base.",
-                    "guideKeys": [
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5"
-                    ]
-                },
-                "level_19": {
-                    "id": "lvl_19",
-                    "name": "Fila Numérica II",
-                    "type": "characters",
-                    "pool": [
-                        "6",
-                        "7",
-                        "8",
-                        "9",
-                        "0"
-                    ],
-                    "targetScore": 1900,
-                    "fallSpeed": 1.4,
-                    "spawnRate": 1390,
-                    "briefing": "Completando secuencia numérica. Mano derecha sube. 6(Índice) a 0(Meñique). No mires abajo.",
-                    "guideKeys": [
-                        "6",
-                        "7",
-                        "8",
-                        "9",
-                        "0"
-                    ]
-                },
-                "level_20": {
-                    "id": "lvl_20",
-                    "name": "Lógica Simbólica",
-                    "type": "characters",
-                    "pool": [
-                        "!",
-                        "@",
-                        "#",
-                        "$",
-                        "%",
-                        "^",
-                        "&",
-                        "*"
-                    ],
-                    "targetScore": 2000,
-                    "fallSpeed": 1.4500000000000002,
-                    "spawnRate": 1345,
-                    "briefing": "Encriptación avanzada activa. Combina Shift con Números para acceder a operadores especiales. Así reescribimos la realidad.",
-                    "guideKeys": [
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5",
-                        "6",
-                        "7",
-                        "8",
-                        "Shift"
-                    ]
-                },
-                "level_21": {
-                    "id": "lvl_21",
-                    "name": "Los Bigramas",
-                    "type": "words",
-                    "pool": [
-                        "th",
-                        "he",
-                        "in",
-                        "er",
-                        "an",
-                        "re",
-                        "on",
-                        "at",
-                        "en"
-                    ],
-                    "targetScore": 4200,
-                    "fallSpeed": 1.5,
-                    "spawnRate": 1300,
-                    "briefing": "Fase de optimización. Estas combinaciones de dos letras aparecen en el 60% de los flujos de datos. Domínalas para fluir como agua.",
-                    "guideKeys": []
-                },
-                "level_22": {
-                    "id": "lvl_22",
-                    "name": "Los Trigramas",
-                    "type": "words",
-                    "pool": [
-                        "the",
-                        "and",
-                        "ing",
-                        "ent",
-                        "ion",
-                        "her",
-                        "for",
-                        "tha"
-                    ],
-                    "targetScore": 6650,
-                    "fallSpeed": 1.55,
-                    "spawnRate": 1255,
-                    "briefing": "Reconocimiento de patrones. Los trigramas son el ADN del lenguaje. Ejecútalos como movimientos únicos y fluidos.",
-                    "guideKeys": []
-                },
-                "level_23": {
-                    "id": "lvl_23",
-                    "name": "Línea de Comandos",
-                    "type": "words",
-                    "pool": [
-                        "ls -la",
-                        "cd root",
-                        "git push",
-                        "npm run",
-                        "sudo su",
-                        "grep -r"
-                    ],
-                    "targetScore": 16400,
-                    "fallSpeed": 1.6,
-                    "spawnRate": 1210,
-                    "briefing": "Acceso directo a interfaz. Ejecuta comandos shell estándar. La velocidad es crítica.",
-                    "guideKeys": []
-                },
-                "level_24": {
-                    "id": "lvl_24",
-                    "name": "Ráfagas Cortas",
-                    "type": "words",
-                    "pool": [
-                        "data",
-                        "node",
-                        "link",
-                        "core",
-                        "hack",
-                        "byte",
-                        "ping",
-                        "host"
-                    ],
-                    "targetScore": 9900,
-                    "fallSpeed": 1.6500000000000001,
-                    "spawnRate": 1165,
-                    "briefing": "Ráfagas cortas de datos. Alta frecuencia. No dudes.",
-                    "guideKeys": []
-                },
-                "level_25": {
-                    "id": "lvl_25",
-                    "name": "Errores de Sintaxis",
-                    "type": "words",
-                    "pool": [
-                        "null;",
-                        "void()",
-                        "return",
-                        "const x",
-                        "let y=",
-                        "if(a)",
-                        "else{}"
-                    ],
-                    "targetScore": 15350,
-                    "fallSpeed": 1.7000000000000002,
-                    "spawnRate": 1120,
-                    "briefing": "Protocolo de depuración. Identifica y teclea estructuras de programación. Precisión sobre velocidad.",
-                    "guideKeys": []
-                },
-                "level_26": {
-                    "id": "lvl_26",
-                    "name": "Flujo Variable",
-                    "type": "words",
-                    "pool": [
-                        "function",
-                        "variable",
-                        "constant",
-                        "array",
-                        "object",
-                        "string",
-                        "number"
-                    ],
-                    "targetScore": 18600,
-                    "fallSpeed": 1.75,
-                    "spawnRate": 1075,
-                    "briefing": "Complejidad de datos en aumento. Nombres de variables largos detectados. Mantén el ritmo.",
-                    "guideKeys": []
-                },
-                "level_27": {
-                    "id": "lvl_27",
-                    "name": "Claves de Cifrado",
-                    "type": "words",
-                    "pool": [
-                        "Xj7-kL",
-                        "9A_z#2",
-                        "P@ssW0",
-                        "Key_Gen",
-                        "Auth-2",
-                        "Token$"
-                    ],
-                    "targetScore": 18150,
-                    "fallSpeed": 1.8,
-                    "spawnRate": 1030,
-                    "briefing": "Rompiendo cifrado. Mayúsculas, números y símbolos mezclados. Esto es una prueba de estrés.",
-                    "guideKeys": []
-                },
-                "level_28": {
-                    "id": "lvl_28",
-                    "name": "Carga Neuronal",
-                    "type": "words",
-                    "pool": [
-                        "consciousness",
-                        "intelligence",
-                        "architecture",
-                        "distributed",
-                        "synchronize"
-                    ],
-                    "targetScore": 36850,
-                    "fallSpeed": 1.85,
-                    "spawnRate": 985,
-                    "briefing": "Carga de datos pesada. Terminología compleja. Mantente enfocado.",
-                    "guideKeys": []
-                },
-                "level_29": {
-                    "id": "lvl_29",
-                    "name": "El Cortafuegos",
-                    "type": "words",
-                    "pool": [
-                        "Access_Denied",
-                        "System.Halt()",
-                        "Error:404",
-                        "Fatal_Exception",
-                        "Buffer_Overflow"
-                    ],
-                    "targetScore": 43200,
-                    "fallSpeed": 1.9000000000000001,
-                    "spawnRate": 940,
-                    "briefing": "Capa de defensa final. El sistema se defiende. Anula protocolos manuales.",
-                    "guideKeys": []
-                },
-                "level_30": {
-                    "id": "lvl_30",
-                    "name": "ACCESO ROOT",
-                    "type": "words",
-                    "pool": [
-                        "sudo rm -rf /",
-                        "System.Override(True)",
-                        "Matrix.Reload()",
-                        "Wake_Up_Neo",
-                        "Follow_The_White_Rabbit"
-                    ],
-                    "targetScore": 58850,
-                    "fallSpeed": 1.9500000000000002,
-                    "spawnRate": 895,
-                    "briefing": "Es esto. El núcleo. Control total del sistema. No nos falles ahora.",
-                    "guideKeys": []
-                }
-            }
-        };
+    "en": {
+        "level_1": {
+            "id": "lvl_1",
+            "name": "Neural Link: Core",
+            "type": "characters",
+            "pool": [
+                "f",
+                "j",
+                "ff",
+                "jj",
+                "fj",
+                "jf"
+            ],
+            "targetScore": 800,
+            "fallSpeed": 0.5,
+            "spawnRate": 2200,
+            "briefing": "Wake up, [ALIAS]. The system is vast, but we start at the center. Your index fingers are the key. Feel the bumps on the F and J keys. Anchor yourself. Establish the link.",
+            "guideKeys": [
+                "f",
+                "j"
+            ]
+        },
+        "level_2": {
+            "id": "lvl_2",
+            "name": "Signal Expansion",
+            "type": "characters",
+            "pool": [
+                "d",
+                "k",
+                "df",
+                "jk",
+                "fd",
+                "kj"
+            ],
+            "targetScore": 850,
+            "fallSpeed": 0.55,
+            "spawnRate": 2155,
+            "briefing": "Good, [ALIAS]. The signal is stabilizing. Expand your influence. Use your middle fingers to reach the D and K nodes while keeping your index fingers on F and J.",
+            "guideKeys": [
+                "d",
+                "k",
+                "f",
+                "j"
+            ]
+        },
+        "level_3": {
+            "id": "lvl_3",
+            "name": "Rhythm Protocol",
+            "type": "characters",
+            "pool": [
+                "s",
+                "l",
+                "sl",
+                "ls",
+                "sdf",
+                "jkl"
+            ],
+            "targetScore": 950,
+            "fallSpeed": 0.6,
+            "spawnRate": 2110,
+            "briefing": "Rhythm is everything in the stream, [ALIAS]. Extend to S and L with your ring fingers. Do not look down. Trust the connection.",
+            "guideKeys": [
+                "s",
+                "l",
+                "d",
+                "k",
+                "f",
+                "j"
+            ]
+        },
+        "level_4": {
+            "id": "lvl_4",
+            "name": "Perimeter Check",
+            "type": "characters",
+            "pool": [
+                "a",
+                ";",
+                "as",
+                "l;",
+                "asdf",
+                "jkl;"
+            ],
+            "targetScore": 1100,
+            "fallSpeed": 0.65,
+            "spawnRate": 2065,
+            "briefing": "Secure the perimeter, [ALIAS]. Your pinky fingers control the outer boundaries, A and ;. The home row is now fully active.",
+            "guideKeys": [
+                "a",
+                ";",
+                "s",
+                "l",
+                "d",
+                "k",
+                "f",
+                "j"
+            ]
+        },
+        "level_5": {
+            "id": "lvl_5",
+            "name": "Central Bridge",
+            "type": "characters",
+            "pool": [
+                "g",
+                "h",
+                "fg",
+                "jh",
+                "gh",
+                "hg"
+            ],
+            "targetScore": 1000,
+            "fallSpeed": 0.7,
+            "spawnRate": 2020,
+            "briefing": "[ALIAS], bridge the gap. Your index fingers must stretch inward to G and H, then return immediately to their home bases F and J.",
+            "guideKeys": [
+                "g",
+                "h",
+                "f",
+                "j"
+            ]
+        },
+        "level_6": {
+            "id": "lvl_6",
+            "name": "Uplink: E & I",
+            "type": "characters",
+            "pool": [
+                "e",
+                "i",
+                "ed",
+                "ik",
+                "de",
+                "ki"
+            ],
+            "targetScore": 1050,
+            "fallSpeed": 0.75,
+            "spawnRate": 1975,
+            "briefing": "Accessing upper memory banks, [ALIAS]. Move your middle finger up from D to E, and K to I. This is the most common pathway.",
+            "guideKeys": [
+                "e",
+                "i",
+                "d",
+                "k"
+            ]
+        },
+        "level_7": {
+            "id": "lvl_7",
+            "name": "Uplink: R & U",
+            "type": "characters",
+            "pool": [
+                "r",
+                "u",
+                "rf",
+                "uj",
+                "fr",
+                "ju"
+            ],
+            "targetScore": 1100,
+            "fallSpeed": 0.8,
+            "spawnRate": 1930,
+            "briefing": "Push higher, [ALIAS]. Index fingers move up to R and U. Keep your anchors strong.",
+            "guideKeys": [
+                "r",
+                "u",
+                "f",
+                "j"
+            ]
+        },
+        "level_8": {
+            "id": "lvl_8",
+            "name": "Uplink: T & O",
+            "type": "characters",
+            "pool": [
+                "t",
+                "o",
+                "tf",
+                "ol",
+                "ft",
+                "lo"
+            ],
+            "targetScore": 1150,
+            "fallSpeed": 0.8500000000000001,
+            "spawnRate": 1885,
+            "briefing": "[ALIAS], we are stretching network capacity. Left index to T. Right ring finger to O. The pattern is complex, but predictable.",
+            "guideKeys": [
+                "t",
+                "o",
+                "f",
+                "l"
+            ]
+        },
+        "level_9": {
+            "id": "lvl_9",
+            "name": "Uplink: W & P",
+            "type": "characters",
+            "pool": [
+                "w",
+                "p",
+                "ws",
+                "p;",
+                "sw",
+                ";p"
+            ],
+            "targetScore": 1200,
+            "fallSpeed": 0.9,
+            "spawnRate": 1840,
+            "briefing": "Reaching outer sectors, [ALIAS]. Left ring to W. Right pinky to P. Precision is mandatory.",
+            "guideKeys": [
+                "w",
+                "p",
+                "s",
+                ";"
+            ]
+        },
+        "level_10": {
+            "id": "lvl_10",
+            "name": "Uplink: Q & Y",
+            "type": "characters",
+            "pool": [
+                "q",
+                "y",
+                "qa",
+                "yj",
+                "aq",
+                "jy"
+            ],
+            "targetScore": 1250,
+            "fallSpeed": 0.95,
+            "spawnRate": 1795,
+            "briefing": "Completing the upper grid, [ALIAS]. Left pinky to Q. Right index stretches far to Y.",
+            "guideKeys": [
+                "q",
+                "y",
+                "a",
+                "j"
+            ]
+        },
+        "level_11": {
+            "id": "lvl_11",
+            "name": "Downlink: V & M",
+            "type": "characters",
+            "pool": [
+                "v",
+                "m",
+                "vf",
+                "mj",
+                "fv",
+                "jm"
+            ],
+            "targetScore": 1300,
+            "fallSpeed": 1,
+            "spawnRate": 1750,
+            "briefing": "Initiating downlink, [ALIAS]. Index fingers curl down to V and M. Do not lose your home position.",
+            "guideKeys": [
+                "v",
+                "m",
+                "f",
+                "j"
+            ]
+        },
+        "level_12": {
+            "id": "lvl_12",
+            "name": "Downlink: C & Comma",
+            "type": "characters",
+            "pool": [
+                "c",
+                ",",
+                "cd",
+                ",k",
+                "dc",
+                "k,"
+            ],
+            "targetScore": 1350,
+            "fallSpeed": 1.05,
+            "spawnRate": 1705,
+            "briefing": "Encoding syntax, [ALIAS]. Reach DOWN with LEFT INDEX to C and RIGHT MIDDLE to Comma (,). Essential for data parsing.",
+            "guideKeys": [
+                "c",
+                ",",
+                "d",
+                "k"
+            ]
+        },
+        "level_13": {
+            "id": "lvl_13",
+            "name": "Downlink: X & Dot",
+            "type": "characters",
+            "pool": [
+                "x",
+                ".",
+                "xs",
+                ".l",
+                "sx",
+                "l."
+            ],
+            "targetScore": 1400,
+            "fallSpeed": 1.1,
+            "spawnRate": 1660,
+            "briefing": "Closing the loop, [ALIAS]. Reach DOWN with LEFT MIDDLE to X and RIGHT RING to Dot (.). The grid is almost fully mapped.",
+            "guideKeys": [
+                "x",
+                ".",
+                "s",
+                "l"
+            ]
+        },
+        "level_14": {
+            "id": "lvl_14",
+            "name": "Downlink: Z & Slash",
+            "type": "characters",
+            "pool": [
+                "z",
+                "/",
+                "za",
+                "/;",
+                "az",
+                ";/"
+            ],
+            "targetScore": 1500,
+            "fallSpeed": 1.15,
+            "spawnRate": 1615,
+            "briefing": "Finalizing grid access, [ALIAS]. Pinky fingers down to Z and Slash (/). You now command the full alphabet.",
+            "guideKeys": [
+                "z",
+                "/",
+                "a",
+                ";"
+            ]
+        },
+        "level_15": {
+            "id": "lvl_15",
+            "name": "Downlink: B & N",
+            "type": "characters",
+            "pool": [
+                "b",
+                "n",
+                "bf",
+                "nj",
+                "fb",
+                "jn"
+            ],
+            "targetScore": 1550,
+            "fallSpeed": 1.2000000000000002,
+            "spawnRate": 1570,
+            "briefing": "The trickiest reach, [ALIAS]. Index fingers stretch down and center to B and N. Master this to seal the connection.",
+            "guideKeys": [
+                "b",
+                "n",
+                "f",
+                "j"
+            ]
+        },
+        "level_16": {
+            "id": "lvl_16",
+            "name": "Shift Logic",
+            "type": "characters",
+            "pool": [
+                "A",
+                "S",
+                "D",
+                "F",
+                "J",
+                "K",
+                "L",
+                ":"
+            ],
+            "targetScore": 1350,
+            "fallSpeed": 1.25,
+            "spawnRate": 1525,
+            "briefing": "Elevating privileges, [ALIAS]. Use the PINKY on the OPPOSITE hand to hold Shift while typing a letter. Right Shift for A-G, Left Shift for H-Z.",
+            "guideKeys": [
+                "Shift",
+                "a",
+                "s",
+                "d",
+                "f",
+                "j",
+                "k",
+                "l"
+            ]
+        },
+        "level_17": {
+            "id": "lvl_17",
+            "name": "Code Syntax I",
+            "type": "characters",
+            "pool": [
+                "{",
+                "}",
+                "[",
+                "]",
+                "(",
+                ")"
+            ],
+            "targetScore": 1400,
+            "fallSpeed": 1.3,
+            "spawnRate": 1480,
+            "briefing": "Injecting code blocks, [ALIAS]. Brackets and parentheses are the skeleton of the Matrix. Use your right pinky to reach them.",
+            "guideKeys": [
+                "{",
+                "}",
+                "[",
+                "]",
+                "(",
+                ")"
+            ]
+        },
+        "level_18": {
+            "id": "lvl_18",
+            "name": "Numbers Row I",
+            "type": "characters",
+            "pool": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+            ],
+            "targetScore": 1500,
+            "fallSpeed": 1.35,
+            "spawnRate": 1435,
+            "briefing": "Parsing numerical data, [ALIAS]. Left hand reaches up. 1(Pinky) to 5(Index). Maintain home row discipline.",
+            "guideKeys": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+            ]
+        },
+        "level_19": {
+            "id": "lvl_19",
+            "name": "Numbers Row II",
+            "type": "characters",
+            "pool": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "0"
+            ],
+            "targetScore": 1550,
+            "fallSpeed": 1.4,
+            "spawnRate": 1390,
+            "briefing": "Completing numerical sequence, [ALIAS]. Right hand reaches up. 6(Index) to 0(Pinky). Do not look down.",
+            "guideKeys": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "0"
+            ]
+        },
+        "level_20": {
+            "id": "lvl_20",
+            "name": "Symbolic Logic",
+            "type": "characters",
+            "pool": [
+                "!",
+                "@",
+                "#",
+                "$",
+                "%",
+                "^",
+                "&",
+                "*"
+            ],
+            "targetScore": 1650,
+            "fallSpeed": 1.4500000000000002,
+            "spawnRate": 1345,
+            "briefing": "Advanced encryption active, [ALIAS]. Combine Shift with Numbers to access special operators. This is how we rewrite reality.",
+            "guideKeys": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "Shift"
+            ]
+        },
+        "level_21": {
+            "id": "lvl_21",
+            "name": "The Bigrams",
+            "type": "words",
+            "pool": [
+                "th",
+                "he",
+                "in",
+                "er",
+                "an",
+                "re",
+                "on",
+                "at",
+                "en"
+            ],
+            "targetScore": 2300,
+            "fallSpeed": 1.5,
+            "spawnRate": 1300,
+            "briefing": "Optimization phase, [ALIAS]. These two-letter combinations appear in 60% of all data streams. Master them to flow like water.",
+            "guideKeys": []
+        },
+        "level_22": {
+            "id": "lvl_22",
+            "name": "The Trigrams",
+            "type": "words",
+            "pool": [
+                "the",
+                "and",
+                "ing",
+                "ent",
+                "ion",
+                "her",
+                "for",
+                "tha"
+            ],
+            "targetScore": 3000,
+            "fallSpeed": 1.55,
+            "spawnRate": 1255,
+            "briefing": "Pattern recognition, [ALIAS]. Trigrams are the DNA of language. Execute them as single, fluid motions.",
+            "guideKeys": []
+        },
+        "level_23": {
+            "id": "lvl_23",
+            "name": "Command Line",
+            "type": "words",
+            "pool": [
+                "ls -la",
+                "cd root",
+                "git push",
+                "npm run",
+                "sudo su",
+                "grep -r"
+            ],
+            "targetScore": 5700,
+            "fallSpeed": 1.6,
+            "spawnRate": 1210,
+            "briefing": "Direct interface access, [ALIAS]. Execute standard shell commands. Speed is critical.",
+            "guideKeys": []
+        },
+        "level_24": {
+            "id": "lvl_24",
+            "name": "Short Bursts",
+            "type": "words",
+            "pool": [
+                "data",
+                "node",
+                "link",
+                "core",
+                "hack",
+                "byte",
+                "ping",
+                "host"
+            ],
+            "targetScore": 4000,
+            "fallSpeed": 1.6500000000000001,
+            "spawnRate": 1165,
+            "briefing": "Short bursts of data, [ALIAS]. High frequency. Do not hesitate.",
+            "guideKeys": []
+        },
+        "level_25": {
+            "id": "lvl_25",
+            "name": "Syntax Errors",
+            "type": "words",
+            "pool": [
+                "null;",
+                "void()",
+                "return",
+                "const x",
+                "let y=",
+                "if(a)",
+                "else{}"
+            ],
+            "targetScore": 5550,
+            "fallSpeed": 1.7000000000000002,
+            "spawnRate": 1120,
+            "briefing": "Debugging protocol, [ALIAS]. Identify and type programming structures. Accuracy over speed.",
+            "guideKeys": []
+        },
+        "level_26": {
+            "id": "lvl_26",
+            "name": "Variable Stream",
+            "type": "words",
+            "pool": [
+                "function",
+                "variable",
+                "constant",
+                "array",
+                "object",
+                "string",
+                "number"
+            ],
+            "targetScore": 6550,
+            "fallSpeed": 1.75,
+            "spawnRate": 1075,
+            "briefing": "[ALIAS], data complexity is increasing. Longer variable names detected. Maintain rhythm.",
+            "guideKeys": []
+        },
+        "level_27": {
+            "id": "lvl_27",
+            "name": "Encryption Keys",
+            "type": "words",
+            "pool": [
+                "Xj7-kL",
+                "9A_z#2",
+                "P@ssW0",
+                "Key_Gen",
+                "Auth-2",
+                "Token$"
+            ],
+            "targetScore": 6500,
+            "fallSpeed": 1.8,
+            "spawnRate": 1030,
+            "briefing": "Cracking encryption, [ALIAS]. Mixed case, numbers, and symbols. This is a stress test.",
+            "guideKeys": []
+        },
+        "level_28": {
+            "id": "lvl_28",
+            "name": "Neural Payload",
+            "type": "words",
+            "pool": [
+                "consciousness",
+                "intelligence",
+                "architecture",
+                "distributed",
+                "synchronize"
+            ],
+            "targetScore": 11650,
+            "fallSpeed": 1.85,
+            "spawnRate": 985,
+            "briefing": "Heavy data load, [ALIAS]. Complex terminology. Stay focused.",
+            "guideKeys": []
+        },
+        "level_29": {
+            "id": "lvl_29",
+            "name": "The Firewall",
+            "type": "words",
+            "pool": [
+                "Access_Denied",
+                "System.Halt()",
+                "Error:404",
+                "Fatal_Exception",
+                "Buffer_Overflow"
+            ],
+            "targetScore": 13450,
+            "fallSpeed": 1.9000000000000001,
+            "spawnRate": 940,
+            "briefing": "Final defense layer, [ALIAS]. The system is fighting back. Override manual protocols.",
+            "guideKeys": []
+        },
+        "level_30": {
+            "id": "lvl_30",
+            "name": "ROOT ACCESS",
+            "type": "words",
+            "pool": [
+                "sudo rm -rf /",
+                "System.Override(True)",
+                "Matrix.Reload()",
+                "Wake_Up_Neo",
+                "Follow_The_White_Rabbit"
+            ],
+            "targetScore": 17800,
+            "fallSpeed": 1.9500000000000002,
+            "spawnRate": 895,
+            "briefing": "This is it, [ALIAS]. The core. Total system control. Do not fail us now.",
+            "guideKeys": []
+        }
+    },
+    "es": {
+        "level_1": {
+            "id": "lvl_1",
+            "name": "Enlace Neuronal: Núcleo",
+            "type": "characters",
+            "pool": [
+                "f",
+                "j",
+                "ff",
+                "jj",
+                "fj",
+                "jf"
+            ],
+            "targetScore": 800,
+            "fallSpeed": 0.5,
+            "spawnRate": 2200,
+            "briefing": "Despierta, [ALIAS]. El sistema es vasto, pero empezamos en el centro. Tus dedos índice son la clave. Siente las marcas en las teclas F y J. Anclate. Establece el enlace.",
+            "guideKeys": [
+                "f",
+                "j"
+            ]
+        },
+        "level_2": {
+            "id": "lvl_2",
+            "name": "Expansión de Señal",
+            "type": "characters",
+            "pool": [
+                "d",
+                "k",
+                "df",
+                "jk",
+                "fd",
+                "kj"
+            ],
+            "targetScore": 850,
+            "fallSpeed": 0.55,
+            "spawnRate": 2155,
+            "briefing": "Bien, [ALIAS]. La señal se estabiliza. Expande tu influencia. Usa tus dedos corazón para alcanzar los nodos D y K mientras mantienes los índices en F y J.",
+            "guideKeys": [
+                "d",
+                "k",
+                "f",
+                "j"
+            ]
+        },
+        "level_3": {
+            "id": "lvl_3",
+            "name": "Protocolo de Ritmo",
+            "type": "characters",
+            "pool": [
+                "s",
+                "l",
+                "sl",
+                "ls",
+                "sdf",
+                "jkl"
+            ],
+            "targetScore": 950,
+            "fallSpeed": 0.6,
+            "spawnRate": 2110,
+            "briefing": "El ritmo lo es todo en el flujo, [ALIAS]. Extiende a S y L con tus dedos anulares. No mires abajo. Confía en la conexión.",
+            "guideKeys": [
+                "s",
+                "l",
+                "d",
+                "k",
+                "f",
+                "j"
+            ]
+        },
+        "level_4": {
+            "id": "lvl_4",
+            "name": "Chequeo Perimetral",
+            "type": "characters",
+            "pool": [
+                "a",
+                "ñ",
+                "as",
+                "lñ",
+                "asdf",
+                "jklñ"
+            ],
+            "targetScore": 1100,
+            "fallSpeed": 0.65,
+            "spawnRate": 2065,
+            "briefing": "Asegura el perímetro, [ALIAS]. Tus meñiques controlan los límites exteriores, A y Ñ. La fila base está ahora totalmente activa.",
+            "guideKeys": [
+                "a",
+                "ñ",
+                "s",
+                "l",
+                "d",
+                "k",
+                "f",
+                "j"
+            ]
+        },
+        "level_5": {
+            "id": "lvl_5",
+            "name": "Puente Central",
+            "type": "characters",
+            "pool": [
+                "g",
+                "h",
+                "fg",
+                "jh",
+                "gh",
+                "hg"
+            ],
+            "targetScore": 1000,
+            "fallSpeed": 0.7,
+            "spawnRate": 2020,
+            "briefing": "[ALIAS], cruza la brecha. Tus índices deben estirarse hacia adentro a G y H, y volver inmediatamente a sus bases F y J.",
+            "guideKeys": [
+                "g",
+                "h",
+                "f",
+                "j"
+            ]
+        },
+        "level_6": {
+            "id": "lvl_6",
+            "name": "Subida: E e I",
+            "type": "characters",
+            "pool": [
+                "e",
+                "i",
+                "ed",
+                "ik",
+                "de",
+                "ki"
+            ],
+            "targetScore": 1050,
+            "fallSpeed": 0.75,
+            "spawnRate": 1975,
+            "briefing": "Accediendo a bancos de memoria superiores, [ALIAS]. Mueve tu dedo corazón de D a E, y de K a I. Es la ruta más común.",
+            "guideKeys": [
+                "e",
+                "i",
+                "d",
+                "k"
+            ]
+        },
+        "level_7": {
+            "id": "lvl_7",
+            "name": "Subida: R y U",
+            "type": "characters",
+            "pool": [
+                "r",
+                "u",
+                "rf",
+                "uj",
+                "fr",
+                "ju"
+            ],
+            "targetScore": 1100,
+            "fallSpeed": 0.8,
+            "spawnRate": 1930,
+            "briefing": "Empuja más alto, [ALIAS]. Los índices suben a R y U. Mantén tus anclajes firmes.",
+            "guideKeys": [
+                "r",
+                "u",
+                "f",
+                "j"
+            ]
+        },
+        "level_8": {
+            "id": "lvl_8",
+            "name": "Subida: T y O",
+            "type": "characters",
+            "pool": [
+                "t",
+                "o",
+                "tf",
+                "ol",
+                "ft",
+                "lo"
+            ],
+            "targetScore": 1150,
+            "fallSpeed": 0.8500000000000001,
+            "spawnRate": 1885,
+            "briefing": "[ALIAS], estamos estirando la capacidad de la red. Índice izquierdo a T. Anular derecho a O. El patrón es complejo, pero predecible.",
+            "guideKeys": [
+                "t",
+                "o",
+                "f",
+                "l"
+            ]
+        },
+        "level_9": {
+            "id": "lvl_9",
+            "name": "Subida: W y P",
+            "type": "characters",
+            "pool": [
+                "w",
+                "p",
+                "ws",
+                "pñ",
+                "sw",
+                "ñp"
+            ],
+            "targetScore": 1200,
+            "fallSpeed": 0.9,
+            "spawnRate": 1840,
+            "briefing": "Alcanzando sectores externos, [ALIAS]. Anular izquierdo a W. Meñique derecho a P. La precisión es obligatoria.",
+            "guideKeys": [
+                "w",
+                "p",
+                "s",
+                "ñ"
+            ]
+        },
+        "level_10": {
+            "id": "lvl_10",
+            "name": "Subida: Q y Y",
+            "type": "characters",
+            "pool": [
+                "q",
+                "y",
+                "qa",
+                "yj",
+                "aq",
+                "jy"
+            ],
+            "targetScore": 1250,
+            "fallSpeed": 0.95,
+            "spawnRate": 1795,
+            "briefing": "Completando la rejilla superior, [ALIAS]. Meñique izquierdo a Q. Índice derecho se estira lejos hasta la Y.",
+            "guideKeys": [
+                "q",
+                "y",
+                "a",
+                "j"
+            ]
+        },
+        "level_11": {
+            "id": "lvl_11",
+            "name": "Bajada: V y M",
+            "type": "characters",
+            "pool": [
+                "v",
+                "m",
+                "vf",
+                "mj",
+                "fv",
+                "jm"
+            ],
+            "targetScore": 1300,
+            "fallSpeed": 1,
+            "spawnRate": 1750,
+            "briefing": "Iniciando bajada, [ALIAS]. Índices se curvan abajo hacia V y M. No pierdas tu posición base.",
+            "guideKeys": [
+                "v",
+                "m",
+                "f",
+                "j"
+            ]
+        },
+        "level_12": {
+            "id": "lvl_12",
+            "name": "Bajada: C y Coma",
+            "type": "characters",
+            "pool": [
+                "c",
+                ",",
+                "cd",
+                ",k",
+                "dc",
+                "k,"
+            ],
+            "targetScore": 1350,
+            "fallSpeed": 1.05,
+            "spawnRate": 1705,
+            "briefing": "Codificando sintaxis, [ALIAS]. Baja tu ÍNDICE IZQUIERDO a C y tu MEDIO DERECHO a Coma (,). Esencial para analizar datos.",
+            "guideKeys": [
+                "c",
+                ",",
+                "d",
+                "k"
+            ]
+        },
+        "level_13": {
+            "id": "lvl_13",
+            "name": "Bajada: X y Punto",
+            "type": "characters",
+            "pool": [
+                "x",
+                ".",
+                "xs",
+                ".l",
+                "sx",
+                "l."
+            ],
+            "targetScore": 1400,
+            "fallSpeed": 1.1,
+            "spawnRate": 1660,
+            "briefing": "Cerrando el bucle, [ALIAS]. Baja tu MEDIO IZQUIERDO a X y tu ANULAR DERECHO a Punto (.). La rejilla está casi mapeada.",
+            "guideKeys": [
+                "x",
+                ".",
+                "s",
+                "l"
+            ]
+        },
+        "level_14": {
+            "id": "lvl_14",
+            "name": "Bajada: Z y Guion",
+            "type": "characters",
+            "pool": [
+                "z",
+                "-",
+                "za",
+                "-ñ",
+                "az",
+                "ñ-"
+            ],
+            "targetScore": 1500,
+            "fallSpeed": 1.15,
+            "spawnRate": 1615,
+            "briefing": "Finalizando acceso a la Matriz, [ALIAS]. Meñiques abajo a Z y Guion (-). Ahora dominas el alfabeto completo.",
+            "guideKeys": [
+                "z",
+                "-",
+                "a",
+                "ñ"
+            ]
+        },
+        "level_15": {
+            "id": "lvl_15",
+            "name": "Bajada: B y N",
+            "type": "characters",
+            "pool": [
+                "b",
+                "n",
+                "bf",
+                "nj",
+                "fb",
+                "jn"
+            ],
+            "targetScore": 1550,
+            "fallSpeed": 1.2000000000000002,
+            "spawnRate": 1570,
+            "briefing": "El alcance más difícil, [ALIAS]. Índices se estiran abajo y al centro a B y N. Domina esto para sellar la conexión.",
+            "guideKeys": [
+                "b",
+                "n",
+                "f",
+                "j"
+            ]
+        },
+        "level_16": {
+            "id": "lvl_16",
+            "name": "Lógica Shift",
+            "type": "characters",
+            "pool": [
+                "A",
+                "S",
+                "D",
+                "F",
+                "J",
+                "K",
+                "L",
+                "Ñ"
+            ],
+            "targetScore": 1350,
+            "fallSpeed": 1.25,
+            "spawnRate": 1525,
+            "briefing": "Elevando privilegios, [ALIAS]. Usa el MEÑIQUE de la mano OPUESTA para mantener Shift mientras tecleas. Shift Derecho para A-G, Izquierdo para H-Z.",
+            "guideKeys": [
+                "Shift",
+                "a",
+                "s",
+                "d",
+                "f",
+                "j",
+                "k",
+                "l"
+            ]
+        },
+        "level_17": {
+            "id": "lvl_17",
+            "name": "Sintaxis Código I",
+            "type": "characters",
+            "pool": [
+                "{",
+                "}",
+                "[",
+                "]",
+                "(",
+                ")"
+            ],
+            "targetScore": 1400,
+            "fallSpeed": 1.3,
+            "spawnRate": 1480,
+            "briefing": "Inyectando bloques de código, [ALIAS]. Corchetes y paréntesis son el esqueleto de Matrix. Usa tu meñique derecho para alcanzarlos.",
+            "guideKeys": [
+                "{",
+                "}",
+                "[",
+                "]",
+                "(",
+                ")"
+            ]
+        },
+        "level_18": {
+            "id": "lvl_18",
+            "name": "Fila Numérica I",
+            "type": "characters",
+            "pool": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+            ],
+            "targetScore": 1500,
+            "fallSpeed": 1.35,
+            "spawnRate": 1435,
+            "briefing": "Analizando datos numéricos, [ALIAS]. Mano izquierda sube. 1(Meñique) a 5(Índice). Mantén disciplina de fila base.",
+            "guideKeys": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+            ]
+        },
+        "level_19": {
+            "id": "lvl_19",
+            "name": "Fila Numérica II",
+            "type": "characters",
+            "pool": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "0"
+            ],
+            "targetScore": 1550,
+            "fallSpeed": 1.4,
+            "spawnRate": 1390,
+            "briefing": "Completando secuencia numérica, [ALIAS]. Mano derecha sube. 6(Índice) a 0(Meñique). No mires abajo.",
+            "guideKeys": [
+                "6",
+                "7",
+                "8",
+                "9",
+                "0"
+            ]
+        },
+        "level_20": {
+            "id": "lvl_20",
+            "name": "Lógica Simbólica",
+            "type": "characters",
+            "pool": [
+                "!",
+                "@",
+                "#",
+                "$",
+                "%",
+                "^",
+                "&",
+                "*"
+            ],
+            "targetScore": 1650,
+            "fallSpeed": 1.4500000000000002,
+            "spawnRate": 1345,
+            "briefing": "Encriptación avanzada activa, [ALIAS]. Combina Shift con Números para acceder a operadores especiales. Así reescribimos la realidad.",
+            "guideKeys": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "Shift"
+            ]
+        },
+        "level_21": {
+            "id": "lvl_21",
+            "name": "Los Bigramas",
+            "type": "words",
+            "pool": [
+                "th",
+                "he",
+                "in",
+                "er",
+                "an",
+                "re",
+                "on",
+                "at",
+                "en"
+            ],
+            "targetScore": 2300,
+            "fallSpeed": 1.5,
+            "spawnRate": 1300,
+            "briefing": "Fase de optimización, [ALIAS]. Estas combinaciones de dos letras aparecen en el 60% de los flujos de datos. Domínalas para fluir como agua.",
+            "guideKeys": []
+        },
+        "level_22": {
+            "id": "lvl_22",
+            "name": "Los Trigramas",
+            "type": "words",
+            "pool": [
+                "the",
+                "and",
+                "ing",
+                "ent",
+                "ion",
+                "her",
+                "for",
+                "tha"
+            ],
+            "targetScore": 3000,
+            "fallSpeed": 1.55,
+            "spawnRate": 1255,
+            "briefing": "Reconocimiento de patrones, [ALIAS]. Los trigramas son el ADN del lenguaje. Ejecútalos como movimientos únicos y fluidos.",
+            "guideKeys": []
+        },
+        "level_23": {
+            "id": "lvl_23",
+            "name": "Línea de Comandos",
+            "type": "words",
+            "pool": [
+                "ls -la",
+                "cd root",
+                "git push",
+                "npm run",
+                "sudo su",
+                "grep -r"
+            ],
+            "targetScore": 5700,
+            "fallSpeed": 1.6,
+            "spawnRate": 1210,
+            "briefing": "Acceso directo a interfaz, [ALIAS]. Ejecuta comandos shell estándar. La velocidad es crítica.",
+            "guideKeys": []
+        },
+        "level_24": {
+            "id": "lvl_24",
+            "name": "Ráfagas Cortas",
+            "type": "words",
+            "pool": [
+                "data",
+                "node",
+                "link",
+                "core",
+                "hack",
+                "byte",
+                "ping",
+                "host"
+            ],
+            "targetScore": 4000,
+            "fallSpeed": 1.6500000000000001,
+            "spawnRate": 1165,
+            "briefing": "Ráfagas cortas de datos, [ALIAS]. Alta frecuencia. No dudes.",
+            "guideKeys": []
+        },
+        "level_25": {
+            "id": "lvl_25",
+            "name": "Errores de Sintaxis",
+            "type": "words",
+            "pool": [
+                "null;",
+                "void()",
+                "return",
+                "const x",
+                "let y=",
+                "if(a)",
+                "else{}"
+            ],
+            "targetScore": 5550,
+            "fallSpeed": 1.7000000000000002,
+            "spawnRate": 1120,
+            "briefing": "Protocolo de depuración, [ALIAS]. Identifica y teclea estructuras de programación. Precisión sobre velocidad.",
+            "guideKeys": []
+        },
+        "level_26": {
+            "id": "lvl_26",
+            "name": "Flujo Variable",
+            "type": "words",
+            "pool": [
+                "function",
+                "variable",
+                "constant",
+                "array",
+                "object",
+                "string",
+                "number"
+            ],
+            "targetScore": 6550,
+            "fallSpeed": 1.75,
+            "spawnRate": 1075,
+            "briefing": "[ALIAS], la complejidad de datos aumenta. Nombres de variables largos detectados. Mantén el ritmo.",
+            "guideKeys": []
+        },
+        "level_27": {
+            "id": "lvl_27",
+            "name": "Claves de Cifrado",
+            "type": "words",
+            "pool": [
+                "Xj7-kL",
+                "9A_z#2",
+                "P@ssW0",
+                "Key_Gen",
+                "Auth-2",
+                "Token$"
+            ],
+            "targetScore": 6500,
+            "fallSpeed": 1.8,
+            "spawnRate": 1030,
+            "briefing": "Rompiendo cifrado, [ALIAS]. Mayúsculas, números y símbolos mezclados. Esto es una prueba de estrés.",
+            "guideKeys": []
+        },
+        "level_28": {
+            "id": "lvl_28",
+            "name": "Carga Neuronal",
+            "type": "words",
+            "pool": [
+                "consciousness",
+                "intelligence",
+                "architecture",
+                "distributed",
+                "synchronize"
+            ],
+            "targetScore": 11650,
+            "fallSpeed": 1.85,
+            "spawnRate": 985,
+            "briefing": "Carga de datos pesada, [ALIAS]. Terminología compleja. Mantente enfocado.",
+            "guideKeys": []
+        },
+        "level_29": {
+            "id": "lvl_29",
+            "name": "El Cortafuegos",
+            "type": "words",
+            "pool": [
+                "Access_Denied",
+                "System.Halt()",
+                "Error:404",
+                "Fatal_Exception",
+                "Buffer_Overflow"
+            ],
+            "targetScore": 13450,
+            "fallSpeed": 1.9000000000000001,
+            "spawnRate": 940,
+            "briefing": "Capa de defensa final, [ALIAS]. El sistema se defiende. Anula protocolos manuales.",
+            "guideKeys": []
+        },
+        "level_30": {
+            "id": "lvl_30",
+            "name": "ACCESO ROOT",
+            "type": "words",
+            "pool": [
+                "sudo rm -rf /",
+                "System.Override(True)",
+                "Matrix.Reload()",
+                "Wake_Up_Neo",
+                "Follow_The_White_Rabbit"
+            ],
+            "targetScore": 17800,
+            "fallSpeed": 1.9500000000000002,
+            "spawnRate": 895,
+            "briefing": "Es esto, [ALIAS]. El núcleo. Control total del sistema. No nos falles ahora.",
+            "guideKeys": []
+        }
+    }
+};
 
         const NeonColors = ['#00FFFF', '#FF00FF', '#39FF14', '#FFFF00'];
         const MATRIX_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*<>[]{}アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワ";
@@ -2852,6 +2909,7 @@
                                     safeProfile.preferences = {
                                         language: 'es',
                                         layout: 'iso-es',
+                                        graphicsQuality: 'auto',
                                         geminiApiKey: "",
                                         geminiModel: "gemini-2.5-flash",
                                         bgImage: null,
@@ -3011,10 +3069,11 @@
                 return this.activeAlias ? this.profiles[this.activeAlias] : null;
             }
 
-            updateSettings(lang, layout, bgRemovalAggression = null, bgRemovalTolerance = null, bgImageContrast = null, bgRemovalColor = null, bgRemovalColorEnabled = null, apiKey = null, modelName = null) {
+            updateSettings(lang, layout, graphicsQuality, bgRemovalAggression = null, bgRemovalTolerance = null, bgImageContrast = null, bgRemovalColor = null, bgRemovalColorEnabled = null, apiKey = null, modelName = null) {
                 if (!this.profile) return;
                 this.profile.preferences.language = lang;
                 this.profile.preferences.layout = layout;
+                this.profile.preferences.graphicsQuality = graphicsQuality || 'auto';
                 if (apiKey !== null) this.profile.preferences.geminiApiKey = apiKey;
                 if (modelName !== null) this.profile.preferences.geminiModel = modelName;
                     if (typeof bgRemovalAggression === 'number' && !Number.isNaN(bgRemovalAggression)) {
@@ -3131,6 +3190,7 @@
                         downFrames: 0,
                         upFrames: 0
                     };
+                    this.qualityMode = 'auto'; // 'auto', 'low', 'medium', 'high'
                     this.adaptiveParticleQuality = 1;
 
                   this.hackRevealActive = false;
@@ -3190,22 +3250,46 @@
                 }
             }
 
-              getPerfSettings(isRevealActive) {
-                  if (isRevealActive) {
-                      return {
-                          activeDropCount: this.bgDrops.length,
-                          dropCharRefreshChance: 0.05,
-                          glowChance: 0.35,
-                          topologyStride: 1,
-                          topologyCharRefreshChance: 0.018,
-                          topologyCellBudget: Number.MAX_SAFE_INTEGER,
-                          fogSkipFrames: 0,
-                          allowRainTintSampling: true,
-                          particleQuality: 1
-                      };
-                  }
+            getPerfSettings(isRevealActive) {
+                // FIXED QUALITY MODES
+                if (this.qualityMode === 'low') {
+                    // Equivalent to Tier 3
+                    if (isRevealActive) {
+                        return { activeDropCount: Math.floor(this.bgDrops.length * 0.45), dropCharRefreshChance: 0.02, glowChance: 0.15, topologyStride: 2, topologyCharRefreshChance: 0.01, topologyCellBudget: 1500, fogSkipFrames: 2, allowRainTintSampling: false, particleQuality: 0.45 };
+                    }
+                    return { activeDropCount: Math.floor(this.bgDrops.length * 0.46), dropCharRefreshChance: 0.018, glowChance: 0.1, topologyStride: 5, topologyCharRefreshChance: 0.0035, topologyCellBudget: 780, fogSkipFrames: 4, allowRainTintSampling: false, particleQuality: 0.45 };
+                }
+                if (this.qualityMode === 'medium') {
+                    // Equivalent to Tier 1
+                    if (isRevealActive) {
+                        return { activeDropCount: Math.floor(this.bgDrops.length * 0.75), dropCharRefreshChance: 0.035, glowChance: 0.25, topologyStride: 1, topologyCharRefreshChance: 0.014, topologyCellBudget: 4000, fogSkipFrames: 1, allowRainTintSampling: true, particleQuality: 0.7 };
+                    }
+                    return { activeDropCount: Math.floor(this.bgDrops.length * 0.72), dropCharRefreshChance: 0.032, glowChance: 0.2, topologyStride: 3, topologyCharRefreshChance: 0.007, topologyCellBudget: 1700, fogSkipFrames: 2, allowRainTintSampling: false, particleQuality: 0.7 };
+                }
+                if (this.qualityMode === 'high') {
+                    // Equivalent to Tier 0 (Best)
+                    if (isRevealActive) {
+                        return { activeDropCount: this.bgDrops.length, dropCharRefreshChance: 0.05, glowChance: 0.35, topologyStride: 1, topologyCharRefreshChance: 0.018, topologyCellBudget: Number.MAX_SAFE_INTEGER, fogSkipFrames: 0, allowRainTintSampling: true, particleQuality: 1 };
+                    }
+                    return { activeDropCount: Math.floor(this.bgDrops.length * 0.90), dropCharRefreshChance: 0.045, glowChance: 0.32, topologyStride: 1, topologyCharRefreshChance: 0.012, topologyCellBudget: 3200, fogSkipFrames: 0, allowRainTintSampling: true, particleQuality: 1.0 };
+                }
 
-                  const tier = this.performance.tier;
+                // AUTO MODE (Legacy logic)
+                if (isRevealActive) {
+                    return {
+                        activeDropCount: this.bgDrops.length,
+                        dropCharRefreshChance: 0.05,
+                        glowChance: 0.35,
+                        topologyStride: 1,
+                        topologyCharRefreshChance: 0.018,
+                        topologyCellBudget: Number.MAX_SAFE_INTEGER,
+                        fogSkipFrames: 0,
+                        allowRainTintSampling: true,
+                        particleQuality: 1
+                    };
+                }
+
+                const tier = this.performance.tier;
                   if (tier === 0) {
                       return {
                           activeDropCount: Math.floor(this.bgDrops.length * 0.85),
@@ -3583,42 +3667,42 @@
                 }
             }
 
-              updateAndDrawBackground(progress = 0) {
-                  for (let key in this.activeHighlights) {
-                      this.activeHighlights[key] -= 0.05;
-                      if (this.activeHighlights[key] <= 0) delete this.activeHighlights[key];
-                  }
+            updateAndDrawBackground(progress = 0, deltaTime = 1.0) {
+                for (let key in this.activeHighlights) {
+                    this.activeHighlights[key] -= 0.05 * deltaTime;
+                    if (this.activeHighlights[key] <= 0) delete this.activeHighlights[key];
+                }
 
-                    const hasTopology = this.imageGrid && this.imageGrid.length > 0;
-                    const revealTransform = this.hackReveal;
-                    const isRevealActive = this.hackRevealPhase !== 'idle';
-                    const perfSettings = this.getPerfSettings(isRevealActive);
-                    this.adaptiveParticleQuality = perfSettings.particleQuality;
-                    this.maxParticles = Math.max(220, Math.floor(this.maxParticlesBase * perfSettings.particleQuality));
+                const hasTopology = this.imageGrid && this.imageGrid.length > 0;
+                const revealTransform = this.hackReveal;
+                const isRevealActive = this.hackRevealPhase !== 'idle';
+                const perfSettings = this.getPerfSettings(isRevealActive);
+                this.adaptiveParticleQuality = perfSettings.particleQuality;
+                this.maxParticles = Math.max(220, Math.floor(this.maxParticlesBase * perfSettings.particleQuality));
 
-                      // 10s total reveal with explicit 80/20 split:
-                      // Phase 1 (0-0.80): green rain -> fully image-tinted character image
-                      // Phase 2 (0.80-1.00): characters keep raining while shrinking into near-pixel size
-                        const phase1Progress = Math.min(1, revealTransform / 0.8);
-                      const phase2Progress = revealTransform <= 0.8 ? 0 : Math.min(1, (revealTransform - 0.8) / 0.2);
-                      const phase1BurstRaw = Math.max(0, Math.min(1, (phase1Progress - 0.9) / 0.1));
-                      const phase1Burst = Math.pow(phase1BurstRaw, 0.55);
-                      const tintPhase = Math.pow(phase1Progress, 0.52);
-                      const reliefPhase = Math.pow(phase1Progress, 0.72);
-                      const shrinkPhase = Math.pow(phase2Progress, 1.02);
-                      const pixelPhase = Math.pow(phase2Progress, 1.08);
-                      const rainVisibility = Math.max(0, 1 - Math.pow(phase2Progress, 2.35));
-                      const shouldTintRain = perfSettings.allowRainTintSampling && (isRevealActive || progress > 0.12);
+                // 10s total reveal with explicit 80/20 split:
+                // Phase 1 (0-0.80): green rain -> fully image-tinted character image
+                // Phase 2 (0.80-1.00): characters keep raining while shrinking into near-pixel size
+                const phase1Progress = Math.min(1, revealTransform / 0.8);
+                const phase2Progress = revealTransform <= 0.8 ? 0 : Math.min(1, (revealTransform - 0.8) / 0.2);
+                const phase1BurstRaw = Math.max(0, Math.min(1, (phase1Progress - 0.9) / 0.1));
+                const phase1Burst = Math.pow(phase1BurstRaw, 0.55);
+                const tintPhase = Math.pow(phase1Progress, 0.52);
+                const reliefPhase = Math.pow(phase1Progress, 0.72);
+                const shrinkPhase = Math.pow(phase2Progress, 1.02);
+                const pixelPhase = Math.pow(phase2Progress, 1.08);
+                const rainVisibility = Math.max(0, 1 - Math.pow(phase2Progress, 2.35));
+                const shouldTintRain = perfSettings.allowRainTintSampling && (isRevealActive || progress > 0.12);
 
 
-                      if (this.bgImageObj && this.bgDrawRect && phase2Progress > 0.22) {
-                            this.ctx.save();
-                            this.ctx.globalAlpha = Math.pow((phase2Progress - 0.22) / 0.78, 2.35);
-                            const rect = this.bgDrawRect;
-                            const revealFinalImage = this.bgImageOriginalObj || this.bgImageObj;
-                            this.ctx.drawImage(revealFinalImage, rect.x, rect.y, rect.w, rect.h);
-                            this.ctx.restore();
-                        }
+                if (this.bgImageObj && this.bgDrawRect && phase2Progress > 0.22) {
+                    this.ctx.save();
+                    this.ctx.globalAlpha = Math.pow((phase2Progress - 0.22) / 0.78, 2.35);
+                    const rect = this.bgDrawRect;
+                    const revealFinalImage = this.bgImageOriginalObj || this.bgImageObj;
+                    this.ctx.drawImage(revealFinalImage, rect.x, rect.y, rect.w, rect.h);
+                    this.ctx.restore();
+                }
 
 
 
@@ -3641,7 +3725,9 @@
                 const activeDropCount = Math.max(1, Math.min(this.bgDrops.length, perfSettings.activeDropCount));
                 for (let dropIndex = 0; dropIndex < activeDropCount; dropIndex++) {
                     const drop = this.bgDrops[dropIndex];
-                    drop.y += drop.speed * drop.z;
+                    
+                    // Apply Delta Time
+                    drop.y += (drop.speed * drop.z) * deltaTime;
 
                     if (drop.y > this.canvas.height) {
                         drop.y = -20;
@@ -3649,7 +3735,7 @@
                     }
                     if (Math.random() < perfSettings.dropCharRefreshChance) drop.char = this.getRandomMatrixChar();
 
-                      if (rainVisibility <= 0.004) continue;
+                    if (rainVisibility <= 0.004) continue;
 
 
                     if (hasTopology) {
@@ -3658,17 +3744,17 @@
 
                         if (c >= 0 && c < this.gridCols && r >= 0 && r < this.gridRows) {
                             const cell = this.imageGrid[c][r];
-                                if (cell) {
-                                    const canWakeTopology = progress > 0.08 || this.hackRevealPhase !== 'idle';
-                                    if (canWakeTopology) {
-                                        const reliefWakeBoost = this.hackRevealPhase === 'idle' ? 1 : (0.5 + reliefPhase * 0.75);
-                                        cell.wake = Math.max(cell.wake, drop.z * 1.5 * rainVisibility * reliefWakeBoost);
-                                    }
+                            if (cell) {
+                                const canWakeTopology = progress > 0.08 || this.hackRevealPhase !== 'idle';
+                                if (canWakeTopology) {
+                                    const reliefWakeBoost = this.hackRevealPhase === 'idle' ? 1 : (0.5 + reliefPhase * 0.75);
+                                    cell.wake = Math.max(cell.wake, drop.z * 1.5 * rainVisibility * reliefWakeBoost);
+                                }
 
 
-                                  if (progress > 0 && cell.edge > 12 && Math.random() < progress * 0.8 * rainVisibility) {
-                                      drop.y -= drop.speed * drop.z * (Math.random() * 2.5 + 1.0);
-                                      drop.x += (Math.random() - 0.5) * this.gridSize * 1.5;
+                                if (progress > 0 && cell.edge > 12 && Math.random() < progress * 0.8 * rainVisibility) {
+                                    drop.y -= (drop.speed * drop.z * (Math.random() * 2.5 + 1.0)) * deltaTime;
+                                    drop.x += (Math.random() - 0.5) * this.gridSize * 1.5;
 
 
                                     // Chispas ralentizadas para acentuar físicas
@@ -3689,7 +3775,7 @@
                     } 
                     
                     let dropCharLower = drop.char.toLowerCase();
-                        const sampledCell = shouldTintRain && this.bgImageObj ? this.sampleCellAt(drop.x, drop.y) : null;
+                    const sampledCell = shouldTintRain && this.bgImageObj ? this.sampleCellAt(drop.x, drop.y) : null;
                         const imageTintStrength = sampledCell ? (0.25 + tintPhase * 0.75) : 0;
 
                         const imgR = sampledCell ? sampledCell.r : 0;
@@ -3949,10 +4035,9 @@
 
             createHealBurst(x, y) {
                 const q = this.adaptiveParticleQuality || 1;
-                const count = Math.max(12, Math.round(30 * q)); // More particles for better effect
+                const count = Math.max(12, Math.round(30 * q)); 
                 
                 for (let i = 0; i < count; i++) {
-                    // Spread horizontally but rise up
                     const spreadX = (Math.random() - 0.5) * 60;
                     const riseSpeed = Math.random() * 2 + 1.5;
                     
@@ -3961,11 +4046,12 @@
                         char: '+',
                         x: x + spreadX, 
                         y: y + (Math.random() * 20), 
-                        vx: (Math.random() - 0.5) * 0.5, // Slight horizontal drift
-                        vy: -riseSpeed, // Upward movement
+                        vx: (Math.random() - 0.5) * 0.5, 
+                        vy: -riseSpeed * 0.2, // Much slower rise
                         life: 1.8, 
                         decay: 0.015,
-                        color: '#39FF14' // Green for health
+                        color: '#39FF14',
+                        fontSize: 48 // Larger font size
                     });
                 }
                 
@@ -4067,19 +4153,20 @@
                 }
             }
 
-            updateAndDrawParticles() {
+            updateAndDrawParticles(deltaTime = 1.0) {
                 const particleVisibility = Math.max(0, 1 - this.hackReveal);
                 for (let i = this.particles.length - 1; i >= 0; i--) {
                     let p = this.particles[i];
 
                     // GRAVEDAD: Ahora caen más suave, acentuando que es un fluido
                     if (p.type === 'pixel') {
-                        p.vy += 0.04; // Fuerza de gravedad tirando hacia abajo muy poco a poco
+                        p.vy += 0.04 * deltaTime; // Fuerza de gravedad tirando hacia abajo muy poco a poco
                     }
 
-                    if (p.vx) p.x += p.vx;
-                    if (p.vy) p.y += p.vy;
-                    p.life -= p.decay * (1 + this.hackReveal * 2.5);
+                    if (p.vx) p.x += p.vx * deltaTime;
+                    if (p.vy) p.y += p.vy * deltaTime;
+                    
+                    p.life -= (p.decay * (1 + this.hackReveal * 2.5)) * deltaTime;
 
                     if (p.life <= 0 || particleVisibility <= 0.01) {
                         this.particles.splice(i, 1);
@@ -4095,12 +4182,12 @@
                             this.ctx.strokeStyle = p.color;
                             this.ctx.lineWidth = p.lineWidth;
                             this.ctx.stroke();
-                            p.radius += p.expansionSpeed;
+                            p.radius += p.expansionSpeed * deltaTime;
                         } else if (p.type === 'block') {
                             let drawX = p.x + (Math.random() > 0.8 ? (Math.random() - 0.5) * 10 : 0);
                             this.ctx.fillRect(drawX, p.y, p.w, p.h);
                         } else if (p.type === 'text') {
-                            this.ctx.font = "24px 'Share Tech Mono'"; 
+                            this.ctx.font = `${p.fontSize || 24}px 'Share Tech Mono'`; 
                             this.ctx.fillText(p.char, p.x, p.y);
                         } else if (p.type === 'pixel') {
                             this.ctx.fillRect(p.x, p.y, p.w, p.h);
@@ -4130,7 +4217,7 @@
                 this.streams = []; 
             }
 
-            update(time, canvasHeight, onMiss) {
+            update(time, canvasHeight, onMiss, deltaTime = 1.0) {
                 if (!this.currentLevelData) return;
 
                 const effectiveSpeed = Math.max(0.1, this.game.speedMultiplier);
@@ -4144,7 +4231,8 @@
 
                 for (let i = this.streams.length - 1; i >= 0; i--) {
                     let s = this.streams[i];
-                    s.y += s.baseSpeed * this.game.speedMultiplier;
+                    // Apply Delta Time to movement
+                    s.y += (s.baseSpeed * this.game.speedMultiplier) * deltaTime;
 
                     if (s.y > canvasHeight + 30) {
                         onMiss(s);
@@ -4600,8 +4688,9 @@
                         this.game.audio.type();
 
                         if (lockedStream.typedLength === lockedStream.text.length) {
-                            this.game.increaseSpeed(); 
                             const isFlawless = lockedStream.misses === 0;
+                            this.game.increaseSpeed(isFlawless); 
+                            
                             if (isFlawless) this.game.combo++;
                             else this.game.combo = 0;
 
@@ -4635,6 +4724,7 @@
                         this.game.noteError();
                         this.game.combo = 0;
                         this.game.decreaseSpeed();
+                        this.game.updateScore(1.0); // Reset visual multiplier
                         this.game.renderer.triggerErrorGlow();
                         this.game.triggerGlitch();
                         this.game.audio.error();
@@ -4662,7 +4752,7 @@
                     this.game.audio.type();
 
                     if (targetStream.typedLength === targetStream.text.length) {
-                        this.game.increaseSpeed(); 
+                        this.game.increaseSpeed(true); 
                         this.game.combo++;
                         const isOnFire = this.game.combo >= 5;
                         const accuracy = 1.0;
@@ -4688,6 +4778,7 @@
                     this.game.noteError();
                     this.game.combo = 0;
                     this.game.decreaseSpeed();
+                    this.game.updateScore(1.0); // Reset visual multiplier
                     this.game.renderer.triggerErrorGlow();
                     this.game.triggerGlitch();
                     this.game.audio.error();
@@ -4768,6 +4859,8 @@
                 this.initUI();
                 
                 if (this.userManager.activeAlias) {
+                    const savedQuality = this.userManager.profile?.preferences?.graphicsQuality || 'auto';
+                    this.renderer.qualityMode = savedQuality;
                     this.showMainMenu();
                 } else {
                     this.showScreen('profiles');
@@ -4801,12 +4894,15 @@
 
             showBriefing(levelData) {
                 this.state = 'BRIEFING';
-                this.showScreen('briefing');
-                
-                const term = document.getElementById('briefing-terminal');
-                const hint = document.getElementById('briefing-hint');
-                term.innerHTML = '';
-                hint.classList.add('hidden');
+                  this.showScreen('briefing');
+                  
+                  const term = document.getElementById('briefing-terminal');
+                  const hint = document.getElementById('briefing-hint');
+                  const t = UIText[levelData.lang || this.userManager.profile.preferences.language] || UIText.en;
+                  
+                  term.innerHTML = '';
+                  hint.innerText = t.briefingHint;
+                  hint.classList.add('hidden');
 
                 const cursor = document.createElement('span');
                 cursor.innerText = '_';
@@ -4814,7 +4910,9 @@
                 cursor.style.color = 'var(--lime)';
                 term.appendChild(cursor);
   
-                  const text = (levelData.briefing || "System Ready...").replace(/{alias}/g, this.userManager.activeAlias || 'HACKER');
+                  const text = (levelData.briefing || "System Ready...")
+                                      .replace(/{alias}/g, this.userManager.activeAlias || 'HACKER')
+                                      .replace(/\[ALIAS\]/g, this.userManager.activeAlias || 'HACKER');
                   
                   let i = 0;
                 const typeSpeed = 25; 
@@ -4917,7 +5015,7 @@
                     }
 
                     const lineData = introLines[lineIndex];
-                    const text = lineData.text.replace('{alias}', alias);
+                    const text = lineData.text.replace('{alias}', alias).replace(/\[ALIAS\]/g, alias);
                     
                     // Clear terminal for each major thought, or append? Matrix usually clears.
                     // "Wake up, Neo..." -> Clears -> "The Matrix has you..."
@@ -5036,6 +5134,8 @@
                         if (this.userManager.profile?.preferences?.geminiApiKey) {
                             this.gemini.setApiKey(this.userManager.profile.preferences.geminiApiKey);
                         }
+                        const savedQuality = this.userManager.profile?.preferences?.graphicsQuality || 'auto';
+                        this.renderer.qualityMode = savedQuality;
                         this.showMainMenu();
                     });
 
@@ -5058,7 +5158,19 @@
                         }
 
 
-                            const bgAggLabelTextEl = document.getElementById('txt-bg-aggr-label');
+                            const optGraphicsAutoEl = document.getElementById('opt-graphics-auto');
+                          const optGraphicsLowEl = document.getElementById('opt-graphics-low');
+                          const optGraphicsMediumEl = document.getElementById('opt-graphics-medium');
+                          const optGraphicsHighEl = document.getElementById('opt-graphics-high');
+                          const lblGraphicsEl = document.getElementById('lbl-settings-graphics');
+
+                          if (optGraphicsAutoEl) optGraphicsAutoEl.innerText = t.optGraphicsAuto;
+                          if (optGraphicsLowEl) optGraphicsLowEl.innerText = t.optGraphicsLow;
+                          if (optGraphicsMediumEl) optGraphicsMediumEl.innerText = t.optGraphicsMedium;
+                          if (optGraphicsHighEl) optGraphicsHighEl.innerText = t.optGraphicsHigh;
+                          if (lblGraphicsEl) lblGraphicsEl.innerText = t.lblGraphicsQuality;
+
+                          const bgAggLabelTextEl = document.getElementById('txt-bg-aggr-label');
                             const bgAggSoftEl = document.getElementById('txt-bg-aggr-soft');
                             const bgAggMediumEl = document.getElementById('txt-bg-aggr-medium');
                             const bgAggStrongEl = document.getElementById('txt-bg-aggr-strong');
@@ -5322,8 +5434,20 @@
                                   let itemIndex = items.indexOf(focusedEl);
                                   const colIndex = itemIndex % cols; // Columna actual
 
-                                  if (e.key === 'ArrowRight') itemIndex = Math.min(itemIndex + 1, items.length - 1);
-                                  else if (e.key === 'ArrowLeft') itemIndex = Math.max(itemIndex - 1, 0);
+                                    if (e.key === 'ArrowRight') {
+                                        if (colIndex === cols - 1) {
+                                            itemIndex = itemIndex - (cols - 1);
+                                        } else {
+                                            itemIndex = Math.min(itemIndex + 1, items.length - 1);
+                                        }
+                                    } else if (e.key === 'ArrowLeft') {
+                                        if (colIndex === 0) {
+                                            const rowEnd = itemIndex + (cols - 1);
+                                            itemIndex = Math.min(rowEnd, items.length - 1);
+                                        } else {
+                                            itemIndex = Math.max(itemIndex - 1, 0);
+                                        }
+                                    }
                                   else if (e.key === 'ArrowDown') {
                                       const nextIndex = itemIndex + cols;
                                       // Si baja desde la última fila (o slot vacío), ir al botón Volver
@@ -5441,7 +5565,11 @@
                 });
 
                 document.getElementById('btn-to-levels').addEventListener('click', () => {
-                    this.pendingLevelSelectFocus = null;
+                    if (typeof this.levelNum === 'number') {
+                        this.pendingLevelSelectFocus = this.levelNum;
+                    } else {
+                        this.pendingLevelSelectFocus = this.userManager.profile.progress.highestLevelUnlocked || 1;
+                    }
                     this.populateLevelSelect();
                     this.showScreen('levels');
                 });
@@ -5495,6 +5623,7 @@
                             const prefs = this.userManager.profile.preferences;
                             document.getElementById('select-lang').value = prefs.language;
                             document.getElementById('select-layout').value = prefs.layout;
+                            document.getElementById('select-graphics').value = prefs.graphicsQuality || 'auto';
                               const apiInput = document.getElementById('input-api-key');
                               if (apiInput) apiInput.value = prefs.geminiApiKey || "";
                               const modelInput = document.getElementById('input-gemini-model');
@@ -5735,31 +5864,33 @@
                           document.getElementById('btn-save-settings').addEventListener('click', async () => {
                               const lang = document.getElementById('select-lang').value;
                               const layout = document.getElementById('select-layout').value;
-                              const apiKey = document.getElementById('input-api-key')?.value.trim() || "";
-                              const modelName = document.getElementById('input-gemini-model')?.value.trim() || "gemini-2.5-flash";
+                              const graphicsQuality = document.getElementById('select-graphics').value;
+                              const apiKey = document.getElementById('input-api-key')?.value || null;
+                              const modelName = document.getElementById('input-gemini-model')?.value || null;
                               const aggr = Math.max(0, Math.min(100, Math.round(Number(document.getElementById('input-bg-aggr')?.value ?? 50))));
-                            const tol = Math.max(0, Math.min(100, Math.round(Number(document.getElementById('input-bg-tol')?.value ?? 45))));
-                            const contrast = Math.max(0, Math.min(100, Math.round(Number(document.getElementById('input-bg-contrast')?.value ?? 50))));
-                            const bgColor = String(document.getElementById('input-bg-color')?.value || '#00ff00');
-                            const bgColorEnabled = !!document.getElementById('input-bg-color-enabled')?.checked;
+                              const tol = Math.max(0, Math.min(100, Math.round(Number(document.getElementById('input-bg-tol')?.value ?? 45))));
+                              const contrast = Math.max(0, Math.min(100, Math.round(Number(document.getElementById('input-bg-contrast')?.value ?? 50))));
+                              const bgColor = String(document.getElementById('input-bg-color')?.value || '#00ff00');
+                              const bgColorEnabled = !!document.getElementById('input-bg-color-enabled')?.checked;
 
 
-                          if (this.pendingBgProcessingPromise) {
-                            try {
-                                await this.pendingBgProcessingPromise;
-                            } catch (err) {
-                                alert("No se pudo terminar de procesar la vista previa de imagen.");
-                                return;
-                            }
-                        }
+                            if (this.pendingBgProcessingPromise) {
+                              try {
+                                  await this.pendingBgProcessingPromise;
+                              } catch (err) {
+                                  alert("No se pudo terminar de procesar la vista previa de imagen.");
+                                  return;
+                              }
+                          }
 
-                        if (this.pendingBgAction === 'set' && !this.pendingBgProcessed) {
-                            alert("No hay una imagen procesada lista para guardar.");
-                            return;
-                        }
+                          if (this.pendingBgAction === 'set' && !this.pendingBgProcessed) {
+                              alert("No hay una imagen procesada lista para guardar.");
+                              return;
+                          }
 
-                              this.userManager.updateSettings(lang, layout, aggr, tol, contrast, bgColor, bgColorEnabled, apiKey, modelName);
-                              this.gemini.setApiKey(apiKey, modelName);
+                                this.userManager.updateSettings(lang, layout, graphicsQuality, aggr, tol, contrast, bgColor, bgColorEnabled, apiKey, modelName);
+                                this.renderer.qualityMode = graphicsQuality;
+                                this.gemini.setApiKey(apiKey, modelName);
 
 
                         if (this.pendingBgAction === 'clear') {
@@ -5817,6 +5948,9 @@
                 });
 
                 document.getElementById('btn-exit-matrix').addEventListener('click', () => {
+                    if (typeof this.levelNum === 'number') {
+                        this.pendingLevelSelectFocus = this.levelNum;
+                    }
                     this.populateLevelSelect();
                     this.showScreen('levels');
                     this.state = 'MENU';
@@ -6519,6 +6653,9 @@
                                 btn.classList.add(isMiniBoss ? 'btn-yellow' : 'btn-cyan');
                                 if (this.newlyUnlockedLevel === i) {
                                     btn.classList.add('level-unveil-effect');
+                                    btn.addEventListener('animationend', () => {
+                                        btn.classList.remove('level-unveil-effect');
+                                    }, { once: true });
                                 }
                                 if (isMiniBoss) btn.classList.add('yellow-mode'); // High contrast for yellow levels
                             if (isFinalBoss) {
@@ -6720,12 +6857,25 @@
                 this.showScreen('playing');
             }
 
-              increaseSpeed() {
-                  this.speedMultiplier = Math.min(2.5, this.speedMultiplier + 0.02);
+              increaseSpeed(isFlawless = true) {
+                  if (isFlawless) {
+                      this.consecutiveCompletes++;
+                  } else {
+                      this.consecutiveCompletes = 0;
+                  }
+
+                  if (this.speedMultiplier < 1.0) {
+                      if (this.consecutiveCompletes >= 5) {
+                          this.speedMultiplier = 1.0;
+                      }
+                  } else {
+                      this.speedMultiplier *= 1.05;
+                  }
               }
 
               decreaseSpeed() {
-                  this.speedMultiplier = Math.max(0.5, this.speedMultiplier * 0.5);
+                  this.consecutiveCompletes = 0;
+                  this.speedMultiplier = Math.max(0.5, this.speedMultiplier * 0.90);
               }
 
               heal(amount) {
@@ -6733,8 +6883,9 @@
                   this.updateHealth();
               }
 
-              resetLevelMetrics() {
-                  this.cheated = false;
+                resetLevelMetrics() {
+                    this.consecutiveCompletes = 0;
+                    this.cheated = false;
                   this.levelMetrics = {
                       startedAt: performance.now(),
                       keypressCount: 0,
@@ -6811,26 +6962,33 @@
                     if (this.cheated) {
                         stars = 0; // Cheater gets 0 stars
                     } else if (accuracy >= 0.99) {
-                        stars = 5; // Hacker Supremo (99-100% precision)
-                    } else if (accuracy >= 0.95) {
-                        stars = 4; // Excelente (95-98%)
+                        stars = 5; // Hacker Supremo (>= 99%)
                     } else if (accuracy >= 0.90) {
-                        stars = 3; // Muy Bueno (90-94%)
+                        stars = 4; // Excelente (90-98%)
                     } else if (accuracy >= 0.80) {
-                        stars = 2; // Bueno (80-89%)
+                        stars = 3; // Muy Bueno (80-89%)
+                    } else if (accuracy >= 0.70) {
+                        stars = 2; // Bueno (70-79%)
                     } else {
-                        stars = 1; // Aprobado (<80%)
+                        stars = 1; // Aprobado (<70%)
                     }
 
                     this.levelMetrics.finalAvgKpm = avgKpm;
                     this.levelMetrics.finalMaxKpm = maxKpm;
                     this.levelMetrics.finalStars = stars;
+
+                    const elapsedMs = performance.now() - this.levelMetrics.startedAt;
+                    const totalSecs = Math.floor(elapsedMs / 1000);
+                    const mm = Math.floor(totalSecs / 60).toString().padStart(2, '0');
+                    const ss = (totalSecs % 60).toString().padStart(2, '0');
+                    this.levelMetrics.finalTimeStr = `${mm}:${ss}`;
                 }
 
                 async renderSuccessMetrics() {
                     this.skipMetricsAnimation = false;
                     const metrics = [
                         { id: 'metric-score', value: this.score },
+                        { id: 'metric-time', value: this.levelMetrics.finalTimeStr, isString: true },
                         { id: 'metric-kpm-avg', value: this.levelMetrics.finalAvgKpm },
                         { id: 'metric-kpm-max', value: this.levelMetrics.finalMaxKpm },
                         { id: 'metric-hits', value: this.levelMetrics.hitCount },
@@ -6841,7 +6999,7 @@
                     metrics.forEach(m => {
                         const el = document.getElementById(m.id);
                         if(el) {
-                            el.innerText = '0';
+                            el.innerText = m.isString ? '--:--' : '0';
                             el.classList.remove('metric-impact');
                         }
                     });
@@ -6859,6 +7017,16 @@
                         if (!el) continue;
                         if (this.state !== 'LEVELUP') return;
                         
+                        if (m.isString) {
+                             el.innerText = m.value;
+                             el.classList.remove('metric-impact');
+                             void el.offsetWidth;
+                             el.classList.add('metric-impact');
+                             this.audio.typeComplete();
+                             await new Promise(r => setTimeout(r, 200));
+                             continue;
+                        }
+
                         if (this.skipMetricsAnimation) {
                             el.innerText = m.value;
                             el.classList.remove('metric-impact');
@@ -6978,45 +7146,92 @@
                 }
 
               addScore(pts) {
-                this.score += pts;
-                this.updateScore();
+                  // Calcular multiplicador basado en la velocidad
+                  let multiplier = 1.0;
+                  
+                  // Umbrales para multiplicadores graduales (x1.5, x2, x3)
+                  if (this.speedMultiplier >= 2.5) {
+                      multiplier = 3.0;
+                  } else if (this.speedMultiplier >= 1.8) {
+                      multiplier = 2.0;
+                  } else if (this.speedMultiplier >= 1.3) {
+                      multiplier = 1.5;
+                  }
 
-                let targetScore;
-                if (this.levelNum === 'AI') {
-                    targetScore = this.customLevelData.targetScore;
-                } else {
-                    const lang = this.userManager.profile.preferences.language;
-                    targetScore = Dictionaries[lang][`level_${this.levelNum}`].targetScore;
-                }
-                
-                if (this.score >= targetScore && this.state === 'PLAYING') {
-                    this.levelComplete();
-                }
-            }
+                  const finalPts = Math.floor(pts * multiplier);
+                  this.score += finalPts;
+                  this.updateScore(multiplier);
 
-            updateScore() {
-                document.getElementById('hud-score').innerText = this.score;
-                const progressBar = document.getElementById('progress-bar');
-                const progressContainer = document.getElementById('progress-bar-container');
+                  let targetScore;
+                  if (this.levelNum === 'AI') {
+                      targetScore = this.customLevelData.targetScore;
+                  } else {
+                      const lang = this.userManager.profile.preferences.language;
+                      targetScore = Dictionaries[lang][`level_${this.levelNum}`].targetScore;
+                  }
+                  
+                  if (this.score >= targetScore && this.state === 'PLAYING') {
+                      this.levelComplete();
+                  }
+              }
 
-                if (this.state === 'PLAYING') {
-                    let targetScore;
-                    if (this.levelNum === 'AI') {
-                        targetScore = this.customLevelData.targetScore;
-                    } else {
-                        const lang = this.userManager.profile.preferences.language;
-                        targetScore = Dictionaries[lang][`level_${this.levelNum}`].targetScore;
-                    }
-                    const progressPercent = Math.min(100, (this.score / targetScore) * 100);
-                    progressBar.style.width = progressPercent + '%';
-                    const isNearComplete = progressPercent >= 80 && progressPercent < 100;
-                    progressBar.classList.toggle('near-complete', isNearComplete);
-                    if (progressContainer) progressContainer.classList.toggle('near-complete-alert', isNearComplete);
-                } else if (progressBar) {
-                    progressBar.classList.remove('near-complete');
-                    if (progressContainer) progressContainer.classList.remove('near-complete-alert');
-                }
-            }
+              updateScore(currentMultiplier = 1.0) {
+                  const scoreEl = document.getElementById('hud-score');
+                  const multEl = document.getElementById('hud-mult-indicator');
+                  
+                  scoreEl.innerText = this.score;
+
+                  // Gestionar visuales del multiplicador
+                  scoreEl.classList.remove('score-mult-1', 'score-mult-1-5', 'score-mult-2', 'score-mult-3');
+                  if (multEl) {
+                      multEl.className = ''; 
+                      multEl.innerHTML = '';
+                  }
+                  
+                  if (currentMultiplier >= 3.0) {
+                      scoreEl.classList.add('score-mult-3');
+                      if (multEl) {
+                          multEl.innerHTML = 'x3.0';
+                          multEl.classList.add('mult-x3', 'visible');
+                      }
+                  } else if (currentMultiplier >= 2.0) {
+                      scoreEl.classList.add('score-mult-2');
+                      if (multEl) {
+                          multEl.innerHTML = 'x2.0';
+                          multEl.classList.add('mult-x2', 'visible');
+                      }
+                  } else if (currentMultiplier >= 1.5) {
+                      scoreEl.classList.add('score-mult-1-5');
+                      if (multEl) {
+                          multEl.innerHTML = 'x1.5';
+                          multEl.classList.add('mult-x1-5', 'visible');
+                      }
+                  } else {
+                      scoreEl.classList.add('score-mult-1');
+                      if (multEl) multEl.classList.remove('visible');
+                  }
+
+                  const progressBar = document.getElementById('progress-bar');
+                  const progressContainer = document.getElementById('progress-bar-container');
+
+                  if (this.state === 'PLAYING') {
+                      let targetScore;
+                      if (this.levelNum === 'AI') {
+                          targetScore = this.customLevelData.targetScore;
+                      } else {
+                          const lang = this.userManager.profile.preferences.language;
+                          targetScore = Dictionaries[lang][`level_${this.levelNum}`].targetScore;
+                      }
+                      const progressPercent = Math.min(100, (this.score / targetScore) * 100);
+                      progressBar.style.width = progressPercent + '%';
+                      const isNearComplete = progressPercent >= 80 && progressPercent < 100;
+                      progressBar.classList.toggle('near-complete', isNearComplete);
+                      if (progressContainer) progressContainer.classList.toggle('near-complete-alert', isNearComplete);
+                  } else if (progressBar) {
+                      progressBar.classList.remove('near-complete');
+                      if (progressContainer) progressContainer.classList.remove('near-complete-alert');
+                  }
+              }
 
             updateHealth() {
                 const percentage = Math.max(0, (this.health / this.maxHealth) * 100);
@@ -7044,7 +7259,14 @@
                   this.noteError();
                   this.health -= 15;
                   this.combo = 0; 
-                  this.decreaseSpeed(); 
+                  
+                    // Reset to initial speed (1.0) when a word hits the floor
+                    if (this.speedMultiplier > 1.0) {
+                        this.speedMultiplier = 1.0;
+                    }
+                    this.consecutiveCompletes = 0;
+                    this.updateScore(1.0); // Reset visual multiplier
+
                   this.renderer.triggerErrorGlow(); 
                   this.updateHealth();
                   this.triggerGlitch();
@@ -7095,6 +7317,7 @@
                     setText('lbl-metric-hits', t.metricHits);
                     setText('lbl-metric-errors', t.metricErrors);
                     setText('lbl-metric-streak', t.metricStreak);
+                    setText('lbl-metric-time', t.metricTime);
                     setText('lbl-metric-rating', t.metricRating);
                 }
 
@@ -7272,6 +7495,15 @@
             }
 
                 loop(timestamp) {
+                    // Calculate Delta Time
+                    if (!this.lastFrameTime) this.lastFrameTime = timestamp;
+                    const elapsed = timestamp - this.lastFrameTime;
+                    this.lastFrameTime = timestamp;
+                    
+                    // Normalize to 60 FPS (16.67ms per frame = 1.0)
+                    // Cap at 3.0 (20 FPS) to prevent massive jumps on lag spikes
+                    const deltaTime = Math.min(3.0, elapsed / 16.6667);
+
                     this.updateFpsCounter(timestamp);
                     if (this.state === 'PLAYING') this.updateKpmDisplay(timestamp);
                     let progress = 0;
@@ -7288,11 +7520,11 @@
                 }
 
                 this.renderer.clearFrame(timestamp);
-                this.renderer.updateAndDrawBackground(progress);
-                this.renderer.updateAndDrawParticles();
+                this.renderer.updateAndDrawBackground(progress, deltaTime);
+                this.renderer.updateAndDrawParticles(deltaTime);
 
                 if (this.state === 'PLAYING') {
-                    this.spawner.update(timestamp, this.renderer.canvas.height, (s) => this.handleMiss(s));
+                    this.spawner.update(timestamp, this.renderer.canvas.height, (s) => this.handleMiss(s), deltaTime);
 
                     let guidedStream = this.inputHandler.getLockedStream();
                     if (!guidedStream) {

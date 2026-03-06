@@ -23,8 +23,8 @@ const curriculum = [
         pool: ["d", "k", "df", "jk", "fd", "kj"],
         type: "characters",
         briefing: {
-            en: "Good. The signal is stabilizing. Expand your influence. Use your middle fingers to reach the D and K nodes while keeping your index fingers on F and J.",
-            es: "Bien. La señal se estabiliza. Expande tu influencia. Usa tus dedos corazón para alcanzar los nodos D y K mientras mantienes los índices en F y J."
+            en: "Good, [ALIAS]. The signal is stabilizing. Expand your influence. Use your middle fingers to reach the D and K nodes while keeping your index fingers on F and J.",
+            es: "Bien, [ALIAS]. La señal se estabiliza. Expande tu influencia. Usa tus dedos corazón para alcanzar los nodos D y K mientras mantienes los índices en F y J."
         },
         guideKeys: ["d", "k", "f", "j"]
     },
@@ -34,8 +34,8 @@ const curriculum = [
         pool: ["s", "l", "sl", "ls", "sdf", "jkl"],
         type: "characters",
         briefing: {
-            en: "Rhythm is everything in the stream. Extend to S and L with your ring fingers. Do not look down. Trust the connection.",
-            es: "El ritmo lo es todo en el flujo. Extiende a S y L con tus dedos anulares. No mires abajo. Confía en la conexión."
+            en: "Rhythm is everything in the stream, [ALIAS]. Extend to S and L with your ring fingers. Do not look down. Trust the connection.",
+            es: "El ritmo lo es todo en el flujo, [ALIAS]. Extiende a S y L con tus dedos anulares. No mires abajo. Confía en la conexión."
         },
         guideKeys: ["s", "l", "d", "k", "f", "j"]
     },
@@ -46,8 +46,8 @@ const curriculum = [
         poolEs: ["a", "ñ", "as", "lñ", "asdf", "jklñ"], // ES layout uses Ñ
         type: "characters",
         briefing: {
-            en: "Secure the perimeter. Your pinky fingers control the outer boundaries, A and ;. The home row is now fully active.",
-            es: "Asegura el perímetro. Tus meñiques controlan los límites exteriores, A y Ñ. La fila base está ahora totalmente activa."
+            en: "Secure the perimeter, [ALIAS]. Your pinky fingers control the outer boundaries, A and ;. The home row is now fully active.",
+            es: "Asegura el perímetro, [ALIAS]. Tus meñiques controlan los límites exteriores, A y Ñ. La fila base está ahora totalmente activa."
         },
         guideKeys: ["a", ";", "s", "l", "d", "k", "f", "j"],
         guideKeysEs: ["a", "ñ", "s", "l", "d", "k", "f", "j"]
@@ -58,8 +58,8 @@ const curriculum = [
         pool: ["g", "h", "fg", "jh", "gh", "hg"],
         type: "characters",
         briefing: {
-            en: "Bridge the gap. Your index fingers must stretch inward to G and H, then return immediately to their home bases F and J.",
-            es: "Cruza la brecha. Tus índices deben estirarse hacia adentro a G y H, y volver inmediatamente a sus bases F y J."
+            en: "[ALIAS], bridge the gap. Your index fingers must stretch inward to G and H, then return immediately to their home bases F and J.",
+            es: "[ALIAS], cruza la brecha. Tus índices deben estirarse hacia adentro a G y H, y volver inmediatamente a sus bases F y J."
         },
         guideKeys: ["g", "h", "f", "j"]
     },
@@ -71,8 +71,8 @@ const curriculum = [
         pool: ["e", "i", "ed", "ik", "de", "ki"],
         type: "characters",
         briefing: {
-            en: "Accessing upper memory banks. Move your middle finger up from D to E, and K to I. This is the most common pathway.",
-            es: "Accediendo a bancos de memoria superiores. Mueve tu dedo corazón de D a E, y de K a I. Es la ruta más común."
+            en: "Accessing upper memory banks, [ALIAS]. Move your middle finger up from D to E, and K to I. This is the most common pathway.",
+            es: "Accediendo a bancos de memoria superiores, [ALIAS]. Mueve tu dedo corazón de D a E, y de K a I. Es la ruta más común."
         },
         guideKeys: ["e", "i", "d", "k"]
     },
@@ -82,8 +82,8 @@ const curriculum = [
         pool: ["r", "u", "rf", "uj", "fr", "ju"],
         type: "characters",
         briefing: {
-            en: "Push higher. Index fingers move up to R and U. Keep your anchors strong.",
-            es: "Empuja más alto. Los índices suben a R y U. Mantén tus anclajes firmes."
+            en: "Push higher, [ALIAS]. Index fingers move up to R and U. Keep your anchors strong.",
+            es: "Empuja más alto, [ALIAS]. Los índices suben a R y U. Mantén tus anclajes firmes."
         },
         guideKeys: ["r", "u", "f", "j"]
     },
@@ -93,8 +93,8 @@ const curriculum = [
         pool: ["t", "o", "tf", "ol", "ft", "lo"],
         type: "characters",
         briefing: {
-            en: "Stretching network capacity. Left index to T. Right ring finger to O. The pattern is complex, but predictable.",
-            es: "Estirando capacidad de red. Índice izquierdo a T. Anular derecho a O. El patrón es complejo, pero predecible."
+            en: "[ALIAS], we are stretching network capacity. Left index to T. Right ring finger to O. The pattern is complex, but predictable.",
+            es: "[ALIAS], estamos estirando la capacidad de la red. Índice izquierdo a T. Anular derecho a O. El patrón es complejo, pero predecible."
         },
         guideKeys: ["t", "o", "f", "l"]
     },
@@ -105,8 +105,8 @@ const curriculum = [
         poolEs: ["w", "p", "ws", "pñ", "sw", "ñp"],
         type: "characters",
         briefing: {
-            en: "Reaching outer sectors. Left ring to W. Right pinky to P. Precision is mandatory.",
-            es: "Alcanzando sectores externos. Anular izquierdo a W. Meñique derecho a P. La precisión es obligatoria."
+            en: "Reaching outer sectors, [ALIAS]. Left ring to W. Right pinky to P. Precision is mandatory.",
+            es: "Alcanzando sectores externos, [ALIAS]. Anular izquierdo a W. Meñique derecho a P. La precisión es obligatoria."
         },
         guideKeys: ["w", "p", "s", ";"],
         guideKeysEs: ["w", "p", "s", "ñ"]
@@ -117,8 +117,8 @@ const curriculum = [
         pool: ["q", "y", "qa", "yj", "aq", "jy"],
         type: "characters",
         briefing: {
-            en: "Completing the upper grid. Left pinky to Q. Right index stretches far to Y.",
-            es: "Completando la rejilla superior. Meñique izquierdo a Q. Índice derecho se estira lejos hasta la Y."
+            en: "Completing the upper grid, [ALIAS]. Left pinky to Q. Right index stretches far to Y.",
+            es: "Completando la rejilla superior, [ALIAS]. Meñique izquierdo a Q. Índice derecho se estira lejos hasta la Y."
         },
         guideKeys: ["q", "y", "a", "j"]
     },
@@ -130,8 +130,8 @@ const curriculum = [
         pool: ["v", "m", "vf", "mj", "fv", "jm"],
         type: "characters",
         briefing: {
-            en: "Initiating downlink. Index fingers curl down to V and M. Do not lose your home position.",
-            es: "Iniciando bajada. Índices se curvan abajo hacia V y M. No pierdas tu posición base."
+            en: "Initiating downlink, [ALIAS]. Index fingers curl down to V and M. Do not lose your home position.",
+            es: "Iniciando bajada, [ALIAS]. Índices se curvan abajo hacia V y M. No pierdas tu posición base."
         },
         guideKeys: ["v", "m", "f", "j"]
     },
@@ -141,8 +141,8 @@ const curriculum = [
         pool: ["c", ",", "cd", ",k", "dc", "k,"],
         type: "characters",
         briefing: {
-            en: "Encoding syntax. Reach DOWN with LEFT INDEX to C and RIGHT MIDDLE to Comma (,). Essential for data parsing.",
-            es: "Codificando sintaxis. Baja tu ÍNDICE IZQUIERDO a C y tu MEDIO DERECHO a Coma (,). Esencial para analizar datos."
+            en: "Encoding syntax, [ALIAS]. Reach DOWN with LEFT INDEX to C and RIGHT MIDDLE to Comma (,). Essential for data parsing.",
+            es: "Codificando sintaxis, [ALIAS]. Baja tu ÍNDICE IZQUIERDO a C y tu MEDIO DERECHO a Coma (,). Esencial para analizar datos."
         },
         guideKeys: ["c", ",", "d", "k"]
     },
@@ -152,8 +152,8 @@ const curriculum = [
         pool: ["x", ".", "xs", ".l", "sx", "l."],
         type: "characters",
         briefing: {
-            en: "Closing the loop. Reach DOWN with LEFT MIDDLE to X and RIGHT RING to Dot (.). The grid is almost fully mapped.",
-            es: "Cerrando el bucle. Baja tu MEDIO IZQUIERDO a X y tu ANULAR DERECHO a Punto (.). La rejilla está casi mapeada."
+            en: "Closing the loop, [ALIAS]. Reach DOWN with LEFT MIDDLE to X and RIGHT RING to Dot (.). The grid is almost fully mapped.",
+            es: "Cerrando el bucle, [ALIAS]. Baja tu MEDIO IZQUIERDO a X y tu ANULAR DERECHO a Punto (.). La rejilla está casi mapeada."
         },
         guideKeys: ["x", ".", "s", "l"]
     },
@@ -164,8 +164,8 @@ const curriculum = [
         poolEs: ["z", "-", "za", "-ñ", "az", "ñ-"], // ES layout uses - typically there
         type: "characters",
         briefing: {
-            en: "Finalizing grid access. Pinky fingers down to Z and Slash (/). You now command the full alphabet.",
-            es: "Finalizando acceso a rejilla. Meñiques abajo a Z y Guion (-). Ahora dominas el alfabeto completo."
+            en: "Finalizing grid access, [ALIAS]. Pinky fingers down to Z and Slash (/). You now command the full alphabet.",
+            es: "Finalizando acceso a la Matriz, [ALIAS]. Meñiques abajo a Z y Guion (-). Ahora dominas el alfabeto completo."
         },
         guideKeys: ["z", "/", "a", ";"],
         guideKeysEs: ["z", "-", "a", "ñ"]
@@ -176,8 +176,8 @@ const curriculum = [
         pool: ["b", "n", "bf", "nj", "fb", "jn"],
         type: "characters",
         briefing: {
-            en: "The trickiest reach. Index fingers stretch down and center to B and N. Master this to seal the connection.",
-            es: "El alcance más difícil. Índices se estiran abajo y al centro a B y N. Domina esto para sellar la conexión."
+            en: "The trickiest reach, [ALIAS]. Index fingers stretch down and center to B and N. Master this to seal the connection.",
+            es: "El alcance más difícil, [ALIAS]. Índices se estiran abajo y al centro a B y N. Domina esto para sellar la conexión."
         },
         guideKeys: ["b", "n", "f", "j"]
     },
@@ -190,8 +190,8 @@ const curriculum = [
         poolEs: ["A", "S", "D", "F", "J", "K", "L", "Ñ"],
         type: "characters",
         briefing: {
-            en: "Elevating privileges. Use the PINKY on the OPPOSITE hand to hold Shift while typing a letter. Right Shift for A-G, Left Shift for H-Z.",
-            es: "Elevando privilegios. Usa el MEÑIQUE de la mano OPUESTA para mantener Shift mientras tecleas. Shift Derecho para A-G, Izquierdo para H-Z."
+            en: "Elevating privileges, [ALIAS]. Use the PINKY on the OPPOSITE hand to hold Shift while typing a letter. Right Shift for A-G, Left Shift for H-Z.",
+            es: "Elevando privilegios, [ALIAS]. Usa el MEÑIQUE de la mano OPUESTA para mantener Shift mientras tecleas. Shift Derecho para A-G, Izquierdo para H-Z."
         },
         guideKeys: ["Shift", "a", "s", "d", "f", "j", "k", "l"]
     },
@@ -201,8 +201,8 @@ const curriculum = [
         pool: ["{", "}", "[", "]", "(", ")"],
         type: "characters",
         briefing: {
-            en: "Injecting code blocks. Brackets and parentheses are the skeleton of the Matrix. Use your right pinky to reach them.",
-            es: "Inyectando bloques de código. Corchetes y paréntesis son el esqueleto de Matrix. Usa tu meñique derecho para alcanzarlos."
+            en: "Injecting code blocks, [ALIAS]. Brackets and parentheses are the skeleton of the Matrix. Use your right pinky to reach them.",
+            es: "Inyectando bloques de código, [ALIAS]. Corchetes y paréntesis son el esqueleto de Matrix. Usa tu meñique derecho para alcanzarlos."
         },
         guideKeys: ["{", "}", "[", "]", "(", ")"]
     },
@@ -212,8 +212,8 @@ const curriculum = [
         pool: ["1", "2", "3", "4", "5"],
         type: "characters",
         briefing: {
-            en: "Parsing numerical data. Left hand reaches up. 1(Pinky) to 5(Index). Maintain home row discipline.",
-            es: "Analizando datos numéricos. Mano izquierda sube. 1(Meñique) a 5(Índice). Mantén disciplina de fila base."
+            en: "Parsing numerical data, [ALIAS]. Left hand reaches up. 1(Pinky) to 5(Index). Maintain home row discipline.",
+            es: "Analizando datos numéricos, [ALIAS]. Mano izquierda sube. 1(Meñique) a 5(Índice). Mantén disciplina de fila base."
         },
         guideKeys: ["1", "2", "3", "4", "5"]
     },
@@ -223,8 +223,8 @@ const curriculum = [
         pool: ["6", "7", "8", "9", "0"],
         type: "characters",
         briefing: {
-            en: "Completing numerical sequence. Right hand reaches up. 6(Index) to 0(Pinky). Do not look down.",
-            es: "Completando secuencia numérica. Mano derecha sube. 6(Índice) a 0(Meñique). No mires abajo."
+            en: "Completing numerical sequence, [ALIAS]. Right hand reaches up. 6(Index) to 0(Pinky). Do not look down.",
+            es: "Completando secuencia numérica, [ALIAS]. Mano derecha sube. 6(Índice) a 0(Meñique). No mires abajo."
         },
         guideKeys: ["6", "7", "8", "9", "0"]
     },
@@ -234,8 +234,8 @@ const curriculum = [
         pool: ["!", "@", "#", "$", "%", "^", "&", "*"],
         type: "characters",
         briefing: {
-            en: "Advanced encryption active. Combine Shift with Numbers to access special operators. This is how we rewrite reality.",
-            es: "Encriptación avanzada activa. Combina Shift con Números para acceder a operadores especiales. Así reescribimos la realidad."
+            en: "Advanced encryption active, [ALIAS]. Combine Shift with Numbers to access special operators. This is how we rewrite reality.",
+            es: "Encriptación avanzada activa, [ALIAS]. Combina Shift con Números para acceder a operadores especiales. Así reescribimos la realidad."
         },
         guideKeys: ["1", "2", "3", "4", "5", "6", "7", "8", "Shift"]
     },
@@ -247,8 +247,8 @@ const curriculum = [
         pool: ["th", "he", "in", "er", "an", "re", "on", "at", "en"],
         type: "words",
         briefing: {
-            en: "Optimization phase. These two-letter combinations appear in 60% of all data streams. Master them to flow like water.",
-            es: "Fase de optimización. Estas combinaciones de dos letras aparecen en el 60% de los flujos de datos. Domínalas para fluir como agua."
+            en: "Optimization phase, [ALIAS]. These two-letter combinations appear in 60% of all data streams. Master them to flow like water.",
+            es: "Fase de optimización, [ALIAS]. Estas combinaciones de dos letras aparecen en el 60% de los flujos de datos. Domínalas para fluir como agua."
         },
         guideKeys: []
     },
@@ -258,8 +258,8 @@ const curriculum = [
         pool: ["the", "and", "ing", "ent", "ion", "her", "for", "tha"],
         type: "words",
         briefing: {
-            en: "Pattern recognition. Trigrams are the DNA of language. Execute them as single, fluid motions.",
-            es: "Reconocimiento de patrones. Los trigramas son el ADN del lenguaje. Ejecútalos como movimientos únicos y fluidos."
+            en: "Pattern recognition, [ALIAS]. Trigrams are the DNA of language. Execute them as single, fluid motions.",
+            es: "Reconocimiento de patrones, [ALIAS]. Los trigramas son el ADN del lenguaje. Ejecútalos como movimientos únicos y fluidos."
         },
         guideKeys: []
     },
@@ -269,8 +269,8 @@ const curriculum = [
         pool: ["ls -la", "cd root", "git push", "npm run", "sudo su", "grep -r"],
         type: "words",
         briefing: {
-            en: "Direct interface access. Execute standard shell commands. Speed is critical.",
-            es: "Acceso directo a interfaz. Ejecuta comandos shell estándar. La velocidad es crítica."
+            en: "Direct interface access, [ALIAS]. Execute standard shell commands. Speed is critical.",
+            es: "Acceso directo a interfaz, [ALIAS]. Ejecuta comandos shell estándar. La velocidad es crítica."
         },
         guideKeys: []
     },
@@ -280,8 +280,8 @@ const curriculum = [
         pool: ["data", "node", "link", "core", "hack", "byte", "ping", "host"],
         type: "words",
         briefing: {
-            en: "Short bursts of data. High frequency. Do not hesitate.",
-            es: "Ráfagas cortas de datos. Alta frecuencia. No dudes."
+            en: "Short bursts of data, [ALIAS]. High frequency. Do not hesitate.",
+            es: "Ráfagas cortas de datos, [ALIAS]. Alta frecuencia. No dudes."
         },
         guideKeys: []
     },
@@ -291,8 +291,8 @@ const curriculum = [
         pool: ["null;", "void()", "return", "const x", "let y=", "if(a)", "else{}"],
         type: "words",
         briefing: {
-            en: "Debugging protocol. Identify and type programming structures. Accuracy over speed.",
-            es: "Protocolo de depuración. Identifica y teclea estructuras de programación. Precisión sobre velocidad."
+            en: "Debugging protocol, [ALIAS]. Identify and type programming structures. Accuracy over speed.",
+            es: "Protocolo de depuración, [ALIAS]. Identifica y teclea estructuras de programación. Precisión sobre velocidad."
         },
         guideKeys: []
     },
@@ -302,8 +302,8 @@ const curriculum = [
         pool: ["function", "variable", "constant", "array", "object", "string", "number"],
         type: "words",
         briefing: {
-            en: "Data complexity increasing. Longer variable names detected. Maintain rhythm.",
-            es: "Complejidad de datos en aumento. Nombres de variables largos detectados. Mantén el ritmo."
+            en: "[ALIAS], data complexity is increasing. Longer variable names detected. Maintain rhythm.",
+            es: "[ALIAS], la complejidad de datos aumenta. Nombres de variables largos detectados. Mantén el ritmo."
         },
         guideKeys: []
     },
@@ -313,8 +313,8 @@ const curriculum = [
         pool: ["Xj7-kL", "9A_z#2", "P@ssW0", "Key_Gen", "Auth-2", "Token$"],
         type: "words",
         briefing: {
-            en: "Cracking encryption. Mixed case, numbers, and symbols. This is a stress test.",
-            es: "Rompiendo cifrado. Mayúsculas, números y símbolos mezclados. Esto es una prueba de estrés."
+            en: "Cracking encryption, [ALIAS]. Mixed case, numbers, and symbols. This is a stress test.",
+            es: "Rompiendo cifrado, [ALIAS]. Mayúsculas, números y símbolos mezclados. Esto es una prueba de estrés."
         },
         guideKeys: []
     },
@@ -324,8 +324,8 @@ const curriculum = [
         pool: ["consciousness", "intelligence", "architecture", "distributed", "synchronize"],
         type: "words",
         briefing: {
-            en: "Heavy data load. Complex terminology. Stay focused.",
-            es: "Carga de datos pesada. Terminología compleja. Mantente enfocado."
+            en: "Heavy data load, [ALIAS]. Complex terminology. Stay focused.",
+            es: "Carga de datos pesada, [ALIAS]. Terminología compleja. Mantente enfocado."
         },
         guideKeys: []
     },
@@ -335,8 +335,8 @@ const curriculum = [
         pool: ["Access_Denied", "System.Halt()", "Error:404", "Fatal_Exception", "Buffer_Overflow"],
         type: "words",
         briefing: {
-            en: "Final defense layer. The system is fighting back. Override manual protocols.",
-            es: "Capa de defensa final. El sistema se defiende. Anula protocolos manuales."
+            en: "Final defense layer, [ALIAS]. The system is fighting back. Override manual protocols.",
+            es: "Capa de defensa final, [ALIAS]. El sistema se defiende. Anula protocolos manuales."
         },
         guideKeys: []
     },
@@ -346,8 +346,8 @@ const curriculum = [
         pool: ["sudo rm -rf /", "System.Override(True)", "Matrix.Reload()", "Wake_Up_Neo", "Follow_The_White_Rabbit"],
         type: "words",
         briefing: {
-            en: "This is it. The core. Total system control. Do not fail us now.",
-            es: "Es esto. El núcleo. Control total del sistema. No nos falles ahora."
+            en: "This is it, [ALIAS]. The core. Total system control. Do not fail us now.",
+            es: "Es esto, [ALIAS]. El núcleo. Control total del sistema. No nos falles ahora."
         },
         guideKeys: []
     }
@@ -355,51 +355,35 @@ const curriculum = [
 
 // Helper to calculate target scores based on pool complexity and desired duration
 const calculateStats = (lvl, index) => {
-    // 1. Calculate Average Points per Item in the pool
-    // Scoring logic (from game code): 10 pts per letter + 20 bonus for word completion. 
-    // Wait, looking at previous user request about "progress only increases when sequence completed".
-    // Actually, usually it's length * 10 + bonus. Let's estimate conservatively.
-    // Let's assume ~30 points per character effectively (10 base + bonus spread out).
-    
-    let totalChars = 0;
-    let totalItems = 0;
-    
-    // Check both EN and ES pools to be safe, or just EN as baseline
-    const pool = lvl.pool; 
-    pool.forEach(item => {
-        totalChars += item.length;
-        totalItems++;
-    });
-    
-    const avgLength = totalChars / totalItems;
-    // Game typically gives: (Length * 10) + (Length * 10 * Multiplier) ... 
-    // Let's simplify: A word of length L gives about L * 30 points in a decent run.
-    const avgPointsPerItem = avgLength * 35; 
-
-    // 2. Calculate Spawn Rate (Difficulty)
+    // 1. Calculate Spawn Rate (Difficulty)
     // Start slow (2.2s) and get faster (down to 0.8s)
     const spawnRate = Math.max(800, 2200 - (index * 45));
     const spawnRateSec = spawnRate / 1000;
 
-    // 3. Define Desired Duration (Seconds)
-    // Level 1: ~50s
-    // Gradual increase to ~90s by Level 30
-    let durationSeconds = 50 + (index * 1.4); 
+    // 2. Define Desired Duration (Seconds)
+    // Level 1: 50s (User request: 45-55s)
+    // Level 30: 90s
+    let durationSeconds = 50 + (index * (40 / 29)); // Linear from 50 to 90
 
-    // Manual Tweaks for Pacing
-    if (index === 0) durationSeconds = 50; // Level 1 specific request (45-55s)
-    if (index === 1) durationSeconds = 60; // Level 2 slightly longer
-    
+    // 3. Calculate Average Points per Item
+    // Game scoring: 10 pts per letter + 20 pts completion bonus
+    let totalPointsInPool = 0;
+    lvl.pool.forEach(item => {
+        let pts = (item.length * 10) + 20; 
+        totalPointsInPool += pts;
+    });
+    const avgPointsPerItem = totalPointsInPool / lvl.pool.length;
+
     // 4. Calculate Target Score
     // Items needed = Duration / SpawnRate
-    // Target = Items * AvgPoints
+    // We reduce it slightly (0.95 factor) to account for human error / startup time
     const itemsNeeded = durationSeconds / spawnRateSec;
-    let target = Math.floor(itemsNeeded * avgPointsPerItem);
+    let target = Math.floor(itemsNeeded * avgPointsPerItem * 0.95);
 
     // Round to nearest 50 for cleanliness
     target = Math.ceil(target / 50) * 50;
 
-    // 5. Fall Speed calculation (keep roughly same)
+    // 5. Fall Speed calculation
     let fallSpeed = 0.5 + (index * 0.05);
 
     return { targetScore: target, fallSpeed: fallSpeed, spawnRate: spawnRate };
@@ -426,7 +410,7 @@ curriculum.forEach((lvl, index) => {
         id: lvl.id,
         name: lvl.name.es,
         type: lvl.type,
-        pool: lvl.poolEs || lvl.pool, // Fallback to EN pool if no specific ES pool (usually okay for letters, except layout diffs)
+        pool: lvl.poolEs || lvl.pool, 
         targetScore: stats.targetScore,
         fallSpeed: stats.fallSpeed,
         spawnRate: stats.spawnRate,
@@ -436,5 +420,13 @@ curriculum.forEach((lvl, index) => {
 });
 
 const fs = require('fs');
-fs.writeFileSync('dictionaries.json', "const Dictionaries = " + JSON.stringify(levels, null, 4) + ";");
-console.log("Written to dictionaries.json");
+// Read index.html
+let html = fs.readFileSync('index.html', 'utf8');
+
+// Replace Dictionaries object
+const newDictionaries = "const Dictionaries = " + JSON.stringify(levels, null, 4) + ";";
+const regex = /const Dictionaries = \{[\s\S]*?\};/m;
+html = html.replace(regex, newDictionaries);
+
+fs.writeFileSync('index.html', html);
+console.log("Updated index.html with new level targets.");
